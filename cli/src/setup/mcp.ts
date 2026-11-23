@@ -36,7 +36,7 @@ export type Servers = Record<
 >
 
 /** OpenCode's user config files under its config folder, in the order OpenCode reads them. */
-export const OPENCODE_CONFIG_NAMES = ["opencodevil.json", "opencodevil.jsonc", ".opencodevil/opencodevil.json", ".opencodevil/opencodevil.jsonc"]
+export const OPENCODE_CONFIG_NAMES = ["opencode.json", "opencode.jsonc", ".opencode/opencode.json", ".opencode/opencode.jsonc"]
 
 export function configFile() {
   const directory = path.join(configRoot, "opencodevil")
