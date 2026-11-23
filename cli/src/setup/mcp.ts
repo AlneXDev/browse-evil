@@ -224,7 +224,7 @@ export async function installRuntime(): Promise<{ entry: string; version: string
   const spec = process.env.OPENCODE_BROWSEVIL_PACKAGE
   const globalRoot = await npmGlobalRoot()
   const at = (...parts: string[]) => (globalRoot ? path.join(globalRoot, ...parts) : undefined)
-  const globalPackage = at("@opencodevil", "browsevil")
+  const globalPackage = at("@opencode", "browsevil")
   const alreadyGlobal = !!(globalPackage && path.resolve(packageRoot) === path.resolve(globalPackage))
   if (!alreadyGlobal || spec) {
     // npx's cache is evictable, so an npm install becomes a global one: agents then run a stable path, and updates are
@@ -236,9 +236,9 @@ export async function installRuntime(): Promise<{ entry: string; version: string
   }
   const root = await npmGlobalRoot()
   if (!root) fail("Could not find npm's global package folder (`npm root -g`); is npm on PATH?")
-  const entry = path.join(root, "@opencodevil", "browsevil", "dist", "cli.mjs")
+  const entry = path.join(root, "@opencode", "browsevil", "dist", "cli.mjs")
   if (!existsSync(entry)) fail(`npm didn't install ${PACKAGE} in ${root}; run \`npm install -g ${PACKAGE}\` and try again.`)
-  const version = readJson<{ version?: string }>(path.join(root, "@opencodevil", "browsevil", "package.json"))?.version ?? opencodevilBrowserVersion
+  const version = readJson<{ version?: string }>(path.join(root, "@opencode", "browsevil", "package.json"))?.version ?? opencodevilBrowserVersion
   // Agents run `browsevil` from PATH, not an absolute node and package path: nvm/fnm change node between sessions, and the
   // global npm bin folder is on PATH whenever npm is. npm keeps it current. Setup-time self-spawns use the bundle this
   // install just wrote, since Windows can't start the PATH shim without a shell.

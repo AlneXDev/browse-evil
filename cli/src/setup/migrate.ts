@@ -156,7 +156,7 @@ function referencesPath(file: string, needle: string): boolean {
 const absoluteNode = (command: string) => /(^|[\\/])(node|node\.exe)$/i.test(command)
 /** An npm or npx entry (not a checkout) whose command is an absolute node plus a package script. */
 const npmEntry = (entry: string) =>
-  /(?:opencodevil-browser\.mjs|_npx[\\/].*@opencodevil[\\/]browsevil|node_modules[\\/]@opencodevil[\\/]browsevil)/i.test(entry)
+  /(?:opencodevil-browser\.mjs|_npx[\\/].*@opencode[\\/]browsevil|node_modules[\\/]@opencode[\\/]browsevil)/i.test(entry)
 
 /**
  * Rewrites one agent's browsevil entry. Returns true when it changed. The old entry is removed and re-added with

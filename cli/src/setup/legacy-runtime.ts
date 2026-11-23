@@ -24,7 +24,7 @@ const FORWARDER = "// browsevil: this old runtime folder runs the current instal
 
 /** The CLI file the old shim starts for `version`. */
 export const legacyEntry = (root: string, version: string) =>
-  path.join(root, "runtime", "versions", version, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
+  path.join(root, "runtime", "versions", version, "node_modules", "@opencode", "browsevil", "dist", "cli.mjs")
 
 /**
  * The install this process runs. A binary is the installer's executable only: under the old shim OPENCODE_BROWSEVIL_HOME

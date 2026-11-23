@@ -114,7 +114,7 @@ export function findOnPath(name: string) {
 export function findOpencode(args: string[]) {
   const explicit = flag(args, "--opencodevil") ?? process.env.OPENCODE_BIN
   if (explicit) return path.resolve(explicit)
-  return findOnPath("opencodevil")
+  return findOnPath("opencodevil") ?? findOnPath("opencodevil-cli")
 }
 
 export function readJson<T>(file: string): T | undefined {

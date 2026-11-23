@@ -131,7 +131,7 @@ export type EntrySpawnOptions = {
 /**
  * The installed browsevil CLI a Windows shim entry runs, found with filesystem checks only. For a bare name (or a bare
  * .cmd/.bat) walk PATH in order; for an explicit .cmd/.bat path use its folder. npm's global prefix puts its shims and
- * node_modules side by side, so the bundle is <folder>\node_modules\@opencodevil\browsevil\dist\cli.mjs.
+ * node_modules side by side, so the bundle is <folder>\node_modules\@opencode\browsevil\dist\cli.mjs.
  */
 export function resolveWindowsShim(
   entry: string,
@@ -155,7 +155,7 @@ export function resolveWindowsShim(
     }
     const shim = withFolder ? entry : pathModule.join(directory, shimmed ? entry : `${entry}.cmd`)
     if (!exists(shim)) continue
-    const script = pathModule.join(directory, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
+    const script = pathModule.join(directory, "node_modules", "@opencode", "browsevil", "dist", "cli.mjs")
     if (exists(script)) return [node, script]
   }
   return undefined
