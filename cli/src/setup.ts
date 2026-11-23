@@ -370,8 +370,8 @@ async function installSteps(args: string[], tty: boolean, caller: AgentName | un
     env,
   })
   if (connected || found === "off" || pairedOffline) return
-  // Up only now, before a pairing file or link names the relay's listen port when it isn't 19988 (a fallback). A
-  // port-less file code only works on 19988, so if the relay can't start the extension starts there and scans.
+  // Up only now, before a pairing file or link names the relay's listen port when it isn't 29698 (a fallback). A
+  // port-less file code only works on 29698, so if the relay can't start the extension starts there and scans.
   if (folder) {
     const failure = ensureRelayQuietly(spawnEntry)
     if (failure) fail(failure)

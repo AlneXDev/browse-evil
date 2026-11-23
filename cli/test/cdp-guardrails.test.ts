@@ -10,10 +10,10 @@ const cookies = [
 ]
 
 afterEach(() => {
-  delete process.env.OPENCODE_BROWSER_ALLOW_ALL_STORAGE
-  delete process.env.OPENCODE_BROWSER_ALLOW_FILE_URLS
-  delete process.env.OPENCODE_BROWSER_ALLOW_ALL_COOKIES
-  delete process.env.OPENCODE_BROWSER_ALLOW_FOREGROUND
+  delete process.env.OPENCODE_BROWSEVIL_ALLOW_ALL_STORAGE
+  delete process.env.OPENCODE_BROWSEVIL_ALLOW_FILE_URLS
+  delete process.env.OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES
+  delete process.env.OPENCODE_BROWSEVIL_ALLOW_FOREGROUND
 })
 
 describe("guardCdpMethod", () => {
@@ -31,7 +31,7 @@ describe("guardCdpMethod", () => {
 
   test("blocks Page.bringToFront unless the relay allows foreground", () => {
     expect(guardCdpMethod({ method: "Page.bringToFront", readOnly: false })).toContain("Page.bringToFront")
-    process.env.OPENCODE_BROWSER_ALLOW_FOREGROUND = "1"
+    process.env.OPENCODE_BROWSEVIL_ALLOW_FOREGROUND = "1"
     expect(guardCdpMethod({ method: "Page.bringToFront", readOnly: false })).toBeNull()
   })
 
@@ -137,8 +137,8 @@ describe("guardCdpMethod", () => {
     expect(guardCdpMethod(batch)).toContain("evil.test")
   })
 
-  test("OPENCODE_BROWSER_ALLOW_ALL_COOKIES lifts the cookie write scope", () => {
-    process.env.OPENCODE_BROWSER_ALLOW_ALL_COOKIES = "1"
+  test("OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES lifts the cookie write scope", () => {
+    process.env.OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES = "1"
     expect(guardCdpMethod({ method: "Network.setCookie", readOnly: false, pageUrls, params: { name: "x", domain: "bank.test" } })).toBeNull()
   })
 })
@@ -182,7 +182,7 @@ describe("site storage scope", () => {
 
   test("a session without web pages reaches no storage, unless the relay allows it", () => {
     expect(guardCdpMethod({ method: "IndexedDB.requestDatabaseNames", readOnly: false, pageUrls: () => ["about:blank"], params: { securityOrigin: "https://app.example.com" } })).toContain("none")
-    process.env.OPENCODE_BROWSER_ALLOW_ALL_STORAGE = "1"
+    process.env.OPENCODE_BROWSEVIL_ALLOW_ALL_STORAGE = "1"
     expect(guard("IndexedDB.requestDatabaseNames", { securityOrigin: "https://bank.test" })).toBeNull()
     expect(guard("Storage.getTrustTokens")).toBeNull()
   })
@@ -226,8 +226,8 @@ describe("navigation scope", () => {
     }
   })
 
-  test("OPENCODE_BROWSER_ALLOW_FILE_URLS allows file: only", () => {
-    process.env.OPENCODE_BROWSER_ALLOW_FILE_URLS = "1"
+  test("OPENCODE_BROWSEVIL_ALLOW_FILE_URLS allows file: only", () => {
+    process.env.OPENCODE_BROWSEVIL_ALLOW_FILE_URLS = "1"
     expect(navigate("Page.navigate", "file:///tmp/report.html")).toBeNull()
     expect(navigate("Page.navigate", "chrome://settings")).toContain("blocked")
   })
@@ -248,7 +248,7 @@ describe("scopeCdpResult", () => {
   test("other results and the escape hatch pass through", () => {
     const result = { cookies }
     expect(scopeCdpResult({ method: "Page.getFrameTree", result, pageUrls })).toBe(result)
-    process.env.OPENCODE_BROWSER_ALLOW_ALL_COOKIES = "1"
+    process.env.OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES = "1"
     expect(scopeCdpResult({ method: "Storage.getCookies", result, pageUrls }).cookies).toHaveLength(4)
   })
 })

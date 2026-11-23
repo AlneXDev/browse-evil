@@ -4,7 +4,7 @@ import path from "node:path"
 export type NodeOutcome = { readonly value?: unknown; readonly error?: string; readonly elapsedMs?: number; readonly maxStallMs?: number; readonly stopped?: string; readonly warnings?: readonly string[] }
 
 // The relay runs execute code under Node, whose vm differs from Bun's: escape attempts run there too.
-// `home` is the OPENCODE_BROWSER_HOME the Node child runs with.
+// `home` is the OPENCODE_BROWSEVIL_HOME the Node child runs with.
 export function nodeRealmRunner(home: string) {
   return (bodies: readonly string[], setup = "", env: Record<string, string> = {}): NodeOutcome[] => {
     const script = `
@@ -43,7 +43,7 @@ export function nodeRealmRunner(home: string) {
       }
       console.log(JSON.stringify(results))
     `
-    const child = spawnSync("node", ["--input-type=module", "--no-warnings", "-e", script, JSON.stringify(bodies)], { encoding: "utf8", timeout: 30_000, env: { ...process.env, OPENCODE_BROWSER_HOME: home, ...env } })
+    const child = spawnSync("node", ["--input-type=module", "--no-warnings", "-e", script, JSON.stringify(bodies)], { encoding: "utf8", timeout: 30_000, env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, ...env } })
     if (child.status !== 0) throw new Error(`node failed: ${child.stderr}`)
     return JSON.parse(child.stdout.trim().split("\n").at(-1) ?? "[]") as NodeOutcome[]
   }

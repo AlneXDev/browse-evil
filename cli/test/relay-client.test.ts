@@ -10,14 +10,14 @@ import { relayStatePath, writeRelayState } from "../src/relay/port.ts"
 
 // The client reads the relay token from the data folder; keep it away from the real install.
 const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-client-"))
-const previousHome = process.env.OPENCODE_BROWSER_HOME
-process.env.OPENCODE_BROWSER_HOME = home
+const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+process.env.OPENCODE_BROWSEVIL_HOME = home
 afterEach(() => {
   fs.rmSync(path.join(home, "relays"), { recursive: true, force: true })
 })
 afterAll(() => {
-  if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-  else process.env.OPENCODE_BROWSER_HOME = previousHome
+  if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+  else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
   fs.rmSync(home, { recursive: true, force: true })
 })
 
@@ -51,7 +51,7 @@ const withRelay = <A, E>(
   elapse: number,
 ) =>
   Effect.gen(function* () {
-    const client = yield* RelayClient.make({ endpoint: "http://127.0.0.1:19988" })
+    const client = yield* RelayClient.make({ endpoint: "http://127.0.0.1:29698" })
     const fiber = yield* Effect.forkChild(Effect.exit(use(client)))
     yield* TestClock.adjust(`${elapse} seconds`)
     return yield* Fiber.join(fiber)
@@ -110,8 +110,8 @@ describe("RelayClient read timeouts", () => {
 
   test("a proof doesn't outlive relay.json", async () => {
     writeRelayState({
-      port: 19988,
-      configuredPort: 19988,
+      port: 29698,
+      configuredPort: 29698,
       pid: process.pid,
       instanceId: "relay-instance",
       startedAt: new Date().toISOString(),
@@ -139,8 +139,8 @@ describe("RelayClient read timeouts", () => {
 
   test("a relay record gone after /version answered means the relay left, not another program", async () => {
     writeRelayState({
-      port: 19988,
-      configuredPort: 19988,
+      port: 29698,
+      configuredPort: 29698,
       pid: process.pid,
       instanceId: "relay-instance",
       startedAt: new Date().toISOString(),
@@ -156,8 +156,8 @@ describe("RelayClient read timeouts", () => {
 
   test("a /version cut off as the relay record disappears is the relay leaving too", async () => {
     writeRelayState({
-      port: 19988,
-      configuredPort: 19988,
+      port: 29698,
+      configuredPort: 29698,
       pid: process.pid,
       instanceId: "relay-instance",
       startedAt: new Date().toISOString(),
@@ -176,8 +176,8 @@ describe("RelayClient read timeouts", () => {
 
   test("a body without instanceId stays another program even if the relay record disappears", async () => {
     writeRelayState({
-      port: 19988,
-      configuredPort: 19988,
+      port: 29698,
+      configuredPort: 29698,
       pid: process.pid,
       instanceId: "relay-instance",
       startedAt: new Date().toISOString(),
@@ -193,8 +193,8 @@ describe("RelayClient read timeouts", () => {
 
   test("a /version cut off as the relay record disappears fails an authorized request before it is sent", async () => {
     writeRelayState({
-      port: 19988,
-      configuredPort: 19988,
+      port: 29698,
+      configuredPort: 29698,
       pid: process.pid,
       instanceId: "relay-instance",
       startedAt: new Date().toISOString(),

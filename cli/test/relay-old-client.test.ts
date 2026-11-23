@@ -15,16 +15,16 @@ import { freePort } from "./support/ports.ts"
 const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-old-client-"))
 const previous = {
   home: process.env.HOME,
-  browseHome: process.env.OPENCODE_BROWSER_HOME,
-  port: process.env.OPENCODE_BROWSER_PORT,
+  browseHome: process.env.OPENCODE_BROWSEVIL_HOME,
+  port: process.env.OPENCODE_BROWSEVIL_PORT,
 }
 process.env.HOME = home
-process.env.OPENCODE_BROWSER_HOME = home
+process.env.OPENCODE_BROWSEVIL_HOME = home
 let relay: ChildProcess | undefined
 
 afterAll(() => {
   relay?.kill()
-  for (const [name, value] of [["HOME", previous.home], ["OPENCODE_BROWSER_HOME", previous.browseHome], ["OPENCODE_BROWSER_PORT", previous.port]] as const) {
+  for (const [name, value] of [["HOME", previous.home], ["OPENCODE_BROWSEVIL_HOME", previous.browseHome], ["OPENCODE_BROWSEVIL_PORT", previous.port]] as const) {
     if (value === undefined) delete process.env[name]
     else process.env[name] = value
   }
@@ -39,14 +39,14 @@ describe("old MCP client against a newer relay", () => {
     const port = await freePort()
     const entry = await bundleCli({ outdir: path.join(home, "dist"), version: "0.0.1", buildId: NEW_BUILD })
     fs.symlinkSync(path.join(import.meta.dir, "../node_modules"), path.join(home, "node_modules"), "junction")
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     relay = spawn(process.execPath, [entry, "serve"], {
       env: {
         PATH: process.env.PATH ?? "",
         HOME: home,
-        OPENCODE_BROWSER_HOME: home,
-        OPENCODE_BROWSER_PORT: String(port),
-        OPENCODE_BROWSER_UPDATE_CHECK: "0",
+        OPENCODE_BROWSEVIL_HOME: home,
+        OPENCODE_BROWSEVIL_PORT: String(port),
+        OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
       },
       stdio: "ignore",
     })

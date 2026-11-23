@@ -35,7 +35,7 @@ describe("CLI contract helpers", () => {
   })
 
   test("exitCodeForError maps relay/extension unavailability to ExitCode.host (4)", () => {
-    expect(exitCodeForError(new RelayUnreachable({ message: "down", endpoint: "http://127.0.0.1:19988", path: "/version", cause: null }))).toBe(ExitCode.host)
+    expect(exitCodeForError(new RelayUnreachable({ message: "down", endpoint: "http://127.0.0.1:29698", path: "/version", cause: null }))).toBe(ExitCode.host)
     expect(exitCodeForError(new Error("boom"))).toBe(ExitCode.failure)
     expect(failure("browse status", "relay_unavailable", "down", { exitCode: ExitCode.host }).error.exitCode).toBe(4)
   })
@@ -50,7 +50,7 @@ describe("CLI process exit codes and session defaults", () => {
       Response.json({ version: "0.0.1", buildId: "2026-01-01T00:00:00Z", instanceId: "older-build" }) })
     try {
       const result = await execFileAsync(process.execPath, [cliEntry, "pair"], {
-        env: { ...process.env, HOME: home, OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_PORT: String(relay.port) }, timeout: 5000,
+        env: { ...process.env, HOME: home, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(relay.port) }, timeout: 5000,
       }).catch((error: { code: number; stderr: string }) => error)
       expect(result).toMatchObject({ code: 1 })
       expect(result.stderr).toContain("Running relay build 2026-01-01")
@@ -67,7 +67,7 @@ describe("CLI process exit codes and session defaults", () => {
     try {
       await Promise.all([["status"], ["session", "list"]].map(async args => {
         const result = await execFileAsync(process.execPath, [cliEntry, ...args], {
-          env: { ...process.env, OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_PORT: String(port), OPENCODE_BROWSER_UPDATE_CHECK: "0" }, timeout: 9000,
+          env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" }, timeout: 9000,
         }).catch((error: { code: number; stderr: string }) => error)
         expect(result).toMatchObject({ code: ExitCode.host })
         expect(result.stderr).toContain(`relay on port ${port} isn't answering`)
@@ -84,7 +84,7 @@ describe("CLI process exit codes and session defaults", () => {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cli-contract-"))
     try {
       const run = spawnSync(process.execPath, [cliEntry, "--json", "status"], {
-        env: { ...process.env, OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_PORT: String(port), OPENCODE_BROWSER_UPDATE_CHECK: "0" },
+        env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
         encoding: "utf8",
       })
       expect(run.status).toBe(ExitCode.host)
@@ -100,7 +100,7 @@ describe("CLI process exit codes and session defaults", () => {
     const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cli-usage-"))
     try {
       const run = spawnSync(process.execPath, [cliEntry, "--json", "status", "--not-a-real-flag"], {
-        env: { ...process.env, OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_UPDATE_CHECK: "0" },
+        env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
         encoding: "utf8",
       })
       expect(run.status).toBe(ExitCode.usage)
@@ -150,12 +150,12 @@ describe("CLI process exit codes and session defaults", () => {
     const port = (server.address() as net.AddressInfo).port
     const baseEnv: NodeJS.ProcessEnv = {
       ...process.env,
-      OPENCODE_BROWSER_HOME: home,
-      OPENCODE_BROWSER_PORT: String(port),
-      OPENCODE_BROWSER_UPDATE_CHECK: "0",
+      OPENCODE_BROWSEVIL_HOME: home,
+      OPENCODE_BROWSEVIL_PORT: String(port),
+      OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
       OPENCODE_SESSION_ID: "ses_Mixed123",
     }
-    delete baseEnv.OPENCODE_BROWSER_SESSION
+    delete baseEnv.OPENCODE_BROWSEVIL_SESSION
     try {
       const def = await execFileAsync(process.execPath, [cliEntry, "execute", "--timeout-ms", "15000", "return 1"], { env: baseEnv, encoding: "utf8" })
       expect(def.stdout.trim()).toBe("ok")

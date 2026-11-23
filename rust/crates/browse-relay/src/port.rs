@@ -1,4 +1,4 @@
-//! Where the relay listens (cli/src/relay/port.ts). The configured port is OPENCODE_BROWSEVIL_PORT, else 19988; state
+//! Where the relay listens (cli/src/relay/port.ts). The configured port is OPENCODE_BROWSEVIL_PORT, else 29698; state
 //! kept by port stays on the configured port. An unpinned relay whose port another program holds steps to the next
 //! free browse port and records the one it bound in <state>/relays/<configured>/relay.json, which clients resolve.
 
@@ -55,7 +55,7 @@ pub fn write_last_port(paths: &Paths, configured: u16, port: u16) -> std::io::Re
     paths::write_private_json(&paths.last_port(configured), &serde_json::json!({ "port": port }))
 }
 
-/// The port clients should dial: a pinned port, else a live relay.json's, else 19988.
+/// The port clients should dial: a pinned port, else a live relay.json's, else 29698.
 pub fn resolve_port(paths: &Paths) -> u16 {
     if let Some(port) = env_port() {
         return port;

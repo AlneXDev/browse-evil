@@ -23,7 +23,7 @@ let base = ""
 let token = ""
 
 beforeAll(async () => {
-  const started = await startRelay(home, { OPENCODE_BROWSER_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(home, { OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   relay = started.child
   port = started.port
   base = `http://127.0.0.1:${port}`
@@ -161,7 +161,7 @@ describe("several browsers", () => {
       b.close()
       expect(await until(() => b!.closeCode !== undefined)).toBe(true)
       const cli = spawnSync(process.execPath, [path.join(import.meta.dir, "../src/main.ts"), "execute", "--session", id, "return 1"], {
-        env: { PATH: process.env.PATH, HOME: multiHome, OPENCODE_BROWSER_HOME: multiHome, OPENCODE_BROWSER_PORT: String(multi!.port), OPENCODE_BROWSER_UPDATE_CHECK: "0" },
+        env: { PATH: process.env.PATH, HOME: multiHome, OPENCODE_BROWSEVIL_HOME: multiHome, OPENCODE_BROWSEVIL_PORT: String(multi!.port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
         encoding: "utf8", timeout: 10_000,
       })
       expect(cli.status).toBe(4)
@@ -232,7 +232,7 @@ describe("several browsers", () => {
 
     // The CLI picks a browser by name, and a name that isn't connected is refused with what is.
     const cli = (args: string[]) => spawnSync(process.execPath, [path.join(import.meta.dir, "../src/main.ts"), ...args], {
-      env: { PATH: process.env.PATH, HOME: multiHome, OPENCODE_BROWSER_HOME: multiHome, OPENCODE_BROWSER_PORT: String(multi!.port), OPENCODE_BROWSER_UPDATE_CHECK: "0" },
+      env: { PATH: process.env.PATH, HOME: multiHome, OPENCODE_BROWSEVIL_HOME: multiHome, OPENCODE_BROWSEVIL_PORT: String(multi!.port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
       encoding: "utf8", timeout: 10_000,
     })
     const created = cli(["session", "new", "cli-on-home", "--browser", "Home Brave"])
@@ -321,7 +321,7 @@ describe.skipIf(lanAddress === undefined)("a browser on another computer (hostna
 describe("sessions of MCP servers that went away", () => {
   test("an implicit session is deleted once its MCP server has been gone for the grace period; a named one stays", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-orphans-"))
-    const started = await startRelay(root, { OPENCODE_BROWSER_CLIENT_GONE_GRACE_MS: "1000" })
+    const started = await startRelay(root, { OPENCODE_BROWSEVIL_CLIENT_GONE_GRACE_MS: "1000" })
     try {
       expect(await new FakeExtension(root, started.port).pair()).toBe(true)
       const client = spawn(process.execPath, ["-e", "setTimeout(() => {}, 60_000)"], { stdio: "ignore" })
@@ -378,7 +378,7 @@ describe("settings from the extension", () => {
 
   test("environment variables override the settings, and the relay reports them", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-env-"))
-    const started = await startRelay(root, { OPENCODE_BROWSER_HUMAN_INPUT: "0", OPENCODE_BROWSER_AGENT_WINDOW: "separate" })
+    const started = await startRelay(root, { OPENCODE_BROWSEVIL_HUMAN_INPUT: "0", OPENCODE_BROWSEVIL_AGENT_WINDOW: "separate" })
     try {
       const scene = await settingsScene({ relayPort: started.port, relayToken: started.token, code: root, tabId: 91, settings: { humanInput: "on" } })
       expect(await until(() => scene.overrides().length === 1)).toBe(true)
@@ -423,7 +423,7 @@ describe("the settings tool's relay API", () => {
     expect(got.body.settings.grouping).toMatchObject({ value: "session", effective: "session", allowed: ["shared", "session", "none"] })
     expect(got.body.settings.groupCollapse).toMatchObject({ value: "auto", effective: "auto", allowed: ["auto", "off"] })
     expect(got.body.settings.muteTabs).toMatchObject({ value: "off", effective: "off", allowed: ["on", "off"] })
-    expect(got.body.note).toContain("OPENCODE_BROWSER_ALLOW_NODE")
+    expect(got.body.note).toContain("OPENCODE_BROWSEVIL_ALLOW_NODE")
 
     const set = await settingsRequest(base, token, { grouping: "shared", idleMinutes: "never", humanInput: "on" })
     expect(set.status).toBe(200)
@@ -456,7 +456,7 @@ describe("the settings tool's relay API", () => {
       [{ muteTabs: "quiet" }, "muteTabs must be one of on, off"],
       [{ idleMinutes: 45 }, "idleMinutes must be one of 10, 30, 60, never"],
       [{ colour: "blue" }, "Unknown setting \"colour\""],
-      [{ OPENCODE_BROWSER_ALLOW_NODE: "1" }, "security switches"],
+      [{ OPENCODE_BROWSEVIL_ALLOW_NODE: "1" }, "security switches"],
       [{ grouping: "none", allowAllCookies: true }, "security switches"],
       [{}, "Nothing to change"],
     ] as const) {
@@ -506,19 +506,19 @@ describe("the settings tool's relay API", () => {
 
   test("a setting an environment variable fixes is reported, and not written", async () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-settings-env-"))
-    const started = await startRelay(root, { OPENCODE_BROWSER_AGENT_WINDOW: "separate" })
+    const started = await startRelay(root, { OPENCODE_BROWSEVIL_AGENT_WINDOW: "separate" })
     try {
       const { extension, sets } = settingsExtension(root, started.port)
       expect(await extension.pair()).toBe(true)
       const relayBase = `http://127.0.0.1:${started.port}`
       const got = await settingsRequest(relayBase, started.token)
-      expect(got.body.settings.window).toMatchObject({ value: "current", effective: "separate", overriddenBy: "OPENCODE_BROWSER_AGENT_WINDOW" })
+      expect(got.body.settings.window).toMatchObject({ value: "current", effective: "separate", overriddenBy: "OPENCODE_BROWSEVIL_AGENT_WINDOW" })
       expect(got.body.settings.humanInput.overriddenBy).toBeUndefined()
       const set = await settingsRequest(relayBase, started.token, { window: "current", grouping: "none" })
       expect(set.status).toBe(200)
       expect(sets()).toEqual([{ grouping: "none" }])
-      expect(set.body.overridden).toEqual([{ key: "window", requested: "current", variable: "OPENCODE_BROWSER_AGENT_WINDOW", effective: "separate" }])
-      expect(set.body.message).toContain("Not changed: window is fixed to separate by OPENCODE_BROWSER_AGENT_WINDOW")
+      expect(set.body.overridden).toEqual([{ key: "window", requested: "current", variable: "OPENCODE_BROWSEVIL_AGENT_WINDOW", effective: "separate" }])
+      expect(set.body.message).toContain("Not changed: window is fixed to separate by OPENCODE_BROWSEVIL_AGENT_WINDOW")
       expect(set.body.message).toContain("relay restart")
       extension.close()
     } finally {

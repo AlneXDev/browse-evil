@@ -21,8 +21,8 @@ const scene = await startBrowserScene({
   name: "guarded-browser-",
   env: {
     BROWSE_TEST_FIXTURE_PORT: String(fixturePort),
-    OPENCODE_BROWSER_CHALLENGE_WAIT_MS: "4000",
-    OPENCODE_BROWSER_HUMAN_INPUT: "0",
+    OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS: "4000",
+    OPENCODE_BROWSEVIL_HUMAN_INPUT: "0",
   },
 })
 const { cli, env, base, root, home } = scene

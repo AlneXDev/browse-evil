@@ -43,7 +43,7 @@ export async function prepareLegacyTakeover(legacy: LegacyRuntime | undefined, o
   readonly install?: Runtime | undefined
   readonly env?: NodeJS.ProcessEnv
   readonly home?: string
-  /** Tests inject the port and pin state so they never touch the real 19988–19997 range. */
+  /** Tests inject the port and pin state so they never touch the real 29698–29706 range. */
   readonly relayPort?: number
   readonly pinned?: boolean
 } = {}): Promise<boolean> {

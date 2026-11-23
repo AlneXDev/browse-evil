@@ -48,8 +48,8 @@ describe("stored credentials of removed features", () => {
     write(path.join(data, "site-secrets", "example.json"), "{}\n", 0o600)
     write(path.join(data, "secrets", "profile.json"), "{}\n", 0o600)
     write(path.join(data, "relay-token"), "token\n", 0o600)
-    const previousHome = process.env.OPENCODE_BROWSER_HOME
-    delete process.env.OPENCODE_BROWSER_HOME
+    const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+    delete process.env.OPENCODE_BROWSEVIL_HOME
     try {
       migrateLegacy(home)
       expect(fs.existsSync(path.join(data, "site-secrets"))).toBe(false)
@@ -58,8 +58,8 @@ describe("stored credentials of removed features", () => {
       // A second run is a no-op and a missing data root is fine.
       expect(migrateLegacy(home)).toMatchObject({ moved: 0, rewritten: 0, removed: [] })
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = previousHome
+      if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
     }
   })
 })
@@ -74,8 +74,8 @@ describe("migration from the old layouts", () => {
     write(opencode, JSON.stringify({
       mcp: { servers: { browse: { type: "local", command: ["/usr/bin/node", path.join(oldData, "bin", "opencode-browser.mjs"), "mcp"] } } },
     }))
-    const previousHome = process.env.OPENCODE_BROWSER_HOME
-    delete process.env.OPENCODE_BROWSER_HOME
+    const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+    delete process.env.OPENCODE_BROWSEVIL_HOME
     try {
       const first = migrateLegacy(home)
       expect(first.moved).toBeGreaterThan(0)
@@ -108,8 +108,8 @@ describe("migration from the old layouts", () => {
       // A second run finds nothing to move or rewrite.
       expect(migrateLegacy(home)).toMatchObject({ moved: 0, rewritten: 0, removed: [] })
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = previousHome
+      if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
     }
   })
 
@@ -117,8 +117,8 @@ describe("migration from the old layouts", () => {
     const { home, old } = legacyHome()
     // A malformed agent config can't be rewritten safely; deleting the executable would leave it pointing at nothing.
     write(path.join(home, ".claude.json"), `{"mcpServers":{"browse":{"command":${JSON.stringify(path.join(old, "bin", "browse"))}`)
-    const previousHome = process.env.OPENCODE_BROWSER_HOME
-    delete process.env.OPENCODE_BROWSER_HOME
+    const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+    delete process.env.OPENCODE_BROWSEVIL_HOME
     try {
       migrateLegacy(home)
       expect(fs.existsSync(path.join(old, "bin", "browse"))).toBe(true)
@@ -127,23 +127,23 @@ describe("migration from the old layouts", () => {
       expect(migrateLegacy(home).removed).not.toContain(old)
       expect(fs.existsSync(path.join(old, "bin", "browse"))).toBe(true)
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = previousHome
+      if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
     }
   })
 
   test("never overwrites a file the new version already has", () => {
     const { home, old } = legacyHome()
     write(path.join(home, ".config", "browse", "settings.json"), "{\"entry\":\"new\"}\n")
-    const previousHome = process.env.OPENCODE_BROWSER_HOME
-    delete process.env.OPENCODE_BROWSER_HOME
+    const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+    delete process.env.OPENCODE_BROWSEVIL_HOME
     try {
       migrateLegacy(home)
       expect(fs.readFileSync(path.join(home, ".config", "browse", "settings.json"), "utf8")).toBe("{\"entry\":\"new\"}\n")
       expect(fs.existsSync(old)).toBe(false)
     } finally {
-      if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = previousHome
+      if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
     }
   })
 })

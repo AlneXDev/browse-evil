@@ -7,13 +7,13 @@ type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonVal
 export type JsonObject = { readonly [key: string]: JsonValue }
 
 /** The relay's default port (cli/src/relay/helpers.ts defaultPort). */
-export const defaultRelayPort = 19988
+export const defaultRelayPort = 29698
 
 /**
- * The ports an unpinned relay falls back to when another program holds 19988, in the order it tries them. Must match
+ * The ports an unpinned relay falls back to when another program holds 29698, in the order it tries them. Must match
  * cli/src/relay/port.ts fallbackPorts (19989 is Browser Control's, so it is skipped there and here).
  */
-export const relayFallbackPorts = [19990, 19991, 19992, 19993, 19994, 19995, 19996, 19997] as const
+export const relayFallbackPorts = [29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706] as const
 
 /** Every port a browse relay can listen on, in the order the extension dials and scans them. */
 export const relayPorts: readonly number[] = [defaultRelayPort, ...relayFallbackPorts]

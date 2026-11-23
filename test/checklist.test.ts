@@ -7,7 +7,7 @@ const state = (overrides: Partial<AgentRelayState> = {}): AgentRelayState => ({
   status: "unpaired",
   pairing: "none",
   tabs: [],
-  relay: { address: "localhost:19988", remote: false },
+  relay: { address: "localhost:29698", remote: false },
   ...overrides,
 })
 const input = (overrides: Partial<ChecklistInput> = {}): ChecklistInput => ({
@@ -43,9 +43,9 @@ describe("onboarding checklist", () => {
 
 describe("relay results", () => {
   test("say where, in plain words", () => {
-    expect(relayResultText("connected", "devbox:19988", false)).toBe("Connected to the relay at devbox:19988.")
-    expect(relayResultText("offline", "localhost:19988", false)).toContain("on this computer (localhost:19988)")
-    expect(relayResultText("offline", "devbox:19988", true)).toStartWith("Code saved.")
+    expect(relayResultText("connected", "devbox:29698", false)).toBe("Connected to the relay at devbox:29698.")
+    expect(relayResultText("offline", "localhost:29698", false)).toContain("on this computer (localhost:29698)")
+    expect(relayResultText("offline", "devbox:29698", true)).toStartWith("Code saved.")
   })
 
   test("mark commands as code", () => {

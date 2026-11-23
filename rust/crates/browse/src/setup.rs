@@ -296,7 +296,7 @@ fn pair_in_browser(browser: &Browser, profile: &str, open: bool) -> anyhow::Resu
     let listen = relay_api::port();
     let port = if listen == relay_api::DEFAULT_PORT { String::new() } else { format!("&port={listen}") };
     let url = format!("chrome-extension://{}/welcome.html#code={code}{port}", browsers::store_id());
-    // The extension takes a port from the link only when it's one of browse's own (19988, 19990-19997); a relay pinned
+    // The extension takes a port from the link only when it's one of browse's own (29698, 29699-29706); a relay pinned
     // elsewhere with OPENCODE_BROWSEVIL_PORT is entered by hand, with its address.
     let known = listen == relay_api::DEFAULT_PORT || browse_relay::protocol::FALLBACK_PORTS.contains(&listen);
     if open && known && browsers::open_in(browser, &url, Some(profile)) {

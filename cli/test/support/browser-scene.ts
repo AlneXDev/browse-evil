@@ -1,5 +1,5 @@
 // One isolated headless browser scene for the `*-browser.ts` integration harnesses: a temp data root with its
-// own OPENCODE_BROWSER_HOME, a port-patched copy of the built extension, a paired relay on a free port, and a
+// own OPENCODE_BROWSEVIL_HOME, a port-patched copy of the built extension, a paired relay on a free port, and a
 // persistent Chromium context with that extension loaded.
 //
 // Pure Node (no `bun:test`) because CI runs each harness directly after `bun build.ts`:
@@ -21,7 +21,7 @@ type BrowserContext = Awaited<ReturnType<typeof chromium.launchPersistentContext
 
 /** What a setup hook sees: paths and env exist, the relay has not started. */
 export type BrowserSceneSetup = {
-  /** The scene's OPENCODE_BROWSER_HOME; write client and pairing files here before the relay reads them. */
+  /** The scene's OPENCODE_BROWSEVIL_HOME; write client and pairing files here before the relay reads them. */
   readonly home: string
   /** The relay's environment; mutate it to add anything the relay must see at startup. */
   readonly env: NodeJS.ProcessEnv
@@ -89,12 +89,12 @@ export async function startBrowserScene<T = undefined>(options: StartBrowserScen
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     HOME: root,
-    OPENCODE_BROWSER_HOME: home,
-    OPENCODE_BROWSER_PORT: String(port),
-    OPENCODE_BROWSER_UPDATE_CHECK: "0",
+    OPENCODE_BROWSEVIL_HOME: home,
+    OPENCODE_BROWSEVIL_PORT: String(port),
+    OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
   }
-  delete env.OPENCODE_BROWSER_ALLOW_NODE
-  delete env.OPENCODE_BROWSER_ALLOW_FOREGROUND
+  delete env.OPENCODE_BROWSEVIL_ALLOW_NODE
+  delete env.OPENCODE_BROWSEVIL_ALLOW_FOREGROUND
   Object.assign(env, options.env)
 
   fs.mkdirSync(path.join(runtime, "dist"), { recursive: true })
@@ -105,7 +105,7 @@ export async function startBrowserScene<T = undefined>(options: StartBrowserScen
   for (const entry of fs.readdirSync(extension, { recursive: true })) {
     const file = path.join(extension, String(entry))
     if (/\.(js|json)$/.test(file) && fs.statSync(file).isFile()) {
-      fs.writeFileSync(file, fs.readFileSync(file, "utf8").replaceAll("19988", String(port)))
+      fs.writeFileSync(file, fs.readFileSync(file, "utf8").replaceAll("29698", String(port)))
     }
   }
   const cli = path.join(runtime, "dist/cli.mjs")

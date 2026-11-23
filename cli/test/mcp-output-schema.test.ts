@@ -394,7 +394,7 @@ describe("tool output schemas", () => {
 
   test("status structured content validates and its fallback text is compact", () => {
     const value = {
-      endpoint: "http://127.0.0.1:19988",
+      endpoint: "http://127.0.0.1:29698",
       currentSession: "mcp-1234abcd",
       sharedSession: false,
       version: { version: "0.0.10", pid: 42 },

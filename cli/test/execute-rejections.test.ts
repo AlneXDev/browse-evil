@@ -15,7 +15,7 @@ function runNodeScope(script: string): Record<string, any> {
   const child = spawnSync("node", ["--input-type=module", "--no-warnings", "-e", script], {
     encoding: "utf8",
     timeout: 15_000,
-    env: { ...process.env, OPENCODE_BROWSER_HOME: home },
+    env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home },
   })
   if (child.status !== 0) throw new Error(`node failed: ${child.stderr}`)
   return JSON.parse(child.stdout.trim().split("\n").at(-1) ?? "{}") as Record<string, any>
@@ -149,7 +149,7 @@ describe("full-Node rejection scope", () => {
       handleRelayProcessFault("unhandledRejection", Object.setPrototypeOf({}, new Proxy({}, { getPrototypeOf() { for (;;) {} } })), {}, { rethrow: () => {} })
       console.log("returned")
     `
-    const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 5_000, env: { ...process.env, OPENCODE_BROWSER_HOME: home } })
+    const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 5_000, env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home } })
     expect(child.status, child.stderr).toBe(0)
     expect(child.stdout).toContain("returned")
   }, 20_000)

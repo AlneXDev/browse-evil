@@ -62,13 +62,13 @@ test("a link without a browse-range port keeps a saved out-of-range loopback add
   expect(atPinned().at(-1)!.received.find((message) => message.method === "hello")?.params?.pairing).toMatchObject({ mode: "code" })
 })
 
-test("a link with &port=9222 also keeps it; the code port stays localhost:19988", async () => {
+test("a link with &port=9222 also keeps it; the code port stays localhost:29698", async () => {
   const before = atPinned().length
   void relay.pairLink("ZYXW9876", PINNED_PORT)
   await until(() => atPinned().length > before && atPinned().at(-1)!.received.some((message) => message.method === "hello"))
   expect(await stored("agentRelayAddress")).toBe(ADDRESS)
   expect(await stored("agentRelayPairingCode")).toBe("ZYXW9876")
-  expect(await stored("agentRelayCodePort")).toBe(19988)
+  expect(await stored("agentRelayCodePort")).toBe(29698)
 })
 
 test("submitting the shown pinned address with a code stays pinned and sends the code there", async () => {

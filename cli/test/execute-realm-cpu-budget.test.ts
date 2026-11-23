@@ -18,7 +18,7 @@ function runScenario<T>(script: string): T {
     const host = (extra = {}) => ({ cpuMs: () => { const cpu = process.threadCpuUsage(); return (cpu.user + cpu.system) / 1000 }, ...extra })
     const busy = (ms) => \`{ const end = host.cpuMs() + \${ms}; while (host.cpuMs() < end) { for (let k = 0; k < 4000; k++) {} } }\`
     ${script}`
-  const child = spawnSync("node", ["--input-type=module", "--no-warnings", "-e", source], { encoding: "utf8", timeout: 60_000, env: { ...process.env, OPENCODE_BROWSER_HOME: path.join(scratch, "home") } })
+  const child = spawnSync("node", ["--input-type=module", "--no-warnings", "-e", source], { encoding: "utf8", timeout: 60_000, env: { ...process.env, OPENCODE_BROWSEVIL_HOME: path.join(scratch, "home") } })
   if (child.status !== 0) throw new Error(`node failed: ${child.stderr}`)
   return JSON.parse(child.stdout.trim().split("\n").at(-1) ?? "null") as T
 }
@@ -36,7 +36,7 @@ test("the sustained budget charges CPU time, not slices stretched by a loaded ma
     `for (let i = 0; i < 40; i++) { host.stall(${sliceMs * 0.05}); await host.later() } return "short stalls"`,
     `for (let i = 0; i < 6; i++) { host.stall(${sliceMs * 0.6}); await host.later() } return "long stalls"`,
     `host.busyOtherSession(); for (let i = 0; i < 40; i++) await host.later(); return "busy relay"`,
-  ], setup, { OPENCODE_BROWSER_EXECUTE_SLICE_MS: String(sliceMs) })
+  ], setup, { OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS: String(sliceMs) })
   expect(values(outcomes)).toEqual([{ value: "short stalls" }, { value: "long stalls" }, { value: "busy relay" }])
 }, 30_000)
 

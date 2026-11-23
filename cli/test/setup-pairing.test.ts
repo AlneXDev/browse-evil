@@ -26,9 +26,9 @@ function runtime(root: string) {
 const env = (home: string, port: number): NodeJS.ProcessEnv => ({
   ...process.env,
   HOME: home,
-  OPENCODE_BROWSER_HOME: home,
-  OPENCODE_BROWSER_PORT: String(port),
-  OPENCODE_BROWSER_UPDATE_CHECK: "0",
+  OPENCODE_BROWSEVIL_HOME: home,
+  OPENCODE_BROWSEVIL_PORT: String(port),
+  OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
 })
 
 async function startRelay(entry: string, home: string, port: number): Promise<ChildProcess> {

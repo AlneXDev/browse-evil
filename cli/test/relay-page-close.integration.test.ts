@@ -12,14 +12,14 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 
 const temporaryRoot = path.join(os.homedir(), ".cache", "oc-tmp")
 fs.mkdirSync(temporaryRoot, { recursive: true })
-// The harness gives the relay its own HOME/OPENCODE_BROWSER_HOME and a free port (never 19988).
+// The harness gives the relay its own HOME/OPENCODE_BROWSEVIL_HOME and a free port (never 29698).
 const home = fs.mkdtempSync(path.join(temporaryRoot, "browse-page-close-"))
 let relay: ChildProcess | undefined
 let port = 0
 let token = ""
 
 beforeAll(async () => {
-  const started = await startRelay(home, { OPENCODE_BROWSER_STORE_ID: "c".repeat(32) })
+  const started = await startRelay(home, { OPENCODE_BROWSEVIL_STORE_ID: "c".repeat(32) })
   relay = started.child
   port = started.port
   token = started.token

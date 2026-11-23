@@ -16,7 +16,7 @@ export const write = (file: string, text: string, mode = 0o644) => {
 
 /** A CLI stand-in: prints who it is for a command, or answers every MCP request with it. */
 export const fakeCli = (label: string) => `import { createInterface } from "node:readline"
-const info = { label: ${JSON.stringify(label)}, argv1: process.argv[1], args: process.argv.slice(2), home: process.env.OPENCODE_BROWSER_HOME ?? null }
+const info = { label: ${JSON.stringify(label)}, argv1: process.argv[1], args: process.argv.slice(2), home: process.env.OPENCODE_BROWSEVIL_HOME ?? null }
 if (process.argv[2] !== "mcp") {
   console.log(JSON.stringify(info))
   process.exit(0)
@@ -53,14 +53,14 @@ export function oldRuntimeHome(homes: string[]) {
   return { home, oldData, shim, oldEntry, packageDir, current, opencode, runtime }
 }
 
-/** Runs `run` with OPENCODE_BROWSER_HOME unset, as migration needs, and restores it after (once a promise settles). */
+/** Runs `run` with OPENCODE_BROWSEVIL_HOME unset, as migration needs, and restores it after (once a promise settles). */
 export function withoutHomeOverride<T>(run: () => T): T {
-  const previous = process.env.OPENCODE_BROWSER_HOME
+  const previous = process.env.OPENCODE_BROWSEVIL_HOME
   const restore = () => {
-    if (previous === undefined) delete process.env.OPENCODE_BROWSER_HOME
-    else process.env.OPENCODE_BROWSER_HOME = previous
+    if (previous === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+    else process.env.OPENCODE_BROWSEVIL_HOME = previous
   }
-  delete process.env.OPENCODE_BROWSER_HOME
+  delete process.env.OPENCODE_BROWSEVIL_HOME
   let result: T
   try {
     result = run()

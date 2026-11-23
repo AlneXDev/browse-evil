@@ -10,8 +10,8 @@ const stub = installChrome()
 
 const STORED_TOKEN = "this-browser-token-0123456789abcdefghijklmn"
 const OTHER_RELAY_TOKEN = "another-relay-token-0123456789abcdefghijklmn"
-const OLD_PORT = 19988
-const BROWSER_PORT = 19990
+const OLD_PORT = 29698
+const BROWSER_PORT = 29699
 
 class FakeWebSocket {
   static readonly CONNECTING = 0
@@ -66,6 +66,6 @@ test("a refused fallback token leaves the entry it came from alone", async () =>
   await until(() => relay.state().status === "untrusted")
   expect(relay.state().pairing).toBe("token")
   expect(await stored("agentRelayTokens")).toEqual({ [`127.0.0.1:${OLD_PORT}`]: STORED_TOKEN })
-  // Nothing authenticated on the discovered port, so the scan forgets it and dialing returns to 19988.
+  // Nothing authenticated on the discovered port, so the scan forgets it and dialing returns to 29698.
   expect(await stored("agentRelayDiscoveredPort")).toBeUndefined()
 })

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { binRoot, cacheRoot, configRoot, dataRoot, installedBinaryPath, stateRoot } from "../src/paths.ts"
 import { relayEnvironment } from "../src/relay/lifecycle.ts"
 
-// paths.ts resolves browse's config, data, state, cache and bin roots from these, and OPENCODE_BROWSER_HOME overrides
+// paths.ts resolves browse's config, data, state, cache and bin roots from these, and OPENCODE_BROWSEVIL_HOME overrides
 // all of them. The managed relay must resolve the same roots as the CLI that started it, or files they share (pairing
 // codes included) land under different folders.
 const pathOverrides = [
@@ -11,7 +11,7 @@ const pathOverrides = [
   "XDG_STATE_HOME",
   "XDG_CACHE_HOME",
   "XDG_BIN_HOME",
-  "OPENCODE_BROWSER_HOME",
+  "OPENCODE_BROWSEVIL_HOME",
 ] as const
 
 /**
@@ -53,7 +53,7 @@ describe("managed relay environment", () => {
 
   test("the relay resolves browse's roots exactly as the CLI that started it", () => {
     const env: NodeJS.ProcessEnv = {
-      OPENCODE_BROWSER_HOME: undefined,
+      OPENCODE_BROWSEVIL_HOME: undefined,
       XDG_CONFIG_HOME: "/tmp/browse-env/config",
       XDG_DATA_HOME: "/tmp/browse-env/data",
       XDG_STATE_HOME: "/tmp/browse-env/state",
@@ -72,7 +72,7 @@ describe("managed relay environment", () => {
       LC_ALL: "C.UTF-8",
       HTTPS_PROXY: "http://proxy.example",
       NODE_EXTRA_CA_CERTS: "/etc/ssl/extra.pem",
-      OPENCODE_BROWSER_PORT: "29988",
+      OPENCODE_BROWSEVIL_PORT: "29988",
       OPENAI_API_KEY: "sk-secret",
       GITHUB_TOKEN: "ghp-secret",
       SOME_OTHER_VARIABLE: "value",
@@ -84,7 +84,7 @@ describe("managed relay environment", () => {
       LC_ALL: "C.UTF-8",
       HTTPS_PROXY: "http://proxy.example",
       NODE_EXTRA_CA_CERTS: "/etc/ssl/extra.pem",
-      OPENCODE_BROWSER_PORT: "29988",
+      OPENCODE_BROWSEVIL_PORT: "29988",
     })
   })
 

@@ -15,8 +15,8 @@ const none = (target: Browser): Detection => ({ browser: target, blocked: false,
 const folder = "/src/browse/dist"
 
 test("a remote relay's pairing text names its address instead of localhost", () => {
-  expect(manualPair("ABCD1234", 19990, "devbox.tail1234.ts.net:19990")).toContain("devbox.tail1234.ts.net:19990")
-  expect(manualPair("ABCD1234", 19990)).toContain("localhost:19990")
+  expect(manualPair("ABCD1234", 29699, "devbox.tail1234.ts.net:29699")).toContain("devbox.tail1234.ts.net:29699")
+  expect(manualPair("ABCD1234", 29699)).toContain("localhost:29699")
 })
 
 test("identifies the calling agent, not the editor hosting a regular terminal", () => {
@@ -64,7 +64,7 @@ test("OpenCode's cwd is the absolute home directory: older OpenCode versions don
       command: ["browse", "mcp"],
       cwd: "~",
       pool: true,
-      environment: { OPENCODE_BROWSER_RUNTIME: "auto-update" },
+      environment: { OPENCODE_BROWSEVIL_RUNTIME: "auto-update" },
     } } } }))
     expect(configureMcp(file, "browse", "browse")).toContain("updated")
     const cwd = parse(fs.readFileSync(file, "utf8")).mcp.servers.browse.cwd
@@ -82,7 +82,7 @@ test("OpenCode shares one browse server: browse's older entries gain pool and a 
     fs.writeFileSync(file, JSON.stringify({
       mcp: {
         servers: {
-          browse: { type: "local", command: ["browse", "mcp"], environment: { OPENCODE_BROWSER_RUNTIME: "auto-update", KEEP: "1" } },
+          browse: { type: "local", command: ["browse", "mcp"], environment: { OPENCODE_BROWSEVIL_RUNTIME: "auto-update", KEEP: "1" } },
           other: { type: "local", command: ["my-server"] },
         },
       },
@@ -94,7 +94,7 @@ test("OpenCode shares one browse server: browse's older entries gain pool and a 
       command: ["browse", "mcp"],
       cwd: userHome,
       pool: true,
-      environment: { OPENCODE_BROWSER_RUNTIME: "auto-update", KEEP: "1" },
+      environment: { OPENCODE_BROWSEVIL_RUNTIME: "auto-update", KEEP: "1" },
     })
     expect(config.mcp.servers.other).toEqual({ type: "local", command: ["my-server"] })
     // A server named browse with a command browse didn't write is the user's; leave it alone.
@@ -110,7 +110,7 @@ test("a binary install's entry runs the executable itself, in OpenCode, other ag
     const binary = path.join(home, ".local", "bin", "browse")
     const opencode = path.join(home, "opencode.json")
     expect(configureMcp(opencode, binary)).toContain("added")
-    expect(parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse).toMatchObject({ command: [binary, "mcp"], cwd: userHome, pool: true, environment: { OPENCODE_BROWSER_RUNTIME: "auto-update" } })
+    expect(parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse).toMatchObject({ command: [binary, "mcp"], cwd: userHome, pool: true, environment: { OPENCODE_BROWSEVIL_RUNTIME: "auto-update" } })
     expect(configureMcp(opencode, binary, binary)).toContain("up to date")
     expect(removeMcp("browse", binary, opencode)).toBe(true)
 
@@ -343,7 +343,7 @@ describe("install with the extension", () => {
   })
 
   test("an installed extension is ready even before the relay runs", () => {
-    const match = { browser: chrome, profile: { dir: "Default", name: "Person 1" }, id: "afeafocngkodbmaipcngoamamfmekgfo" }
+    const match = { browser: chrome, profile: { dir: "Default", name: "Person 1" }, id: "lfmeghngagemglmdnplimokblljgmnoj" }
     const { outcome, output } = run({ detections: [{ ...none(chrome), enabled: [match] }] })
     expect(outcome).toBe("ready")
     expect(output).toBe("")
@@ -358,7 +358,7 @@ describe("install with the extension", () => {
   })
 
   test("a turned-off extension is reported, not reinstalled", () => {
-    const match = { browser: chrome, profile: { dir: "Default", name: "Person 1" }, id: "afeafocngkodbmaipcngoamamfmekgfo" }
+    const match = { browser: chrome, profile: { dir: "Default", name: "Person 1" }, id: "lfmeghngagemglmdnplimokblljgmnoj" }
     const { outcome, calls, output } = run({ detections: [{ ...none(chrome), disabled: [match] }] })
     expect(outcome).toBe("off")
     expect(calls.open).toEqual([])
@@ -391,7 +391,7 @@ describe("the store item", () => {
 
   test("a checkout, with no store item baked in, points at browse's public item", () => {
     const { output } = run()
-    expect(output).toContain("https://chromewebstore.google.com/detail/mfnicocicmmlkpjnaffgihfjhdgjkdjg")
+    expect(output).toContain("https://chromewebstore.google.com/detail/lfmeghngagemglmdnplimokblljgmnoj")
     expect(output).not.toContain("unpacked")
   })
 })
@@ -423,7 +423,7 @@ describe("pairing the store build", () => {
   })
 
   test("never hands the code to an extension that isn't a configured store item", () => {
-    const { outcome, opened } = pair([{ ...none(chrome), enabled: [{ browser: chrome, profile, id: "afeafocngkodbmaipcngoamamfmekgfo" }] }])
+    const { outcome, opened } = pair([{ ...none(chrome), enabled: [{ browser: chrome, profile, id: "lfmeghngagemglmdnplimokblljgmnoj" }] }])
     expect(outcome).toBe("none")
     expect(opened).toEqual([])
   })
@@ -523,7 +523,7 @@ test("install --remote prefers the tailnet's addresses, else the LAN's, and prin
   const address = (value: string, internal = false) => ({ address: value, family: "IPv4" as const, internal, netmask: "255.255.255.0", mac: "00:00:00:00:00:00", cidr: null })
   const lan = { lo: [address("127.0.0.1", true)], eth0: [address("192.168.1.20")], docker0: [address("172.17.0.1")], wlan0: [address("169.254.3.4"), address("10.0.0.5")] }
   expect(remoteRelayAddresses(lan)).toEqual(["192.168.1.20", "10.0.0.5"])
-  expect(remoteRelayAddresses(lan, { port: 19988 })).toEqual(["192.168.1.20", "10.0.0.5"])
+  expect(remoteRelayAddresses(lan, { port: 29698 })).toEqual(["192.168.1.20", "10.0.0.5"])
   expect(remoteRelayAddresses(lan, { port: 20001 })).toEqual(["192.168.1.20:20001", "10.0.0.5:20001"])
   const tailnet = { ...lan, tailscale0: [address("100.101.102.103")] }
   expect(remoteRelayAddresses(tailnet)).toEqual(["100.101.102.103"])

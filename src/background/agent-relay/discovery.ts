@@ -1,5 +1,5 @@
 // Finding this computer's relay when it isn't on the default port. An unpinned relay steps to a fallback port when
-// another program (Playwriter) holds 19988 (cli/src/relay/port.ts) and tells the extension where it went when it
+// another program (Playwriter) holds 29698 (cli/src/relay/port.ts) and tells the extension where it went when it
 // pairs; without that hint, a failed connection scans the candidates' open /version for a browse relay.
 import { defaultRelayPort, isJsonObject, relayPortHint, relayPorts } from "../../agent-relay/protocol"
 import { probeRelayPort } from "../../agent-relay/probe"
@@ -17,7 +17,7 @@ export type RelayTarget = {
 /**
  * The relay address to dial. An address the user set (one with a port, or another computer) and the PORT_KEY dev pin
  * are explicit and dialled exactly as given. Everything else is automatic: the port a pairing hint or a scan found,
- * else 19988.
+ * else 29698.
  */
 export function relayTarget(stored: Record<string, unknown>): RelayTarget {
   const address = relayAddress(stored[RELAY_ADDRESS_KEY]) ?? { host: "127.0.0.1" }
@@ -43,7 +43,7 @@ export async function scanRelayPorts(timeoutMs = PROBE_TIMEOUT_MS): Promise<numb
   return answers.filter((port): port is number => port !== undefined)
 }
 
-/** The port to move to: the proven port, then a port with a token, then 19988, then the rest in dial order. */
+/** The port to move to: the proven port, then a port with a token, then 29698, then the rest in dial order. */
 export function chooseRelayPort(
   found: readonly number[],
   options: { readonly proven?: number; readonly tokenFor: (port: number) => boolean },

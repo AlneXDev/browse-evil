@@ -8,8 +8,8 @@ import { installChrome, settle } from "../chrome-stub"
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const SPOOF_PORT = 19990
-const REAL_PORT = 19991
+const SPOOF_PORT = 29699
+const REAL_PORT = 29700
 const SPOOF_TOKEN = "spoof-token-0123456789abcdefghijklmnopqrstuv"
 const REAL_TOKEN = "real-token-0123456789abcdefghijklmnopqrstuv"
 

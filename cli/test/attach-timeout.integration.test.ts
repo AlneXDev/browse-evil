@@ -18,11 +18,11 @@ let base = ""
 let token = ""
 
 beforeAll(async () => {
-  // The harness gives every relay its own temp HOME and an ephemeral port (`freePort`), never 19988.
+  // The harness gives every relay its own temp HOME and an ephemeral port (`freePort`), never 29698.
   const started = await startRelay(home, {
-    OPENCODE_BROWSER_MANAGED_RELAY: "1",
-    OPENCODE_BROWSER_ATTACH_TIMEOUT_MS: "200",
-    OPENCODE_BROWSER_RESTART_TIMEOUT_MS: "1000",
+    OPENCODE_BROWSEVIL_MANAGED_RELAY: "1",
+    OPENCODE_BROWSEVIL_ATTACH_TIMEOUT_MS: "200",
+    OPENCODE_BROWSEVIL_RESTART_TIMEOUT_MS: "1000",
   })
   relay = started.child
   port = started.port

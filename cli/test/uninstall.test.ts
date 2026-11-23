@@ -12,7 +12,7 @@ const legacyHost = process.platform === "win32" && ["Google\\Chrome", "Microsoft
   spawnSync("reg", ["query", `HKCU\\Software\\${browser}\\NativeMessagingHosts\\ai.opencode.browser`, "/ve"]).status === 0)
 
 /**
- * A child environment built from scratch: a host OPENCODE_BROWSER_PACKAGE makes uninstall run `npm uninstall -g`, and host
+ * A child environment built from scratch: a host OPENCODE_BROWSEVIL_PACKAGE makes uninstall run `npm uninstall -g`, and host
  * agent config variables (CLAUDE_CONFIG_DIR, OPENCODE_CONFIG_DIR, ...) would point it at real agent configs. Only PATH and
  * the Windows essentials Bun needs come from the host.
  */
@@ -31,10 +31,10 @@ function isolatedEnv(home: string, port: number, browseHome = true): NodeJS.Proc
     XDG_BIN_HOME: path.join(home, "xdg-bin"),
     CLAUDE_CONFIG_DIR: path.join(home, "claude"),
     OPENCODE_CONFIG_DIR: path.join(home, "opencode"),
-    OPENCODE_BROWSER_PORT: String(port),
-    OPENCODE_BROWSER_UPDATE_CHECK: "0",
+    OPENCODE_BROWSEVIL_PORT: String(port),
+    OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
   }
-  if (browseHome) env.OPENCODE_BROWSER_HOME = path.join(home, "data")
+  if (browseHome) env.OPENCODE_BROWSEVIL_HOME = path.join(home, "data")
   if (process.platform === "win32") {
     for (const key of ["SystemRoot", "ComSpec", "TEMP", "TMP"]) {
       const value = process.env[key]
@@ -56,7 +56,7 @@ test.skipIf(legacyHost)("uninstall stops its managed relay before removing its d
   const port = await freePort(), url = `http://127.0.0.1:${port}/version`
   const env = isolatedEnv(home, port)
   const cli = [process.execPath, path.join(import.meta.dir, "../src/main.ts")]
-  const relay = Bun.spawn([...cli, "serve"], { env: { ...env, OPENCODE_BROWSER_MANAGED_RELAY: "1" }, stdout: "ignore", stderr: "ignore" })
+  const relay = Bun.spawn([...cli, "serve"], { env: { ...env, OPENCODE_BROWSEVIL_MANAGED_RELAY: "1" }, stdout: "ignore", stderr: "ignore" })
   const ready = () => fetch(url).then(r => r.ok, () => false)
   try {
     for (let n = 0; n < 100 && !await ready(); n++) await Bun.sleep(50)

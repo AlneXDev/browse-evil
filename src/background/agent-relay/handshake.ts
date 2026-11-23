@@ -467,7 +467,7 @@ export function createRelayHandshake(deps: {
     const local = address.host === "127.0.0.1" &&
       (address.port === undefined || hinted !== undefined || (automatic && (address.port === current.port || address.port === shownPort)))
     const value = local ? "" : address.port ? `${address.host}:${address.port}` : address.host
-    // A code typed without a port must not ride on a port only a scan found: 19988 is where an unpaired extension
+    // A code typed without a port must not ride on a port only a scan found: 29698 is where an unpaired extension
     // starts. A relay found by a scan is never given a pairing code (agent-relay/discovery.ts).
     const scannedOnly = automatic && hinted === undefined && code !== undefined && before[DISCOVERED_KIND_KEY] !== "hint"
     const codePort = hinted ?? (scannedOnly
@@ -498,7 +498,7 @@ export function createRelayHandshake(deps: {
       if (Array.isArray(spent))
         await chrome.storage.local.set({ [SPENT_KEY]: spent.filter((entry) => entry !== code.code) })
     }
-    // Removed before the write, so the reconnect the write triggers already dials 19988 instead of the scanned port.
+    // Removed before the write, so the reconnect the write triggers already dials 29698 instead of the scanned port.
     if (clearDiscovered) await chrome.storage.local.remove([DISCOVERED_PORT_KEY, DISCOVERED_KIND_KEY])
     // One write, so storage.onChanged reconnects once.
     if (changed)
@@ -524,7 +524,7 @@ export function createRelayHandshake(deps: {
   }
 
   /**
-   * A one-time code from install's link (welcome.html#code=…, or `&port=` when the relay isn't on 19988). The port is
+   * A one-time code from install's link (welcome.html#code=…, or `&port=` when the relay isn't on 29698). The port is
    * taken as the discovered port, and as the only port the code may ever be sent to.
    */
   const pairLink = async (input: string, hint?: number) => {
@@ -536,12 +536,12 @@ export function createRelayHandshake(deps: {
     const saved = relayAddress(stored[RELAY_ADDRESS_KEY])
     // A link with no browse-range port is still for this computer. Keep a saved loopback address only when it pins a
     // port outside the relay range (OPENCODE_BROWSEVIL_PORT=9222, say): that browser is deliberately pinned there. Every
-    // other address (remote, or an in-range loopback) is cleared so the link dials its port or 19988.
+    // other address (remote, or an in-range loopback) is cleared so the link dials its port or 29698.
     const keepPinned = port === undefined && saved?.host === "127.0.0.1" &&
       saved.port !== undefined && !relayPorts.includes(saved.port)
     const address = keepPinned ? stored[RELAY_ADDRESS_KEY] as string : ""
-    // A link without a port is for 19988. Drop a port only a scan found first, so the reconnect this write triggers
-    // dials 19988 with the code instead of carrying it to whatever answered a scan.
+    // A link without a port is for 29698. Drop a port only a scan found first, so the reconnect this write triggers
+    // dials 29698 with the code instead of carrying it to whatever answered a scan.
     if (port === undefined) await chrome.storage.local.remove([DISCOVERED_PORT_KEY, DISCOVERED_KIND_KEY])
     await chrome.storage.local.set({
       [RELAY_ADDRESS_KEY]: address,

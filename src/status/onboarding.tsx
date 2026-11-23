@@ -24,7 +24,7 @@ import { applyColorScheme, Brand, createFlash, createRelay, Note, Rich, type Rel
 import "./onboarding.css"
 
 // `browse install` opens the setup page with a one-time code in the fragment (welcome.html#code=…, which forwards
-// here), plus the relay's port when it isn't 19988, for a store build (cli/src/setup.ts pairStoreExtension). Take
+// here), plus the relay's port when it isn't 29698, for a store build (cli/src/setup.ts pairStoreExtension). Take
 // them, then drop the whole fragment from the URL (address bar and history) before anything else.
 const link = pairingLink(location.hash)
 let fragmentCode = link?.code

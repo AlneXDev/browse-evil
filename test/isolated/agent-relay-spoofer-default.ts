@@ -2,14 +2,14 @@ import { expect, test } from "bun:test"
 import { pairingProof, randomNonce } from "../../src/background/pairing"
 import { installChrome, settle } from "../chrome-stub"
 
-// A spoofer on 19988 (the default) and the real relay on 19990: the scan must leave the port that just failed its
-// proof and reach 19990. Run by ../isolated.test.ts.
+// A spoofer on 29698 (the default) and the real relay on 29699: the scan must leave the port that just failed its
+// proof and reach 29699. Run by ../isolated.test.ts.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const SPOOF_PORT = 19988
-const REAL_PORT = 19990
+const SPOOF_PORT = 29698
+const REAL_PORT = 29699
 const SPOOF_TOKEN = "spoof-token-0123456789abcdefghijklmnopqrstuv"
 const REAL_TOKEN = "real-token-0123456789abcdefghijklmnopqrstuv"
 
@@ -77,7 +77,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("a spoofed 19988 is left for the real relay on 19990", async () => {
+test("a spoofed 29698 is left for the real relay on 29699", async () => {
   await until(() => relay.state().status === "connected")
   expect(FakeWebSocket.made.at(-1)!.url).toBe(`ws://127.0.0.1:${REAL_PORT}/extension`)
   expect(await stored("agentRelayDiscoveredPort")).toBe(REAL_PORT)

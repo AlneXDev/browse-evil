@@ -12,8 +12,8 @@ const runtime = path.join(root, "runtime")
 const installed = () => JSON.parse(readFileSync(path.join(runtime, "current.json"), "utf8"))
 const current = () => installed().version
 const entry = (version) => path.join(runtime, "versions", version, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
-process.env.OPENCODE_BROWSER_HOME ??= root
-const relayPort = Number(process.env.OPENCODE_BROWSER_PORT) || 19988
+process.env.OPENCODE_BROWSEVIL_HOME ??= root
+const relayPort = Number(process.env.OPENCODE_BROWSEVIL_PORT) || 29698
 
 const binary = installed().binary
 if (binary) {
@@ -28,8 +28,8 @@ if (binary) {
   const REPLAY = "opencode-browser-shim-initialize"
   // Every server this supervisor starts keeps one implicit session, and the relay watches this process (not the
   // server it replaces), so an update doesn't end the agent's session or close its tabs.
-  process.env.OPENCODE_BROWSER_MCP_SESSION ??= "mcp-" + Math.random().toString(16).slice(2, 10).padEnd(8, "0")
-  process.env.OPENCODE_BROWSER_CLIENT_PID = String(process.pid)
+  process.env.OPENCODE_BROWSEVIL_MCP_SESSION ??= "mcp-" + Math.random().toString(16).slice(2, 10).padEnd(8, "0")
+  process.env.OPENCODE_BROWSEVIL_CLIENT_PID = String(process.pid)
   let version = current()
   let child
   let initialize

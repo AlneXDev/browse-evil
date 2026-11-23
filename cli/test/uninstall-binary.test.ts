@@ -37,15 +37,15 @@ function envFor(home: Home): NodeJS.ProcessEnv {
     XDG_STATE_HOME: path.join(home.home, ".local", "state"),
     XDG_CACHE_HOME: path.join(home.home, ".cache"),
     XDG_BIN_HOME: home.bin,
-    OPENCODE_BROWSER_HOME: home.root,
-    OPENCODE_BROWSER_PORT: "29988",
-    OPENCODE_BROWSER_UPDATE_CHECK: "0",
-    OPENCODE_BROWSER_AUTOSTART: "0",
+    OPENCODE_BROWSEVIL_HOME: home.root,
+    OPENCODE_BROWSEVIL_PORT: "29988",
+    OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
+    OPENCODE_BROWSEVIL_AUTOSTART: "0",
     SHELL: "/bin/sh",
     TEST_BINARY: home.installer,
     TEST_MANAGED: home.managed,
   }
-  delete env.OPENCODE_BROWSER_PACKAGE
+  delete env.OPENCODE_BROWSEVIL_PACKAGE
   delete env.GITHUB_ACTIONS
   delete env.GITHUB_PATH
   return env
@@ -60,7 +60,7 @@ function run(script: string, home: Home) {
   })
 }
 
-test.skipIf(process.platform === "win32")("uninstall removes the installer's executable when OPENCODE_BROWSER_HOME points elsewhere", () => {
+test.skipIf(process.platform === "win32")("uninstall removes the installer's executable when OPENCODE_BROWSEVIL_HOME points elsewhere", () => {
   const home = makeHome()
   try {
     writeFileSync(home.installer, "#!/bin/sh\nexit 0\n", { mode: 0o755 })
@@ -70,7 +70,7 @@ import path from "node:path"
 import { installBinaryRuntime, addToPath } from "./src/setup/binary.ts"
 import { installedBinaryPath } from "./src/paths.ts"
 import { uninstall } from "./src/setup/commands.ts"
-globalThis.__OPENCODE_BROWSER_COMPILED__ = true
+globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
 Object.defineProperty(process, "execPath", { value: process.env.TEST_BINARY })
 const managed = installedBinaryPath()
 await installBinaryRuntime()
@@ -98,7 +98,7 @@ test.skipIf(process.platform === "win32")("uninstall keeps the installer's execu
       `
 import { installBinaryRuntime } from "./src/setup/binary.ts"
 import { uninstall } from "./src/setup/commands.ts"
-globalThis.__OPENCODE_BROWSER_COMPILED__ = true
+globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
 Object.defineProperty(process, "execPath", { value: process.env.TEST_BINARY })
 await installBinaryRuntime()
 await uninstall(["--yes"])
@@ -125,7 +125,7 @@ test.skipIf(process.platform === "win32")("uninstall removes an installer-path f
     const result = run(
       `
 import { uninstall } from "./src/setup/commands.ts"
-globalThis.__OPENCODE_BROWSER_COMPILED__ = true
+globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
 Object.defineProperty(process, "execPath", { value: process.env.TEST_MANAGED })
 await uninstall(["--yes"])
 `,
@@ -149,7 +149,7 @@ test.skipIf(process.platform === "win32")("uninstall keeps an installer-path fil
     const result = run(
       `
 import { uninstall } from "./src/setup/commands.ts"
-globalThis.__OPENCODE_BROWSER_COMPILED__ = true
+globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
 Object.defineProperty(process, "execPath", { value: process.env.TEST_MANAGED })
 await uninstall(["--yes"])
 `,

@@ -32,10 +32,10 @@ function installBuild(packageDir: string, version: string) {
 
 /** The environment of a process an agent starts, without the test runner's browse or XDG settings. */
 const agentEnv = (home: string, port: number) => ({
-  ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(XDG_|OPENCODE_BROWSER_)/.test(name))),
+  ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(XDG_|OPENCODE_BROWSEVIL_)/.test(name))),
   HOME: home,
-  OPENCODE_BROWSER_PORT: String(port),
-  OPENCODE_BROWSER_AUTO_UPDATE: "off",
+  OPENCODE_BROWSEVIL_PORT: String(port),
+  OPENCODE_BROWSEVIL_AUTO_UPDATE: "off",
 })
 
 /** The `mcp` processes running a CLI under `folder`. */
@@ -76,11 +76,11 @@ function expectPrivateFilesIn(home: string, files: Record<string, string>) {
   }
 }
 
-/** A free port outside browse's real relay range, so no test here can touch 19988–19997. */
+/** A free port outside browse's real relay range, so no test here can touch 29698–29706. */
 async function freePortOutsideBrowseRange(): Promise<number> {
   for (;;) {
     const port = await freePort()
-    if (port < 19988 || port > 19997) return port
+    if (port < 29698 || port > 29706) return port
   }
 }
 
@@ -90,30 +90,30 @@ describe("taking over the old self-managed runtime", () => {
     // While the old runtime is active, browse shares its folder with the relay the shim started.
     const env: NodeJS.ProcessEnv = {}
     settleLegacyHome(env, legacyRuntime(home))
-    expect(env.OPENCODE_BROWSER_HOME).toBe(oldData)
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBe(oldData)
     // A relay running from the old runtime itself has nothing to hand over to.
     expect(adoptLegacyRuntime(legacyRuntime(home), { ...runtime, entry: oldEntry, version: "0.0.15-dev.108" })).toBe(false)
 
     expect(adoptLegacyRuntime(legacyRuntime(home), runtime, Date.parse("2026-11-08T16:00:00Z"))).toBe(true)
     expect(legacyRuntime(home)).toMatchObject({ version: "0.0.16-dev.130", movedTo: current, switchedAt: "2026-11-08T16:00:00.000Z" })
-    const ran = spawnSync(node, [shim, "status"], { encoding: "utf8", env: { ...process.env, OPENCODE_BROWSER_HOME: "" } })
+    const ran = spawnSync(node, [shim, "status"], { encoding: "utf8", env: { ...process.env, OPENCODE_BROWSEVIL_HOME: "" } })
     expect(JSON.parse(ran.stdout)).toMatchObject({ label: "0.0.16-dev.130", argv1: current, args: ["status"] })
     settleLegacyHome(env, legacyRuntime(home))
-    expect(env.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
   })
 
   test("a binary takeover finds the installer's executable, not one under the old folder the shim points at", () => {
     const { home, oldData } = oldRuntimeHome(homes)
     const executable = path.join(home, ".local", "bin", "browse")
     write(executable, "#!/bin/sh\n", 0o755)
-    const previous = process.env.OPENCODE_BROWSER_HOME
-    process.env.OPENCODE_BROWSER_HOME = oldData
+    const previous = process.env.OPENCODE_BROWSEVIL_HOME
+    process.env.OPENCODE_BROWSEVIL_HOME = oldData
     try {
       expect(currentInstall({ compiled: true, execPath: executable, home })).toMatchObject({ kind: "binary", entry: executable })
       expect(currentInstall({ compiled: true, execPath: path.join(home, "Downloads", "browse"), home })).toBeUndefined()
     } finally {
-      if (previous === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = previous
+      if (previous === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = previous
     }
   })
 
@@ -123,16 +123,16 @@ describe("taking over the old self-managed runtime", () => {
     write(token, "stale\n", 0o600)
     const before = fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")
     using busy = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response("") })
-    const busyEnv: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: String(busy.port) }
+    const busyEnv: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: String(busy.port) }
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: busyEnv, home })).toBe(false)
-    const isolated: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: path.join(home, "isolated"), OPENCODE_BROWSER_PORT: String(await freePort()) }
+    const isolated: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: path.join(home, "isolated"), OPENCODE_BROWSEVIL_PORT: String(await freePort()) }
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: isolated, home })).toBe(false)
-    expect(busyEnv.OPENCODE_BROWSER_HOME).toBe(oldData)
+    expect(busyEnv.OPENCODE_BROWSEVIL_HOME).toBe(oldData)
     expect(fs.readFileSync(token, "utf8")).toBe("stale\n")
 
-    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: String(await freePort()) }
+    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: String(await freePort()) }
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env, home })).toBe(true)
-    expect(env.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
     expect(fs.readFileSync(token, "utf8")).toBe(`${relayToken}\n`)
     expect(fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")).toBe(before)
     expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).not.toEqual(["browse", "mcp"])
@@ -152,7 +152,7 @@ describe("taking over the old self-managed runtime", () => {
       spawnSync(node, [current, "serve", ...(options.args ?? [])], {
         encoding: "utf8",
         timeout: options.timeout ?? 20_000,
-        env: { ...agentEnv(home, port), OPENCODE_BROWSER_HOME: options.home ?? oldData },
+        env: { ...agentEnv(home, port), OPENCODE_BROWSEVIL_HOME: options.home ?? oldData },
       })
     serve(await freePort(), { args: ["--help"] })
     serve(busy.port!)
@@ -161,7 +161,7 @@ describe("taking over the old self-managed runtime", () => {
     expect(fs.readFileSync(record, "utf8")).toBe(before)
 
     const port = await freePort()
-    const relay = spawn(node, [current, "serve"], { env: { ...agentEnv(home, port), OPENCODE_BROWSER_HOME: oldData }, stdio: "ignore" })
+    const relay = spawn(node, [current, "serve"], { env: { ...agentEnv(home, port), OPENCODE_BROWSEVIL_HOME: oldData }, stdio: "ignore" })
     try {
       expect(await until(() => legacyRuntime(home)?.movedTo === fs.realpathSync(current))).toBe(true)
       expect(((await (await fetch(`http://127.0.0.1:${port}/version`)).json()) as { pid: number }).pid).toBe(relay.pid!)
@@ -180,7 +180,7 @@ describe("taking over the old self-managed runtime", () => {
       home,
       port: await freePort(),
       command: [node, shim],
-      env: { OPENCODE_BROWSER_HOME: undefined, OPENCODE_BROWSER_CLIENT_PID: undefined, OPENCODE_BROWSER_MCP_SESSION: undefined },
+      env: { OPENCODE_BROWSEVIL_HOME: undefined, OPENCODE_BROWSEVIL_CLIENT_PID: undefined, OPENCODE_BROWSEVIL_MCP_SESSION: undefined },
     })
     const call = () => mcp.request("tools/call", { name: "status", arguments: {} })
     try {
@@ -217,16 +217,16 @@ describe("taking over the old self-managed runtime", () => {
     fs.symlinkSync(home, linked)
     homes.push(linked)
     adoptLegacyRuntime(legacyRuntime(linked), oldRuntimeHome(homes).runtime)
-    // The shim sets OPENCODE_BROWSER_HOME from its own resolved location.
-    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: fs.realpathSync(oldData) }
+    // The shim sets OPENCODE_BROWSEVIL_HOME from its own resolved location.
+    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: fs.realpathSync(oldData) }
     settleLegacyHome(env, legacyRuntime(linked))
-    expect(env.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
   })
 
   test("pairings and tokens arrive in the new folders byte for byte, still private", async () => {
     const { home, oldData, runtime } = oldRuntimeHome(homes)
     const files = privateFiles(oldData)
-    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: String(await freePort()) }
+    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: String(await freePort()) }
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env, home })).toBe(true)
     expect(await withoutHomeOverride(() => commitLegacyTakeover())).toBe(true)
     expectPrivateFilesIn(home, files)
@@ -237,16 +237,16 @@ describe("taking over the old self-managed runtime", () => {
     const files = privateFiles(oldData)
     const before = fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")
     const port = String(await freePort())
-    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: port }, home })).toBe(true)
+    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: port }, home })).toBe(true)
     // The process dies here. The next one finds the old runtime still active and shares its folder again.
     expect(fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")).toBe(before)
     const next: NodeJS.ProcessEnv = {}
     settleLegacyHome(next, legacyRuntime(home))
-    expect(next.OPENCODE_BROWSER_HOME).toBe(oldData)
+    expect(next.OPENCODE_BROWSEVIL_HOME).toBe(oldData)
     // Meanwhile the user revokes a browser, which the old relay still serves from the old folder.
     fs.rmSync(path.join(oldData, "browser-tokens.json"))
     delete files["browser-tokens.json"]
-    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: port }, home })).toBe(true)
+    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: port }, home })).toBe(true)
     expect(await withoutHomeOverride(() => commitLegacyTakeover())).toBe(true)
     expect(fs.existsSync(path.join(home, ".local", "share", "browse", "browser-tokens.json"))).toBe(false)
     expectPrivateFilesIn(home, files)
@@ -256,13 +256,13 @@ describe("taking over the old self-managed runtime", () => {
     const { home, oldData, opencode, runtime } = oldRuntimeHome(homes)
     const files = privateFiles(oldData)
     const takenOver = Date.now()
-    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSER_HOME: oldData, OPENCODE_BROWSER_PORT: String(await freePort()) }, home })).toBe(true)
+    expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: String(await freePort()) }, home })).toBe(true)
     // commitLegacyTakeover dies after pointing the old runtime here, before migrating.
     expect(adoptLegacyRuntime(legacyRuntime(home), runtime, takenOver)).toBe(true)
     // The next start (main.ts): the old folder the shim sets is no override, and migration runs.
-    const next: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData }
+    const next: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData }
     settleLegacyHome(next, legacyRuntime(home))
-    expect(next.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(next.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
     withoutHomeOverride(() => migrateLegacy(home, takenOver + 60_000))
     expectPrivateFilesIn(home, files)
     expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).toEqual(["browse", "mcp"])
@@ -291,7 +291,7 @@ describe("taking over the old self-managed runtime", () => {
 
   test("an unpinned relay on a free port takes the old runtime over", async () => {
     const { home, oldData, runtime } = oldRuntimeHome(homes)
-    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData }
+    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData }
     // Nothing answers and nothing is bound: the relay can start here, so the takeover must go ahead.
     expect(await prepareLegacyTakeover(legacyRuntime(home), {
       install: runtime,
@@ -300,7 +300,7 @@ describe("taking over the old self-managed runtime", () => {
       relayPort: await freePortOutsideBrowseRange(),
       pinned: false,
     })).toBe(true)
-    expect(env.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
   })
 
   test("an unpinned relay only lets a definite non-browse listener through, never a slow or silent one", async () => {
@@ -308,7 +308,7 @@ describe("taking over the old self-managed runtime", () => {
     // Playwriter and friends answer HTTP, just not browse's /version: the relay can fall back (relay/port.ts), so a
     // takeover must go ahead rather than being blocked by whatever holds the port.
     using other = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response("Not Found", { status: 404 }) })
-    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: oldData }
+    const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData }
     expect(await prepareLegacyTakeover(legacyRuntime(home), {
       install: runtime,
       env,
@@ -316,7 +316,7 @@ describe("taking over the old self-managed runtime", () => {
       relayPort: other.port!,
       pinned: false,
     })).toBe(true)
-    expect(env.OPENCODE_BROWSER_HOME).toBeUndefined()
+    expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
 
     // A port that accepts but never answers HTTP is a doubt: takeover waits, exactly as for a busy one.
     const { home: silentHome, oldData: silentData, runtime: silentRuntime } = oldRuntimeHome(homes)
@@ -324,7 +324,7 @@ describe("taking over the old self-managed runtime", () => {
     await new Promise<void>((resolve) => silent.listen(0, "127.0.0.1", resolve))
     const silentPort = (silent.address() as net.AddressInfo).port
     try {
-      const silentEnv: NodeJS.ProcessEnv = { OPENCODE_BROWSER_HOME: silentData }
+      const silentEnv: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: silentData }
       expect(await prepareLegacyTakeover(legacyRuntime(silentHome), {
         install: silentRuntime,
         env: silentEnv,
@@ -332,7 +332,7 @@ describe("taking over the old self-managed runtime", () => {
         relayPort: silentPort,
         pinned: false,
       })).toBe(false)
-      expect(silentEnv.OPENCODE_BROWSER_HOME).toBe(silentData)
+      expect(silentEnv.OPENCODE_BROWSEVIL_HOME).toBe(silentData)
     } finally {
       silent.close()
     }

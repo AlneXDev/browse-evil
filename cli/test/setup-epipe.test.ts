@@ -11,10 +11,10 @@ function isolatedEnv(home: string): NodeJS.ProcessEnv {
     PATH: process.env.PATH,
     HOME: home,
     USERPROFILE: home,
-    OPENCODE_BROWSER_HOME: path.join(home, "browse"),
-    OPENCODE_BROWSER_PORT: "29988",
-    OPENCODE_BROWSER_AUTO_UPDATE: "off",
-    OPENCODE_BROWSER_UPDATE_CHECK: "0",
+    OPENCODE_BROWSEVIL_HOME: path.join(home, "browse"),
+    OPENCODE_BROWSEVIL_PORT: "29988",
+    OPENCODE_BROWSEVIL_AUTO_UPDATE: "off",
+    OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
   }
 }
 

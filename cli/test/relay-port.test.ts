@@ -29,27 +29,27 @@ import { relayToken } from "../src/relay/secrets.ts"
 import { freePort } from "./support/ports.ts"
 import type { RelayVersion } from "../src/relay/schema.ts"
 
-// Port fallback and relay.json (relay/port.ts). Candidates are passed in so nothing here touches 19988–19997.
+// Port fallback and relay.json (relay/port.ts). Candidates are passed in so nothing here touches 29698–29706.
 const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-port-"))
-const previousHome = process.env.OPENCODE_BROWSER_HOME
-const previousPort = process.env.OPENCODE_BROWSER_PORT
-process.env.OPENCODE_BROWSER_HOME = home
-delete process.env.OPENCODE_BROWSER_PORT
+const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+process.env.OPENCODE_BROWSEVIL_HOME = home
+delete process.env.OPENCODE_BROWSEVIL_PORT
 afterAll(() => {
-  if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-  else process.env.OPENCODE_BROWSER_HOME = previousHome
-  if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-  else process.env.OPENCODE_BROWSER_PORT = previousPort
+  if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+  else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
+  if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+  else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
   fs.rmSync(home, { recursive: true, force: true })
 })
 
 const header = (request: Request, name: string) => request.headers.get(name) ?? undefined
 
-/** A free port outside browse's real range, so no test here can bind 19988–19997. */
+/** A free port outside browse's real range, so no test here can bind 29698–29706. */
 async function freePortOutsideBrowseRange(): Promise<number> {
   for (;;) {
     const port = await freePort()
-    if (port < 19988 || port > 19997) return port
+    if (port < 29698 || port > 29706) return port
   }
 }
 
@@ -77,11 +77,11 @@ describe("relay port fallback", () => {
       expect(relay.url).toBe(`http://127.0.0.1:${fallback}`)
       expect(readRelayState()).toMatchObject({
         port: fallback,
-        configuredPort: 19988,
+        configuredPort: 29698,
         pid: process.pid,
       })
       // State is per configured port, next to that port's lifecycle log, and never the token.
-      expect(relayStatePath()).toBe(path.join(home, "relays", "19988", "relay.json"))
+      expect(relayStatePath()).toBe(path.join(home, "relays", "29698", "relay.json"))
       expect(fs.statSync(relayStatePath()).mode & 0o777).toBe(0o600)
 
       // A client with no pinned port resolves the fallback through relay.json.
@@ -220,9 +220,9 @@ describe("relay port fallback", () => {
   test("a slow relay is not taken for a foreign one and replaced by a second relay", async () => {
     let started = 0
     const relay = {
-      endpoint: "http://127.0.0.1:19988",
+      endpoint: "http://127.0.0.1:29698",
       version: Effect.fail(new RelayClient.RelayTimedOut({
-        message: "The relay on port 19988 isn't answering (/version timed out after 5s).",
+        message: "The relay on port 29698 isn't answering (/version timed out after 5s).",
         path: "/version",
       })),
     } as unknown as RelayClient.Interface
@@ -249,7 +249,7 @@ describe("relay port fallback", () => {
     let calls = 0
     let started = 0
     const relay = {
-      endpoint: "http://127.0.0.1:19988",
+      endpoint: "http://127.0.0.1:29698",
       version: Effect.suspend(() => {
         calls++
         // After the old relay's shutdown it removes relay.json; the endpoint falls back to a port Playwriter holds.
@@ -287,7 +287,7 @@ describe("relay port fallback", () => {
     let calls = 0
     let started = 0
     const relay = {
-      endpoint: "http://127.0.0.1:19988",
+      endpoint: "http://127.0.0.1:29698",
       version: Effect.suspend(() => {
         calls++
         if (calls === 1) return Effect.fail(new RelayClient.RelayDecodeFailed({
@@ -327,8 +327,8 @@ describe("relay port fallback", () => {
       },
     })
     relayToken(home)
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     try {
       // Playwriter's reply, with no relay.json: setup finds no relay, and the client refuses before the token.
       const noRelay = async () => {
@@ -377,16 +377,16 @@ describe("relay port fallback", () => {
       expect(sent.some((value) => value?.startsWith("Bearer "))).toBe(true)
     } finally {
       fs.rmSync(path.join(home, "relays", String(port)), { recursive: true, force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   }, 30_000)
 
   test("a draining relay on a fallback port is not replaced while relay.json still names it", async () => {
     const configured = await freePortOutsideBrowseRange()
     const fallback = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(configured)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(configured)
     const startedAt = new Date().toISOString()
     const old = {
       version: "0.0.15",
@@ -403,7 +403,7 @@ describe("relay port fallback", () => {
         endpoint: endpointForPort(fallback),
         version: Effect.suspend(() => {
           calls++
-          // The old instance answers while it drains. Once it stops, 19988 answers as another program, but relay.json
+          // The old instance answers while it drains. Once it stops, 29698 answers as another program, but relay.json
           // still names the old instance and its process is alive: that is not an exit yet.
           return calls <= 2
             ? Effect.succeed(old)
@@ -428,15 +428,15 @@ describe("relay port fallback", () => {
       expect(started).toBe(0)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned-port drain retries a /version cut off while relay.json still names the old relay", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const old = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -476,15 +476,15 @@ describe("relay port fallback", () => {
       expect(readiness.waitForReconnect).toBe(true)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned-port drain whose relay.json is gone keeps a cut /version a hard error", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const old = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -525,15 +525,15 @@ describe("relay port fallback", () => {
       expect(calls).toBe(3)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned-port restart waits out a confirmed /version cut off by another drain", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const old = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -571,15 +571,15 @@ describe("relay port fallback", () => {
       expect(readiness.waitForReconnect).toBe(true)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned ensureRelay starts one relay after a drain ends without a replacement", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const old = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -628,15 +628,15 @@ describe("relay port fallback", () => {
       expect(readiness.version.instanceId).toBe("started-relay")
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("an unpinned ensureRelay starts past a drain on a stale live record", async () => {
     const recordedPort = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    delete process.env.OPENCODE_BROWSER_PORT
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    delete process.env.OPENCODE_BROWSEVIL_PORT
     const stale = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -675,15 +675,15 @@ describe("relay port fallback", () => {
       expect(readiness.version.instanceId).toBe("started-relay")
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("an unpinned restart starts past a drain on a stale live record", async () => {
     const recordedPort = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    delete process.env.OPENCODE_BROWSER_PORT
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    delete process.env.OPENCODE_BROWSEVIL_PORT
     const stale = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -723,15 +723,15 @@ describe("relay port fallback", () => {
       expect(readiness.version.instanceId).toBe("started-relay")
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned port with a live-looking relay.json and another program fails with the port error", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const stale = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -781,15 +781,15 @@ describe("relay port fallback", () => {
       expect(starts).toBe(0)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
   test("a pinned-port drain that keeps answering as the old relay stays RelayStillRunning", async () => {
     const port = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(port)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(port)
     const old = {
       version: "0.0.15",
       buildId: "2026-11-06T00:00:00Z",
@@ -819,8 +819,8 @@ describe("relay port fallback", () => {
       expect(calls).toBe(4)
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   })
 
@@ -836,7 +836,7 @@ describe("relay port fallback", () => {
       expect(await liveRelayPort({ root })).toBeUndefined()
       writeRelayState({
         port,
-        configuredPort: 19988,
+        configuredPort: 29698,
         pid: process.pid,
         instanceId: "live-relay",
         startedAt: new Date().toISOString(),
@@ -893,8 +893,8 @@ describe("relay port fallback", () => {
     const configured = await freePortOutsideBrowseRange()
     const lookalike = await freePortOutsideBrowseRange()
     const recorded = await freePortOutsideBrowseRange()
-    const previousPort = process.env.OPENCODE_BROWSER_PORT
-    process.env.OPENCODE_BROWSER_PORT = String(configured)
+    const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
+    process.env.OPENCODE_BROWSEVIL_PORT = String(configured)
     const sent: Array<string | undefined> = []
     using fake = Bun.serve({
       hostname: "127.0.0.1",
@@ -929,8 +929,8 @@ describe("relay port fallback", () => {
       expect(await verifiedRelayEndpoint()).toBeUndefined()
     } finally {
       fs.rmSync(relayStatePath(), { force: true })
-      if (previousPort === undefined) delete process.env.OPENCODE_BROWSER_PORT
-      else process.env.OPENCODE_BROWSER_PORT = previousPort
+      if (previousPort === undefined) delete process.env.OPENCODE_BROWSEVIL_PORT
+      else process.env.OPENCODE_BROWSEVIL_PORT = previousPort
     }
   }, 30_000)
 
@@ -961,7 +961,7 @@ describe("relay port fallback", () => {
   })
 
   test("candidates are the configured port first, then the fallback range", () => {
-    expect(relayPortCandidates(19988)).toEqual([19988, 19990, 19991, 19992, 19993, 19994, 19995, 19996, 19997])
+    expect(relayPortCandidates(29698)).toEqual([29698, 29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706])
   })
 
   test("a pinned port is used as is, with no probing or fallback", async () => {

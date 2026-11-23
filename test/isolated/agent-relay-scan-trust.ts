@@ -2,14 +2,14 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A port only a scan found can answer /version like browse and then fail the handshake. That reply is not proof: the
-// close must stay eligible for a scan, and the scan prefers 19988 or a port this browser holds a token for, so a fake
+// close must stay eligible for a scan, and the scan prefers 29698 or a port this browser holds a token for, so a fake
 // listener can't keep the extension on itself. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const SCANNED_PORT = 19990
-const DEFAULT_PORT = 19988
+const SCANNED_PORT = 29699
+const DEFAULT_PORT = 29698
 const SCANNED_TOKEN = "scanned-token-0123456789abcdefghijklmnopqrst"
 const DEFAULT_TOKEN = "default-token-0123456789abcdefghijklmnopqrst"
 
@@ -82,7 +82,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("a bogus challenge on a scanned port is not proof, so the next scan moves to 19988", async () => {
+test("a bogus challenge on a scanned port is not proof, so the next scan moves to 29698", async () => {
   await until(() => FakeWebSocket.made.some((socket) => socket.url.includes(`:${SCANNED_PORT}/`) && socket.received.some((message) => message.method === "hello")))
   const scanned = FakeWebSocket.made.find((socket) => socket.url.includes(`:${SCANNED_PORT}/`))!
   // It answered, challenged, and never proved the token: that close must not pin the extension here.

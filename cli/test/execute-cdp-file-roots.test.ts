@@ -9,13 +9,13 @@ const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cdp-roots-"))
 let previousHome: string | undefined
 
 beforeAll(() => {
-  previousHome = process.env.OPENCODE_BROWSER_HOME
-  process.env.OPENCODE_BROWSER_HOME = path.join(scratch, "home")
-  fs.mkdirSync(process.env.OPENCODE_BROWSER_HOME, { recursive: true })
+  previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+  process.env.OPENCODE_BROWSEVIL_HOME = path.join(scratch, "home")
+  fs.mkdirSync(process.env.OPENCODE_BROWSEVIL_HOME, { recursive: true })
 })
 afterAll(() => {
-  if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-  else process.env.OPENCODE_BROWSER_HOME = previousHome
+  if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+  else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
   fs.rmSync(scratch, { recursive: true, force: true })
 })
 

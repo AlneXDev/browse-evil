@@ -93,12 +93,12 @@ mod tests {
 
     #[test]
     fn host_headers() {
-        assert!(validate_host_header(Some("127.0.0.1:19988"), "127.0.0.1", 19988).is_ok());
-        assert!(validate_host_header(Some("localhost"), "127.0.0.1", 19988).is_ok());
-        assert!(validate_host_header(Some("[::1]:19988"), "127.0.0.1", 19988).is_ok());
-        assert!(validate_host_header(Some("evil.com:19988"), "127.0.0.1", 19988).is_err());
-        assert!(validate_host_header(Some("127.0.0.1:1"), "127.0.0.1", 19988).is_err());
-        assert!(validate_host_header(None, "127.0.0.1", 19988).is_err());
+        assert!(validate_host_header(Some("127.0.0.1:29698"), "127.0.0.1", 29698).is_ok());
+        assert!(validate_host_header(Some("localhost"), "127.0.0.1", 29698).is_ok());
+        assert!(validate_host_header(Some("[::1]:29698"), "127.0.0.1", 29698).is_ok());
+        assert!(validate_host_header(Some("evil.com:29698"), "127.0.0.1", 29698).is_err());
+        assert!(validate_host_header(Some("127.0.0.1:1"), "127.0.0.1", 29698).is_err());
+        assert!(validate_host_header(None, "127.0.0.1", 29698).is_err());
     }
 
     #[test]

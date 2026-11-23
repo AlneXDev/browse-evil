@@ -12,14 +12,14 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 
 const temporaryRoot = path.join(os.homedir(), ".cache", "oc-tmp")
 fs.mkdirSync(temporaryRoot, { recursive: true })
-// The harness gives the relay its own HOME/OPENCODE_BROWSER_HOME and a free port (never 19988).
+// The harness gives the relay its own HOME/OPENCODE_BROWSEVIL_HOME and a free port (never 29698).
 const home = fs.mkdtempSync(path.join(temporaryRoot, "browse-fetch-release-"))
 let relay: ChildProcess | undefined
 let port = 0
 let token = ""
 
 beforeAll(async () => {
-  const started = await startRelay(home, { OPENCODE_BROWSER_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(home, { OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   relay = started.child
   port = started.port
   token = started.token
@@ -326,7 +326,7 @@ test("a client that never enabled Fetch sends no Fetch.disable", async () => {
 
 test("relay shutdown releases Fetch before the extension link closes", async () => {
   const shutdownHome = fs.mkdtempSync(path.join(temporaryRoot, "browse-fetch-shutdown-"))
-  const started = await startRelay(shutdownHome, { OPENCODE_BROWSER_MANAGED_RELAY: "1", OPENCODE_BROWSER_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(shutdownHome, { OPENCODE_BROWSEVIL_MANAGED_RELAY: "1", OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   const shutdownRelay = started.child
   const tabId = 421
   const extension = new FakeExtension(shutdownHome, started.port)

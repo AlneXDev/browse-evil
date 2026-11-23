@@ -1,4 +1,4 @@
-// The link to the browse relay (ws://127.0.0.1:19988/extension). The relay runs agent sessions
+// The link to the browse relay (ws://127.0.0.1:29698/extension). The relay runs agent sessions
 // for the browse MCP server and the browse CLI (page tools, `execute` scripts, recordings, handoffs) and drives tabs
 // through this extension; this module runs its commands. The wire protocol is in ../agent-relay/protocol.ts,
 // the relay itself in cli/src/relay.ts.
@@ -417,10 +417,10 @@ export function createAgentRelay(input: { changed: (state: AgentRelayState) => v
     if (socket && socket.readyState <= WebSocket.OPEN) return
     clearTimeout(retry)
     retry = undefined
-    // An unpacked build's pairing file names the relay's port when it isn't 19988 (cli/src/relay/port.ts).
+    // An unpacked build's pairing file names the relay's port when it isn't 29698 (cli/src/relay/port.ts).
     await handshake.pairingHint()
     const stored = await chrome.storage.local.get([PORT_KEY, RELAY_ADDRESS_KEY, ...discoveredKeys])
-    // An address the user set (or the PORT_KEY dev pin), else this one: 19988, or the port a hint or scan found.
+    // An address the user set (or the PORT_KEY dev pin), else this one: 29698, or the port a hint or scan found.
     const target = relayTarget(stored)
     const previous = `${host}:${port}`
     host = target.host

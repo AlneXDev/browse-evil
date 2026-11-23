@@ -2,13 +2,13 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A relay address typed as localhost:<fallback port> with a code is a hint, not a pin: the address stays automatic, the
-// code goes to that port, and when that port later fails a scan can move back to 19988. Run by ../isolated.test.ts.
+// code goes to that port, and when that port later fails a scan can move back to 29698. Run by ../isolated.test.ts.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const HINT_PORT = 19990
-const DEFAULT_PORT = 19988
+const HINT_PORT = 29699
+const DEFAULT_PORT = 29698
 const CODE = "ZZZZZZZZ"
 
 type Message = { method?: string; params?: Record<string, unknown> }
@@ -61,7 +61,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("localhost:19990 with a code is a hint; a later failure scans back to 19988", async () => {
+test("localhost:29699 with a code is a hint; a later failure scans back to 29698", async () => {
   await until(() => at(DEFAULT_PORT).some((socket) => socket.received.length > 0))
   void relay.connectTo(`localhost:${HINT_PORT}`, CODE)
   await until(() => at(HINT_PORT).some((socket) => socket.received.some((message) => message.method === "hello")))
@@ -71,13 +71,13 @@ test("localhost:19990 with a code is a hint; a later failure scans back to 19988
   expect(await stored("agentRelayDiscoveredPort")).toBe(HINT_PORT)
   expect(await stored("agentRelayDiscoveredKind")).toBe("hint")
   expect(await stored("agentRelayCodePort")).toBe(HINT_PORT)
-  // Now the hint port fails, and a scan finds 19988.
+  // Now the hint port fails, and a scan finds 29698.
   at(HINT_PORT).at(-1)!.close(1006)
   await until(() => at(DEFAULT_PORT).length > 1 && at(DEFAULT_PORT).at(-1)!.readyState === FakeWebSocket.OPEN)
   expect(await stored("agentRelayDiscoveredPort")).toBe(DEFAULT_PORT)
   expect(await stored("agentRelayAddress")).toBe("")
   expect(relay.state().relay).toEqual({ address: `localhost:${DEFAULT_PORT}`, remote: false })
-  // The code stayed with its own port: 19988 got presence only.
+  // The code stayed with its own port: 29698 got presence only.
   const last = at(DEFAULT_PORT).at(-1)!
   expect(last.received.map((message) => message.method)).toEqual(["protocol"])
   expect(last.received).not.toContainEqual(expect.objectContaining({ method: "hello" }))

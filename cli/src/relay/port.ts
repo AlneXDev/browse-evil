@@ -1,8 +1,8 @@
 // Where the relay listens, and where the CLI finds it.
 //
-// The configured port is OPENCODE_BROWSEVIL_PORT, else 19988. Everything an install keeps by port (the session catalog,
+// The configured port is OPENCODE_BROWSEVIL_PORT, else 29698. Everything an install keeps by port (the session catalog,
 // the lifecycle log, the current-session key) stays on the configured port, so a fallback never moves data. Only the
-// listen port changes: another product (Playwriter) also uses 19988, and an unpinned relay steps to the next free
+// listen port changes: another product (Playwriter) also uses 29698, and an unpinned relay steps to the next free
 // browse port instead of failing onboarding. The extension learns the listen port when it pairs.
 //
 // <state root>/relays/<configured port>/relay.json records the port the running relay actually bound. Clients resolve
@@ -14,7 +14,7 @@ import { writePrivateJsonFileSync } from "../fs-durability.ts"
 import { stateRoot } from "../paths.ts"
 import { defaultPort } from "./helpers.ts"
 
-/** The ports an unpinned relay falls back to after 19988. Not 19989: that is Browser Control's (helpers.ts). */
+/** The ports an unpinned relay falls back to after 29698. Not 19989: that is Browser Control's (helpers.ts). */
 export const fallbackPorts = [29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706] as const
 
 export const endpointForPort = (port: number): string => `http://127.0.0.1:${port}`
@@ -26,7 +26,7 @@ function envPort(env: NodeJS.ProcessEnv = process.env): number | undefined {
   return Number.isSafeInteger(port) && port > 0 && port < 65_536 ? port : undefined
 }
 
-/** The port this install is configured for: OPENCODE_BROWSEVIL_PORT, else 19988. State paths and keys use this one. */
+/** The port this install is configured for: OPENCODE_BROWSEVIL_PORT, else 29698. State paths and keys use this one. */
 export const configuredRelayPort = (env: NodeJS.ProcessEnv = process.env): number => envPort(env) ?? defaultPort
 
 /** Whether OPENCODE_BROWSEVIL_PORT pins the relay to one port, with no fallback. */
@@ -119,7 +119,7 @@ export function processAlive(pid: number): boolean {
 
 /**
  * The port clients should dial. A pinned OPENCODE_BROWSEVIL_PORT wins; otherwise the relay.json a live relay wrote for
- * this install; otherwise 19988. Cheap: an environment read, a small file read and one `kill(pid, 0)`.
+ * this install; otherwise 29698. Cheap: an environment read, a small file read and one `kill(pid, 0)`.
  */
 export function resolveRelayPort(root = stateRoot()): number {
   const pinned = envPort()
@@ -129,7 +129,7 @@ export function resolveRelayPort(root = stateRoot()): number {
   return defaultPort
 }
 
-/** The ports an unpinned relay tries, in order: the configured port, then 19990–19997. */
+/** The ports an unpinned relay tries, in order: the configured port, then 29699–29706. */
 export function relayPortCandidates(configuredPort = configuredRelayPort()): number[] {
   return [...new Set([configuredPort, ...fallbackPorts])]
 }
@@ -194,7 +194,7 @@ export async function verifiedRelay(
   const live = state !== undefined && state.configuredPort === configuredPort && processAlive(state.pid)
     ? state
     : undefined
-  // This one read decides the port: a pinned port stays pinned, otherwise a live relay.json names it, else 19988.
+  // This one read decides the port: a pinned port stays pinned, otherwise a live relay.json names it, else 29698.
   const port = envPort() ?? live?.port ?? defaultPort
   const version = await browseVersionAt(port, options.timeoutMs ?? 3_000)
   if (!version) return undefined
@@ -243,7 +243,7 @@ export async function liveRelayPort(
   return state?.port
 }
 
-/** "19988, 19990-19997" */
+/** "29698, 29699-29706" */
 function portListText(ports: readonly number[]): string {
   const groups: string[] = []
   const sorted = [...ports].sort((left, right) => left - right)
@@ -277,7 +277,7 @@ export type ChooseRelayPortOptions = {
   /** An explicit port (or OPENCODE_BROWSEVIL_PORT): bind only it, with no fallback. */
   readonly pinned?: boolean
   readonly host?: string
-  /** Replaces the built-in list. Tests pass free ports so they never touch the real 19988–19997 range. */
+  /** Replaces the built-in list. Tests pass free ports so they never touch the real 29698–29706 range. */
   readonly candidates?: readonly number[]
   readonly probeTimeoutMs?: number
   readonly root?: string

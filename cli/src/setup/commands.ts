@@ -213,7 +213,7 @@ export async function extension() {
   await syncDev()
   if (!existsSync(path.join(folder, "manifest.json")))
     fail(`${folder} has no built extension. Run \`${installCommand()}\` first.`)
-  // The folder code names the live relay's port when one is running; otherwise it stays usable on 19988.
+  // The folder code names the live relay's port when one is running; otherwise it stays usable on 29698.
   const failure = ensureRelayQuietly(readJson<Settings>(files.settings)?.entry ?? runningEntry())
   if (failure) log(`! Couldn't start the relay: ${failure}`)
   await pairUnpacked()

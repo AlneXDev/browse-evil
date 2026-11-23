@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// A pending pairing code is only sent to the port it was given for (19988 without a hint). When 19988 belongs to
+// A pending pairing code is only sent to the port it was given for (29698 without a hint). When 29698 belongs to
 // another program and the relay is found on a fallback port by scanning, the code stays put: a wrong relay would
 // refuse it, and a refusal spends it. Once the link names the port, the code goes there. Run by ../isolated.test.ts.
 
@@ -9,8 +9,8 @@ const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
-const DEFAULT_PORT = 19988
-const BROWSER_PORT = 19990
+const DEFAULT_PORT = 29698
+const BROWSER_PORT = 29699
 
 class FakeWebSocket {
   static readonly CONNECTING = 0
@@ -67,7 +67,7 @@ async function until(check: () => boolean) {
 }
 
 test("a code is never sent to a port only a scan found", async () => {
-  await until(() => relay.state().relay.address === "localhost:19988" && socketsAt(BROWSER_PORT).length > 0)
+  await until(() => relay.state().relay.address === "localhost:29698" && socketsAt(BROWSER_PORT).length > 0)
   expect((await stub.chrome.storage.local.get("agentRelayDiscoveredPort")).agentRelayDiscoveredPort).toBe(BROWSER_PORT)
   const scanned = socketsAt(BROWSER_PORT)[0]!
   await until(() => scanned.sent.length > 0)
@@ -92,7 +92,7 @@ test("a link that names the port lets the code go there", async () => {
   expect(relay.state().pairing).toBe("code")
 })
 
-test("a link without a port clears the port it was on and points the code at 19988", async () => {
+test("a link without a port clears the port it was on and points the code at 29698", async () => {
   const before = socketsAt(DEFAULT_PORT).length
   expect(await relay.pairLink(CODE)).toBe(true)
   await until(() => socketsAt(DEFAULT_PORT).length > before)
@@ -104,7 +104,7 @@ test("a link without a port clears the port it was on and points the code at 199
 test("a link clears a stored address so it can dial the link's port", async () => {
   await stub.chrome.storage.local.set({ agentRelayAddress: "100.64.0.2" })
   await settle()
-  expect(await relay.pairLink(CODE, 19991)).toBe(true)
+  expect(await relay.pairLink(CODE, 29700)).toBe(true)
   expect((await stub.chrome.storage.local.get("agentRelayAddress")).agentRelayAddress).toBe("")
-  expect((await stub.chrome.storage.local.get("agentRelayCodePort")).agentRelayCodePort).toBe(19991)
+  expect((await stub.chrome.storage.local.get("agentRelayCodePort")).agentRelayCodePort).toBe(29700)
 })

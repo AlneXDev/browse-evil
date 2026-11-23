@@ -7,10 +7,10 @@ const state = (overrides: Partial<AgentRelayState> = {}): AgentRelayState => ({
   status: "unpaired",
   pairing: "none",
   tabs: [],
-  relay: { address: "localhost:19988", remote: false },
+  relay: { address: "localhost:29698", remote: false },
   ...overrides,
 })
-const remote = { address: "devbox:19988", remote: true }
+const remote = { address: "devbox:29698", remote: true }
 
 describe("first-run step", () => {
   test("a store install with nothing set up is told to run install, once the probe has answered", () => {
@@ -21,7 +21,7 @@ describe("first-run step", () => {
 
   test("a relay that runs but isn't paired with this browser asks to pair", () => {
     expect(firstRunStep(state(), "found")).toEqual({ kind: "pair", reason: "unpaired", unpacked: false })
-    expect(firstRunStep(state({ relay: remote }), "unknown")).toEqual({ kind: "pair", reason: "unpaired", remote: "devbox:19988", unpacked: false })
+    expect(firstRunStep(state({ relay: remote }), "unknown")).toEqual({ kind: "pair", reason: "unpaired", remote: "devbox:29698", unpacked: false })
   })
 
   test("an active installer needs no second command", () => {
@@ -48,7 +48,7 @@ describe("first-run step", () => {
     expect(firstRunStep(state({ status: "connected", pairing: "token", tabs: [{ tabId: 4 }], relay: remote }), "unknown")).toEqual({
       kind: "connected",
       tabs: 1,
-      remote: "devbox:19988",
+      remote: "devbox:29698",
     })
   })
 

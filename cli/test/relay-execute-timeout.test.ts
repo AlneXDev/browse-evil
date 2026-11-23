@@ -8,12 +8,12 @@ const read = (env: Record<string, string>): number | undefined =>
 describe("the relay's execute timeout", () => {
   // The 60s default is session-manager's: an unset variable must not reach the hook as a chosen timeout, or every
   // execute would raise Playwright's 30s action timeout with it.
-  test("is unset when OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS is unset", () => {
+  test("is unset when OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS is unset", () => {
     expect(read({})).toBeUndefined()
   })
 
-  test("reads OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS when the relay is given one", () => {
-    expect(read({ OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS: "120000" })).toBe(120_000)
-    expect(read({ OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS: "0" })).toBe(0)
+  test("reads OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS when the relay is given one", () => {
+    expect(read({ OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS: "120000" })).toBe(120_000)
+    expect(read({ OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS: "0" })).toBe(0)
   })
 })

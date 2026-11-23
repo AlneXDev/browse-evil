@@ -20,7 +20,7 @@ pub fn bin_root() -> PathBuf {
         .unwrap_or_else(|| crate::setup::home().join(".local").join("bin"))
 }
 
-/// The port the running relay listens on (a pinned port, else a live relay.json's, else 19988).
+/// The port the running relay listens on (a pinned port, else a live relay.json's, else 29698).
 pub fn port() -> u16 {
     browse_relay::port::resolve_port(&paths())
 }

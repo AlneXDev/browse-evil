@@ -14,7 +14,7 @@ export function RelayForm(props: { relay: Relay; help?: boolean; remote?: boolea
   const [pending, setPending] = createSignal(false)
   const [result, setResult] = createSignal<RelayResult>()
 
-  // The field shows where the extension connects (the port the worker found a relay on, else localhost:19988),
+  // The field shows where the extension connects (the port the worker found a relay on, else localhost:29698),
   // unless the user is editing it.
   createEffect(() => {
     const relay = props.relay.state()?.relay
@@ -55,7 +55,7 @@ export function RelayForm(props: { relay: Relay; help?: boolean; remote?: boolea
               setEdited(true)
               setAddress(event.currentTarget.value)
             }}
-            placeholder={props.remote ? "100.64.0.1 or devbox" : "localhost:19988"}
+            placeholder={props.remote ? "100.64.0.1 or devbox" : "localhost:29698"}
             autocomplete="off"
             spellcheck={false}
           />

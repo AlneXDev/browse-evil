@@ -35,13 +35,13 @@ afterAll(() => {
 const env = (extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv => ({
   ...process.env,
   HOME: home,
-  OPENCODE_BROWSER_HOME: home,
-  OPENCODE_BROWSER_PORT: "29988",
-  OPENCODE_BROWSER_AUTOSTART: "false",
-  OPENCODE_BROWSER_UPDATE_CHECK: "0",
+  OPENCODE_BROWSEVIL_HOME: home,
+  OPENCODE_BROWSEVIL_PORT: "29988",
+  OPENCODE_BROWSEVIL_AUTOSTART: "false",
+  OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
   // An older install's supervisor sets these for a server it starts; inherit none from whatever started the tests.
-  OPENCODE_BROWSER_CLIENT_PID: undefined,
-  OPENCODE_BROWSER_MCP_SESSION: undefined,
+  OPENCODE_BROWSEVIL_CLIENT_PID: undefined,
+  OPENCODE_BROWSEVIL_MCP_SESSION: undefined,
   ...extra,
 })
 
@@ -64,8 +64,8 @@ function installedBinary() {
   const binary = path.join(home, "bin", "browse")
   fs.mkdirSync(path.dirname(binary), { recursive: true })
   fs.writeFileSync(binary, `#!/usr/bin/env bun
-globalThis.__OPENCODE_BROWSER_COMPILED__ = true
-globalThis.__OPENCODE_BROWSER_VERSION__ = "1.0.0"
+globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
+globalThis.__OPENCODE_BROWSEVIL_VERSION__ = "1.0.0"
 await import(${JSON.stringify(source)})
 `, { mode: 0o755 })
   return binary
@@ -210,7 +210,7 @@ describe("browse mcp shuts down cleanly when its client closes stdin", () => {
     // timeout, so a tool call is genuinely in flight when stdin closes: it must still be answered. Only a request that
     // never answers, such as `subscriptions/listen`, may be cut.
     const relay = await blackholeRelay()
-    const mcp = server([process.execPath, source, "mcp"], { OPENCODE_BROWSER_PORT: String(relay.port) })
+    const mcp = server([process.execPath, source, "mcp"], { OPENCODE_BROWSEVIL_PORT: String(relay.port) })
     try {
       await mcp.handshake()
       const reply = mcp.request(3, "tools/call", { name: "tabs_cleanup", arguments: {} })

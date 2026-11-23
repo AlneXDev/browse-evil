@@ -8,8 +8,8 @@ const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
-const PROVEN_PORT = 19990
-const FILE_PORT = 19991
+const PROVEN_PORT = 29699
+const FILE_PORT = 29700
 const TOKEN = "paired-token-0123456789abcdefghijklmnopqrstuv"
 
 class FakeWebSocket {

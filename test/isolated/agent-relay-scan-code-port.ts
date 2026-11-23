@@ -2,14 +2,14 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A pairing code typed without a port must never be carried to a port only a scan found: someone else can answer
-// /version like browse there. It goes to 19988 instead, and the scanned port is forgotten so the next attempt starts
+// /version like browse there. It goes to 29698 instead, and the scanned port is forgotten so the next attempt starts
 // from the default. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const SCANNED_PORT = 19990
-const DEFAULT_PORT = 19988
+const SCANNED_PORT = 29699
+const DEFAULT_PORT = 29698
 const CODE = "ZZZZZZZZ"
 
 type Message = { method?: string; params?: Record<string, unknown> }
@@ -66,7 +66,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("a code entered while the discovered port is scan-only goes to 19988, not the scanned port", async () => {
+test("a code entered while the discovered port is scan-only goes to 29698, not the scanned port", async () => {
   await until(() => at(SCANNED_PORT).some((socket) => socket.received.length > 0))
   // A scan-only port no connection has authenticated is not offered in the form.
   expect(relay.state().relay).toEqual({ address: `localhost:${DEFAULT_PORT}`, remote: false })

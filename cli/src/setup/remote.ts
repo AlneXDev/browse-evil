@@ -30,7 +30,7 @@ export function remoteRelayAddresses(
     .map((address) => address.address)
   const tailnet = ipv4.filter((address) => tailnetIPv4.test(address))
   const hosts = tailnet.length ? [...(options.magicDns ? [options.magicDns] : []), ...tailnet] : ipv4
-  const port = options.port && options.port !== 19988 ? `:${options.port}` : ""
+  const port = options.port && options.port !== 29698 ? `:${options.port}` : ""
   return [...new Set(hosts)].map((host) => host + port)
 }
 

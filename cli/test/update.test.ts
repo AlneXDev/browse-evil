@@ -142,7 +142,7 @@ describe("update check", () => {
     expect(lsRemotes).toBe(3)
   })
 
-  test("the notice names the update and the command; OPENCODE_BROWSER_UPDATE_CHECK=0 turns it off", async () => {
+  test("the notice names the update and the command; OPENCODE_BROWSEVIL_UPDATE_CHECK=0 turns it off", async () => {
     const { clone, push, data } = scenario()
     push("a.txt")
     git(clone, "fetch", "-q")
@@ -151,13 +151,13 @@ describe("update check", () => {
     // The remote head isn't fetched yet, so the summary names the two heads.
     expect(notice?.summary).toMatch(/^origin\/main is at [0-9a-f]{7} \(you have [0-9a-f]{7}\)$/)
     expect(notice?.command).toMatch(/ update$/)
-    const previous = process.env.OPENCODE_BROWSER_UPDATE_CHECK
-    process.env.OPENCODE_BROWSER_UPDATE_CHECK = "0"
+    const previous = process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK
+    process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK = "0"
     try {
       expect(await updateNotice({ repo: clone, dataDir: path.join(data, "other") })).toBeUndefined()
     } finally {
-      if (previous === undefined) delete process.env.OPENCODE_BROWSER_UPDATE_CHECK
-      else process.env.OPENCODE_BROWSER_UPDATE_CHECK = previous
+      if (previous === undefined) delete process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK
+      else process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK = previous
     }
   })
 

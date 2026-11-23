@@ -15,7 +15,7 @@ const base = `http://127.0.0.1:${port}`
 const relay = Bun.spawn([path.resolve(binary), "serve"], {
   cwd: home, stdout: "ignore", stderr: "inherit",
   env: { PATH: process.env.PATH, SystemRoot: process.env.SystemRoot, USERPROFILE: home, HOME: home,
-    OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_PORT: String(port), OPENCODE_BROWSER_UPDATE_CHECK: "0", OPENCODE_BROWSER_MANAGED_RELAY: "1" },
+    OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0", OPENCODE_BROWSEVIL_MANAGED_RELAY: "1" },
 })
 const log = () => fs.readFileSync(path.join(home, "logs/relay.log"), "utf8")
 const execute = (sessionId: string) => fetch(`${base}/cli/execute`, {

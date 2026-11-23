@@ -82,7 +82,7 @@ export const configuredExecuteTimeoutMs = Config.Int("OPENCODE_BROWSEVIL_EXECUTE
 
 export const startRelay = Effect.fn("Relay.start")(function* (options: {
   readonly port?: number
-  /** Test-only: replaces the fallback candidate list so tests never touch the real 19988–19997 range. */
+  /** Test-only: replaces the fallback candidate list so tests never touch the real 29698–29706 range. */
   readonly portCandidates?: readonly number[]
   readonly releaseTargetGraceMs?: number
   readonly sessionCatalogPath?: string | null
@@ -910,7 +910,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     Effect.gen(function* () {
       yield* listenHttpServer({ server: httpServer, host: listenHost, port })
       // Published only once the port is bound: clients resolve through it to find a fallback port. Never holds a token.
-      // A fallback port that can't be recorded leaves clients on 19988 (another program): fail the start instead.
+      // A fallback port that can't be recorded leaves clients on 29698 (another program): fail the start instead.
       // Inside this block, so a failed write runs cleanup instead of leaving the bound server behind.
       yield* Effect.try({
         try: () => writeRelayState({ port, configuredPort, pid: process.pid, instanceId: browserId, startedAt }),

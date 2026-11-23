@@ -1,14 +1,14 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// An unlocked (and unpaired) extension with no pairing hint: 19988 is held by something that isn't browse (Playwriter
+// An unlocked (and unpaired) extension with no pairing hint: 29698 is held by something that isn't browse (Playwriter
 // does the same), so the connection fails before any browse protocol. The worker scans the candidate ports' /version,
 // finds the relay on a fallback port, stores it, and reconnects there. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const BROWSER_PORT = 19990
+const BROWSER_PORT = 29699
 const probes: string[] = []
 
 class FakeWebSocket {
@@ -68,14 +68,14 @@ async function until(check: () => boolean) {
 }
 
 test("an automatic connection scans a failed port and moves to the browse relay it finds", async () => {
-  await until(() => relay.state().relay.address === "localhost:19988" && made().some((url) => url.includes(":19990/")))
-  expect(made()).toEqual(["ws://127.0.0.1:19988/extension", "ws://127.0.0.1:19990/extension"])
+  await until(() => relay.state().relay.address === "localhost:29698" && made().some((url) => url.includes(":29699/")))
+  expect(made()).toEqual(["ws://127.0.0.1:29698/extension", "ws://127.0.0.1:29699/extension"])
   expect(await stored("agentRelayDiscoveredPort")).toBe(BROWSER_PORT)
   // The scan asked every candidate, not just the failed port.
-  expect(probes.some((url) => url.endsWith(":19988/version"))).toBe(true)
-  expect(probes.some((url) => url.endsWith(":19990/version"))).toBe(true)
+  expect(probes.some((url) => url.endsWith(":29698/version"))).toBe(true)
+  expect(probes.some((url) => url.endsWith(":29699/version"))).toBe(true)
   // A port only a scan found, with no authenticated connection, isn't offered in the form: it shows the default.
-  expect(relay.state().relay).toEqual({ address: "localhost:19988", remote: false })
+  expect(relay.state().relay).toEqual({ address: "localhost:29698", remote: false })
   // Nothing to pair with yet: the connection is presence-only, and now watches the right port.
   await until(() => FakeWebSocket.made.at(-1)!.sent.length > 0)
   expect(relay.state().status).toBe("unpaired")
@@ -87,13 +87,13 @@ test("an automatic connection scans a failed port and moves to the browse relay 
 
 test("saving the automatic address the page shows does not pin it", async () => {
   const before = FakeWebSocket.made.length
-  const outcome = relay.connectTo("localhost:19990", "")
+  const outcome = relay.connectTo("localhost:29699", "")
   await until(() => FakeWebSocket.made.length > before)
   // Presence-only again, and still on the automatic port: no address was stored.
   FakeWebSocket.made.at(-1)!.close(1000)
   expect(await outcome).toMatchObject({ status: "unpaired" })
   expect((await stub.chrome.storage.local.get("agentRelayAddress")).agentRelayAddress).toBe("")
-  expect(relay.state().relay).toEqual({ address: "localhost:19990", remote: false })
+  expect(relay.state().relay).toEqual({ address: "localhost:29699", remote: false })
 })
 
 test("a second failure right after a scan doesn't scan again", async () => {

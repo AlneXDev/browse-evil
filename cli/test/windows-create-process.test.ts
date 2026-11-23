@@ -93,8 +93,8 @@ describe("windows relay environment block", () => {
   })
 
   test("keeps the last value for names that differ only by case", () => {
-    expect(windowsEnvironmentBlock({ opencode_browser_managed_relay: "0", PATH: "C:\\bin", OPENCODE_BROWSER_MANAGED_RELAY: "1" }))
-      .toBe("OPENCODE_BROWSER_MANAGED_RELAY=1\0PATH=C:\\bin\0\0")
+    expect(windowsEnvironmentBlock({ opencode_browser_managed_relay: "0", PATH: "C:\\bin", OPENCODE_BROWSEVIL_MANAGED_RELAY: "1" }))
+      .toBe("OPENCODE_BROWSEVIL_MANAGED_RELAY=1\0PATH=C:\\bin\0\0")
   })
 
   test("terminates an empty environment with two NULs", () => {

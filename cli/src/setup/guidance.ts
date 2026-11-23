@@ -70,7 +70,7 @@ export function pairStoreExtension(
   options: Pick<LocateOptions, "detections" | "preferred" | "allowOpen" | "env"> & {
     code: () => string
     storeIds?: readonly string[]
-    /** The relay's listen port; appended to the link and the manual text when it isn't 19988 (relay/port.ts). */
+    /** The relay's listen port; appended to the link and the manual text when it isn't 29698 (relay/port.ts). */
     port?: number
   },
   effects: Effects = systemEffects,

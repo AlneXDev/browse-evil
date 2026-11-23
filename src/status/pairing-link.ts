@@ -1,5 +1,5 @@
 // install's pairing link (welcome.html#code=…, see cli/src/setup/guidance.ts pairStoreExtension): a one-time code
-// and, when the relay isn't on 19988, the port it listens on.
+// and, when the relay isn't on 29698, the port it listens on.
 import { relayPortHint } from "../agent-relay/protocol"
 
 export type PairingLink = { readonly code: string; readonly port?: number }

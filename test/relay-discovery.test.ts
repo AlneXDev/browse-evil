@@ -13,8 +13,8 @@ afterEach(() => {
 
 describe("pairing link fragment", () => {
   test("takes the code and the relay port when it is one browse uses", () => {
-    expect(pairingLink("#code=ABCD1234&port=19990")).toEqual({ code: "ABCD1234", port: 19990 })
-    expect(pairingLink("#code=ABCD1234&port=19988")).toEqual({ code: "ABCD1234", port: 19988 })
+    expect(pairingLink("#code=ABCD1234&port=29699")).toEqual({ code: "ABCD1234", port: 29699 })
+    expect(pairingLink("#code=ABCD1234&port=29698")).toEqual({ code: "ABCD1234", port: 29698 })
     expect(pairingLink("#code=ABCD1234")).toEqual({ code: "ABCD1234" })
   })
 
@@ -32,39 +32,39 @@ describe("pairing link fragment", () => {
   })
 
   test("the accepted ports are the default and its fallbacks, and nothing else", () => {
-    expect(relayPorts).toEqual([19988, 19990, 19991, 19992, 19993, 19994, 19995, 19996, 19997])
+    expect(relayPorts).toEqual([29698, 29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706])
     for (const port of relayPorts) expect(relayPortHint(port)).toBe(port)
-    for (const value of [19989, 19987, 19998, 0, Number.NaN, "19990", null, undefined])
+    for (const value of [19989, 19987, 19998, 0, Number.NaN, "29699", null, undefined])
       expect(relayPortHint(value)).toBeUndefined()
   })
 })
 
 describe("relay target", () => {
   test("nothing stored dials the default port automatically", () => {
-    expect(relayTarget({})).toEqual({ host: "127.0.0.1", port: 19988, automatic: true })
-    expect(relayTarget({ agentRelayAddress: "" })).toEqual({ host: "127.0.0.1", port: 19988, automatic: true })
-    expect(relayTarget({ agentRelayAddress: "localhost" })).toEqual({ host: "127.0.0.1", port: 19988, automatic: true })
+    expect(relayTarget({})).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
+    expect(relayTarget({ agentRelayAddress: "" })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
+    expect(relayTarget({ agentRelayAddress: "localhost" })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
   })
 
   test("an automatic connection dials the discovered port", () => {
-    expect(relayTarget({ agentRelayDiscoveredPort: 19993 })).toEqual({ host: "127.0.0.1", port: 19993, automatic: true })
+    expect(relayTarget({ agentRelayDiscoveredPort: 29702 })).toEqual({ host: "127.0.0.1", port: 29702, automatic: true })
     // A discovered value that isn't a browse port is ignored, like an unknown setting.
-    expect(relayTarget({ agentRelayDiscoveredPort: 19989 })).toEqual({ host: "127.0.0.1", port: 19988, automatic: true })
-    expect(relayTarget({ agentRelayDiscoveredPort: "19993" })).toEqual({ host: "127.0.0.1", port: 19988, automatic: true })
+    expect(relayTarget({ agentRelayDiscoveredPort: 19989 })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
+    expect(relayTarget({ agentRelayDiscoveredPort: "29702" })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
   })
 
   test("an address with a port, or another computer, is explicit and never scans", () => {
-    expect(relayTarget({ agentRelayAddress: "devbox:19990" })).toEqual({ host: "devbox", port: 19990, automatic: false })
-    expect(relayTarget({ agentRelayAddress: "100.64.0.2" })).toEqual({ host: "100.64.0.2", port: 19988, automatic: false })
+    expect(relayTarget({ agentRelayAddress: "devbox:29699" })).toEqual({ host: "devbox", port: 29699, automatic: false })
+    expect(relayTarget({ agentRelayAddress: "100.64.0.2" })).toEqual({ host: "100.64.0.2", port: 29698, automatic: false })
     // Even a loopback address with a port was pinned by the user.
-    expect(relayTarget({ agentRelayAddress: "localhost:19991" })).toEqual({ host: "127.0.0.1", port: 19991, automatic: false })
+    expect(relayTarget({ agentRelayAddress: "localhost:29700" })).toEqual({ host: "127.0.0.1", port: 29700, automatic: false })
   })
 
   test("the PORT_KEY dev pin is explicit, and the discovered port doesn't override its address", () => {
     expect(relayTarget({ agentRelayPort: 19925 })).toEqual({ host: "127.0.0.1", port: 19925, automatic: false })
-    expect(relayTarget({ agentRelayPort: 19990, agentRelayDiscoveredPort: 19993 })).toEqual({
+    expect(relayTarget({ agentRelayPort: 29699, agentRelayDiscoveredPort: 29702 })).toEqual({
       host: "127.0.0.1",
-      port: 19990,
+      port: 29699,
       automatic: false,
     })
     expect(relayTarget({ agentRelayAddress: "devbox", agentRelayPort: 19925 })).toEqual({
@@ -81,11 +81,11 @@ describe("relay scan", () => {
     globalThis.fetch = (async (input: string | URL) => {
       asked.push(String(input))
       const port = Number(/127\.0\.0\.1:(\d+)\/version/.exec(String(input))?.[1])
-      return port === 19988 || port === 19992
+      return port === 29698 || port === 29701
         ? Response.json({ version: "0.0.2", instanceId: "abc" })
         : new Response("not found", { status: 404 })
     }) as typeof fetch
-    expect(await scanRelayPorts()).toEqual([19988, 19992])
+    expect(await scanRelayPorts()).toEqual([29698, 29701])
     expect(asked).toHaveLength(relayPorts.length)
   })
 
@@ -98,12 +98,12 @@ describe("relay scan", () => {
     expect(await scanRelayPorts()).toEqual([])
   })
 
-  test("prefers the proven port, then a token, then 19988", () => {
-    expect(chooseRelayPort([19990, 19991], { tokenFor: (port) => port === 19991 })).toBe(19991)
-    expect(chooseRelayPort([19990, 19991], { tokenFor: () => false })).toBe(19990)
-    expect(chooseRelayPort([19990, 19988], { tokenFor: () => false })).toBe(19988)
-    expect(chooseRelayPort([19990, 19991, 19988], { proven: 19990, tokenFor: (port) => port === 19991 })).toBe(19990)
-    expect(chooseRelayPort([19990, 19991, 19988], { tokenFor: (port) => port === 19991 })).toBe(19991)
+  test("prefers the proven port, then a token, then 29698", () => {
+    expect(chooseRelayPort([29699, 29700], { tokenFor: (port) => port === 29700 })).toBe(29700)
+    expect(chooseRelayPort([29699, 29700], { tokenFor: () => false })).toBe(29699)
+    expect(chooseRelayPort([29699, 29698], { tokenFor: () => false })).toBe(29698)
+    expect(chooseRelayPort([29699, 29700, 29698], { proven: 29699, tokenFor: (port) => port === 29700 })).toBe(29699)
+    expect(chooseRelayPort([29699, 29700, 29698], { tokenFor: (port) => port === 29700 })).toBe(29700)
     expect(chooseRelayPort([], { tokenFor: () => true })).toBeUndefined()
   })
 })

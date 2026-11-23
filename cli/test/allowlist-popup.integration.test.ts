@@ -19,7 +19,7 @@ let token = ""
 const allowed = "https://127.0.0.1:8443"
 
 beforeAll(async () => {
-  const started = await startRelay(home, { OPENCODE_BROWSER_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(home, { OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   relay = started.child
   port = started.port
   base = `http://127.0.0.1:${port}`

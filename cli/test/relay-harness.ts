@@ -154,7 +154,7 @@ export function cdpCall(socket: WebSocket, id: number, method: string, params: R
 export async function startRelay(root: string, env: Record<string, string> = {}, reusePort?: number) {
   const relayPort = reusePort ?? await freePort()
   const child = spawn(process.execPath, [path.join(import.meta.dir, "../src/main.ts"), "serve"], {
-    env: { PATH: process.env.PATH ?? "", HOME: root, OPENCODE_BROWSER_HOME: root, OPENCODE_BROWSER_PORT: String(relayPort), OPENCODE_BROWSER_UPDATE_CHECK: "0", ...env },
+    env: { PATH: process.env.PATH ?? "", HOME: root, OPENCODE_BROWSEVIL_HOME: root, OPENCODE_BROWSEVIL_PORT: String(relayPort), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0", ...env },
     stdio: "ignore",
   })
   for (let attempt = 0; attempt < 100; attempt++) {

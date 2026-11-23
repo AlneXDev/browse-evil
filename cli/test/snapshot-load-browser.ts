@@ -1,7 +1,7 @@
 // Isolated headless regression and load check for snapshot() on large DOMs:
 //   bun build.ts && node --no-warnings test/snapshot-load-browser.ts [--browser <chromium executable>]
 // Uses a port-patched copy of the extension in headless Chromium with --use-mock-keychain, a fresh
-// OPENCODE_BROWSER_HOME, and BROWSE_TEST_RELAY_PORT / BROWSE_TEST_FIXTURE_PORT (else free ports).
+// OPENCODE_BROWSEVIL_HOME, and BROWSE_TEST_RELAY_PORT / BROWSE_TEST_FIXTURE_PORT (else free ports).
 import assert from "node:assert/strict"
 import fs from "node:fs"
 import http from "node:http"
@@ -30,7 +30,7 @@ const scene = await startBrowserScene({
   ...(options.browser === undefined ? {} : { browser: options.browser }),
   name: "snapshot-load-browser-",
   extraArgs: ["--use-mock-keychain"],
-  env: { OPENCODE_BROWSER_AUTOSTART: "false" },
+  env: { OPENCODE_BROWSEVIL_AUTOSTART: "false" },
 })
 const { root, home, base, fixturePort, fixtureUrl } = scene
 const authorization = `Bearer ${relayToken(home)}`

@@ -2,13 +2,13 @@ import { afterEach, describe, expect, test } from "bun:test"
 import { beforeInput, clampPoint, humanInputEnabled, setHumanInput } from "../src/execute/human-input.ts"
 
 // Human-like input follows the extension's setting from the next input, without a relay restart, and
-// OPENCODE_BROWSER_HUMAN_INPUT overrides it either way.
+// OPENCODE_BROWSEVIL_HUMAN_INPUT overrides it either way.
 
-const original = process.env.OPENCODE_BROWSER_HUMAN_INPUT
+const original = process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT
 afterEach(() => {
   setHumanInput(undefined)
-  if (original === undefined) delete process.env.OPENCODE_BROWSER_HUMAN_INPUT
-  else process.env.OPENCODE_BROWSER_HUMAN_INPUT = original
+  if (original === undefined) delete process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT
+  else process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT = original
 })
 
 let nextTab = 1
@@ -28,13 +28,13 @@ async function move() {
 
 describe("human-like input", () => {
   test("is on by default: a move becomes a path of intermediate moves", async () => {
-    delete process.env.OPENCODE_BROWSER_HUMAN_INPUT
+    delete process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT
     expect(humanInputEnabled()).toBe(true)
     expect((await move()).sent).toBeGreaterThan(5)
   })
 
   test("turned off at runtime, the next move goes straight through, and back on it paces again", async () => {
-    delete process.env.OPENCODE_BROWSER_HUMAN_INPUT
+    delete process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT
     setHumanInput(false)
     const off = await move()
     expect(off.sent).toBe(0)
@@ -43,12 +43,12 @@ describe("human-like input", () => {
     expect((await move()).sent).toBeGreaterThan(5)
   })
 
-  test("OPENCODE_BROWSER_HUMAN_INPUT overrides the setting both ways", async () => {
-    process.env.OPENCODE_BROWSER_HUMAN_INPUT = "0"
+  test("OPENCODE_BROWSEVIL_HUMAN_INPUT overrides the setting both ways", async () => {
+    process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT = "0"
     setHumanInput(true)
     expect(humanInputEnabled()).toBe(false)
     expect((await move()).sent).toBe(0)
-    process.env.OPENCODE_BROWSER_HUMAN_INPUT = "1"
+    process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT = "1"
     setHumanInput(false)
     expect(humanInputEnabled()).toBe(true)
     expect((await move()).sent).toBeGreaterThan(5)

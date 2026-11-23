@@ -16,10 +16,10 @@ export function mcpStdio(options: {
     env: {
       ...process.env,
       HOME: options.home,
-      OPENCODE_BROWSER_HOME: options.home,
-      ...(options.port ? { OPENCODE_BROWSER_PORT: String(options.port) } : {}),
-      OPENCODE_BROWSER_AUTOSTART: "false",
-      OPENCODE_BROWSER_UPDATE_CHECK: "0",
+      OPENCODE_BROWSEVIL_HOME: options.home,
+      ...(options.port ? { OPENCODE_BROWSEVIL_PORT: String(options.port) } : {}),
+      OPENCODE_BROWSEVIL_AUTOSTART: "false",
+      OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
       ...options.env,
     },
   })

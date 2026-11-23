@@ -36,7 +36,7 @@ let base = ""
 let token = ""
 
 beforeAll(async () => {
-  const started = await startRelay(home, { OPENCODE_BROWSER_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(home, { OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   relay = started.child
   port = started.port
   base = `http://127.0.0.1:${port}`
@@ -144,7 +144,7 @@ describe("relay", () => {
 
   test("pair waits for its own code, not a browser that redeemed another code", async () => {
     const pair = spawn(process.execPath, [path.join(import.meta.dir, "../src/main.ts"), "pair", "--wait-seconds", "8"], {
-      env: { PATH: process.env.PATH, HOME: home, OPENCODE_BROWSER_HOME: home, OPENCODE_BROWSER_PORT: String(port) }, stdio: ["ignore", "pipe", "pipe"],
+      env: { PATH: process.env.PATH, HOME: home, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(port) }, stdio: ["ignore", "pipe", "pipe"],
     })
     let output = ""
     pair.stdout.on("data", chunk => { output += chunk })

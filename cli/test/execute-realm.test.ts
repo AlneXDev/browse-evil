@@ -15,13 +15,13 @@ const home = path.join(scratch, "home")
 let previousHome: string | undefined
 
 beforeAll(() => {
-  previousHome = process.env.OPENCODE_BROWSER_HOME
-  process.env.OPENCODE_BROWSER_HOME = home
+  previousHome = process.env.OPENCODE_BROWSEVIL_HOME
+  process.env.OPENCODE_BROWSEVIL_HOME = home
   fs.mkdirSync(home, { recursive: true })
 })
 afterAll(() => {
-  if (previousHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-  else process.env.OPENCODE_BROWSER_HOME = previousHome
+  if (previousHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+  else process.env.OPENCODE_BROWSEVIL_HOME = previousHome
   fs.rmSync(scratch, { recursive: true, force: true })
 })
 
@@ -56,12 +56,12 @@ function runInBun(bodies: readonly string[]): NodeOutcome[] {
     }
     console.log(JSON.stringify(results))
   `
-  const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 30_000, env: { ...process.env, OPENCODE_BROWSER_HOME: home } })
+  const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 30_000, env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home } })
   if (child.status !== 0) throw new Error(`bun failed: ${child.stderr}`)
   return JSON.parse(child.stdout.trim().split("\n").at(-1) ?? "[]") as NodeOutcome[]
 }
 
-/** Runs full-Node execute code in a child with the relay's process guard, as OPENCODE_BROWSER_ALLOW_NODE=1 does. */
+/** Runs full-Node execute code in a child with the relay's process guard, as OPENCODE_BROWSEVIL_ALLOW_NODE=1 does. */
 function runFullNodeExecute(code: string): { readonly value?: unknown; readonly warnings?: readonly string[] } {
   const script = `
     const { runUserCode } = await import(${JSON.stringify(path.join(import.meta.dir, "../src/execute/code-runner.ts"))})
@@ -83,7 +83,7 @@ function runFullNodeExecute(code: string): { readonly value?: unknown; readonly 
     await new Promise(resolve => setTimeout(resolve, 100))
     console.log(JSON.stringify({ value: result.result, warnings }))
   `
-  const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 15_000, env: { ...process.env, OPENCODE_BROWSER_HOME: home } })
+  const child = spawnSync(process.execPath, ["-e", script], { encoding: "utf8", timeout: 15_000, env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home } })
   if (child.status !== 0) throw new Error(`execute child failed: ${child.stderr}`)
   return JSON.parse(child.stdout.trim().split("\n").at(-1) ?? "{}")
 }
@@ -278,7 +278,7 @@ describe("Node escape corpus", () => {
   })
 
   // N18: every way execute JavaScript gets the CPU is bounded by one slice, so a runaway loop
-  // stalls the relay (and every other session) for at most OPENCODE_BROWSER_EXECUTE_SLICE_MS.
+  // stalls the relay (and every other session) for at most OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS.
   test("CPU slices bound loops in code, awaits, callbacks, timers, events, getters and thenables", () => {
     const sliceMs = 200
     const cases: Record<string, string> = {
@@ -301,11 +301,11 @@ describe("Node escape corpus", () => {
       "thenable result": "return {then(){while(true){}}}",
       "catastrophic regex": "return /^(a+)+$/.test('a'.repeat(40) + 'b')",
     }
-    const outcomes = runInNode(Object.values(cases), playwrightShapes, { OPENCODE_BROWSER_EXECUTE_SLICE_MS: String(sliceMs) })
+    const outcomes = runInNode(Object.values(cases), playwrightShapes, { OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS: String(sliceMs) })
     Object.keys(cases).forEach((name, index) => {
       const outcome = outcomes[index]!
       expect(outcome.error, name).toMatch(/synchronous CPU budget: JavaScript ran for over 200ms without yielding/)
-      expect(outcome.error, name).toMatch(/OPENCODE_BROWSER_EXECUTE_SLICE_MS/)
+      expect(outcome.error, name).toMatch(/OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS/)
       // One slice plus scheduling noise; never the whole execute timeout.
       expect(outcome.maxStallMs!, name).toBeGreaterThan(sliceMs * 0.8)
       expect(outcome.maxStallMs!, name).toBeLessThan(sliceMs + 250)
@@ -317,7 +317,7 @@ describe("Node escape corpus", () => {
     const sliceMs = 100
     const [outcome] = runInNode([
       `setInterval(() => { const end = performance.now() + ${sliceMs * 0.9}; while (performance.now() < end) {} }, 0); await new Promise(()=>{})`,
-    ], "", { OPENCODE_BROWSER_EXECUTE_SLICE_MS: String(sliceMs) })
+    ], "", { OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS: String(sliceMs) })
     expect(outcome?.error).toMatch(/sustained CPU budget/)
     expect(outcome!.maxStallMs!).toBeLessThan(sliceMs + 250)
     // Stopped within a couple of slices (the window is three slice lengths), not after a long burst allowance.
@@ -333,7 +333,7 @@ describe("Node escape corpus", () => {
       `${busy(0.8)} ${pause(0)} ${busy(0.3)} ${pause(4 * sliceMs)}` +
       `for (let i = 0; i < 3; i++) { ${busy(0.4)} ${pause(0)} } ${pause(4 * sliceMs)}` +
       `for (let i = 0; i < 3; i++) { ${busy(0.4)} ${pause(0)} } return "done"`,
-    ], "", { OPENCODE_BROWSER_EXECUTE_SLICE_MS: String(sliceMs) })
+    ], "", { OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS: String(sliceMs) })
     expect(outcome?.error).toBeUndefined()
     expect(outcome?.value).toBe("done")
   }, 30_000)
@@ -525,9 +525,9 @@ describe("execute file access", () => {
     } satisfies NodeJS.ProcessEnv
     const names = Object.keys(variables) as Array<keyof typeof variables>
     const saved = new Map(names.map((name) => [name, process.env[name]]))
-    const savedBrowseHome = process.env.OPENCODE_BROWSER_HOME
-    // paths.ts honours XDG variables against the default home; drop OPENCODE_BROWSER_HOME so each root is separate.
-    delete process.env.OPENCODE_BROWSER_HOME
+    const savedBrowseHome = process.env.OPENCODE_BROWSEVIL_HOME
+    // paths.ts honours XDG variables against the default home; drop OPENCODE_BROWSEVIL_HOME so each root is separate.
+    delete process.env.OPENCODE_BROWSEVIL_HOME
     Object.assign(process.env, variables)
     try {
       for (const root of [configRoot(), dataRoot(), stateRoot(), cacheRoot()]) {
@@ -581,16 +581,16 @@ describe("execute file access", () => {
         if (value === undefined) delete process.env[name]
         else process.env[name] = value
       }
-      if (savedBrowseHome === undefined) delete process.env.OPENCODE_BROWSER_HOME
-      else process.env.OPENCODE_BROWSER_HOME = savedBrowseHome
+      if (savedBrowseHome === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
+      else process.env.OPENCODE_BROWSEVIL_HOME = savedBrowseHome
       fs.rmSync(xdg, { recursive: true, force: true })
     }
   })
 
-  test("refuses the everyday folders and installer binary while OPENCODE_BROWSER_HOME points elsewhere", () => {
+  test("refuses the everyday folders and installer binary while OPENCODE_BROWSEVIL_HOME points elsewhere", () => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-realm-override-"))
     const variables = {
-      OPENCODE_BROWSER_HOME: path.join(root, "home"),
+      OPENCODE_BROWSEVIL_HOME: path.join(root, "home"),
       XDG_CONFIG_HOME: path.join(root, "config"),
       XDG_DATA_HOME: path.join(root, "data"),
       XDG_STATE_HOME: path.join(root, "state"),
@@ -602,8 +602,8 @@ describe("execute file access", () => {
     Object.assign(process.env, variables)
     try {
       // The override's own folders stay denied.
-      const overrideFile = path.join(variables.OPENCODE_BROWSER_HOME, "pairing-codes.json")
-      fs.mkdirSync(variables.OPENCODE_BROWSER_HOME, { recursive: true })
+      const overrideFile = path.join(variables.OPENCODE_BROWSEVIL_HOME, "pairing-codes.json")
+      fs.mkdirSync(variables.OPENCODE_BROWSEVIL_HOME, { recursive: true })
       fs.writeFileSync(overrideFile, "{}")
       expect(() => assertExecuteFilePath(overrideFile, "files.read")).toThrow(/inside browse's own files/)
 

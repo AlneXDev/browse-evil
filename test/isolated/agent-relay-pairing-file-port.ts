@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// An unpacked build's relay-pairing.json carries the port the relay bound when it isn't 19988
+// An unpacked build's relay-pairing.json carries the port the relay bound when it isn't 29698
 // (cli/src/relay/browser-pairing.ts writeExtensionPairing). Before dialling, the worker takes it as the discovered
 // port, so the first connection goes to the relay instead of scanning for it. Run by ../isolated.test.ts.
 
@@ -9,7 +9,7 @@ const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
-const BROWSER_PORT = 19990
+const BROWSER_PORT = 29699
 const probes: string[] = []
 
 class FakeWebSocket {

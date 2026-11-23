@@ -8,8 +8,8 @@ import { installChrome, settle } from "../chrome-stub"
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
-const SPOOF_PORT = 19990
-const OTHER_PORT = 19991
+const SPOOF_PORT = 29699
+const OTHER_PORT = 29700
 const SPOOF_TOKEN = "spoof-token-0123456789abcdefghijklmnopqrstuv"
 
 type Message = { method?: string; params?: Record<string, unknown> }
@@ -76,5 +76,5 @@ test("a failed proven port loses its record when another candidate answers", asy
   expect(await stored("agentRelayDiscoveredPort")).toBe(OTHER_PORT)
   expect(await stored("agentRelayProvenPort")).toBeUndefined()
   // The other port hasn't proved itself yet, so the form still shows the default.
-  expect(relay.state().relay).toEqual({ address: "localhost:19988", remote: false })
+  expect(relay.state().relay).toEqual({ address: "localhost:29698", remote: false })
 })

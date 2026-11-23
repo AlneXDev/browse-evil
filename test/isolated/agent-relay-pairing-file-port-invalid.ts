@@ -2,7 +2,7 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A pairing file that names a port browse never uses (19989 is Browser Control's) is ignored like any other bad
-// value: the extension still dials 19988 and doesn't move. Run by ../isolated.test.ts in its own process.
+// value: the extension still dials 29698 and doesn't move. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
@@ -51,7 +51,7 @@ async function until(check: () => boolean) {
 
 test("a port outside the browse range in the pairing file is ignored", async () => {
   await until(() => FakeWebSocket.made.length > 0)
-  expect(FakeWebSocket.made[0]!.url).toBe("ws://127.0.0.1:19988/extension")
+  expect(FakeWebSocket.made[0]!.url).toBe("ws://127.0.0.1:29698/extension")
   await until(() => relay.state().pairing === "code")
   expect(await stored("agentRelayDiscoveredPort")).toBeUndefined()
   // The file's code is still usable on the default port it applies to.

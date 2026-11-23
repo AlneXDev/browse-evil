@@ -39,7 +39,7 @@ const DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
 
 #[derive(Clone)]
 pub struct ServeOptions {
-    /// Listen here, with no fallback. None: OPENCODE_BROWSEVIL_PORT, else 19988 falling back to 19990–19997.
+    /// Listen here, with no fallback. None: OPENCODE_BROWSEVIL_PORT, else 29698 falling back to 29699–29706.
     pub port: Option<u16>,
     pub paths: Paths,
     pub version: String,

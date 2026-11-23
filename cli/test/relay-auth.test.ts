@@ -65,12 +65,12 @@ describe("relay token", () => {
 
 describe("Host, Origin and Sec-Fetch-Site checks", () => {
   test("accept loopback hosts on the relay's port only", () => {
-    for (const hostHeader of ["127.0.0.1:19988", "localhost:19988", "[::1]:19988", "127.0.0.1"]) {
-      expect(validateHostHeader({ hostHeader, host: "127.0.0.1", port: 19988 })).toBeUndefined()
+    for (const hostHeader of ["127.0.0.1:29698", "localhost:29698", "[::1]:29698", "127.0.0.1"]) {
+      expect(validateHostHeader({ hostHeader, host: "127.0.0.1", port: 29698 })).toBeUndefined()
     }
-    expect(validateHostHeader({ hostHeader: "127.0.0.1:1234", host: "127.0.0.1", port: 19988 })).toBe("Invalid Host header port")
-    expect(validateHostHeader({ hostHeader: "evil.test:19988", host: "127.0.0.1", port: 19988 })).toBe("Invalid Host header")
-    expect(validateHostHeader({ hostHeader: undefined, host: "127.0.0.1", port: 19988 })).toBe("Invalid Host header")
+    expect(validateHostHeader({ hostHeader: "127.0.0.1:1234", host: "127.0.0.1", port: 29698 })).toBe("Invalid Host header port")
+    expect(validateHostHeader({ hostHeader: "evil.test:29698", host: "127.0.0.1", port: 29698 })).toBe("Invalid Host header")
+    expect(validateHostHeader({ hostHeader: undefined, host: "127.0.0.1", port: 29698 })).toBe("Invalid Host header")
   })
 
   test("refuse cross-site browser requests", () => {
@@ -86,7 +86,7 @@ describe("Host, Origin and Sec-Fetch-Site checks", () => {
     expect(validateWebSocketOrigin({ origin: store, requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: store, requireChromeExtension: true, additionalChromeExtensionOrigins: new Set([store]) })).toBeUndefined()
     // The store ID earlier builds hard-coded is accepted only once a release configures it.
-    expect(validateWebSocketOrigin({ origin: "chrome-extension://mfnicocicmmlkpjnaffgihfjhdgjkdjg", requireChromeExtension: true })).toBeDefined()
+    expect(validateWebSocketOrigin({ origin: "chrome-extension://lfmeghngagemglmdnplimokblljgmnoj", requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: "chrome-extension://aaaabbbbccccddddeeeeffffgggghhhh", requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: undefined, requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: "https://evil.test" })).toBeDefined()
@@ -163,7 +163,7 @@ describe("browser tokens", () => {
 
 describe("code exchange", () => {
   test("the extension and the relay agree on the session key, and the token unmasks only with it", async () => {
-    const port = 19988
+    const port = 29698
     const code = mintPairingCode(fs.mkdtempSync(path.join(home, "exchange-")))
     const extensionKeys = await ExtensionPairing.ecdhKeyPair()
     const relay = ecdhExchange(extensionKeys.publicKey)!
@@ -192,7 +192,7 @@ describe("token handshake", () => {
   const code = issueBrowserToken("test", home)
   const relayNonce = ExtensionPairing.randomNonce()
   const extensionNonce = ExtensionPairing.randomNonce()
-  const port = 19988
+  const port = 29698
 
   test("the extension accepts the relay's proof, and the relay the extension's", async () => {
     // Relay → extension: the relay proves it knows the code over both nonces.
@@ -222,7 +222,7 @@ describe("token handshake", () => {
     expect(secretsEqual(pairingProof(code, "extension", port, extensionNonce, relayNonce), forwardedExtensionProof)).toBe(false)
     const forwardedRelayProof = pairingProof(code, "relay", port, relayNonce, extensionNonce)
     expect(ExtensionPairing.sameSecret(await ExtensionPairing.pairingProof(code, "relay", 19989, relayNonce, extensionNonce), forwardedRelayProof)).toBe(false)
-    expect(ExtensionPairing.pairingEndpoint(port)).toBe("127.0.0.1:19988/extension")
+    expect(ExtensionPairing.pairingEndpoint(port)).toBe("127.0.0.1:29698/extension")
   })
 
   test("install writes a one-time code into an unpacked extension folder", () => {

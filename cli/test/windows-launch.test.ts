@@ -22,8 +22,8 @@ for (const shell of ["cmd", "powershell", "closed console"]) {
     const ps = `& ${launch.map(s => `'${s.replaceAll("'", "''")}'`).join(" ")} session list --json`
     expect(await version().catch(() => undefined)).toBeUndefined()
     const proc = Bun.spawn(["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script], {
-      env: { ...process.env, HOME: home, USERPROFILE: home, APPDATA: home, LOCALAPPDATA: home, OPENCODE_BROWSER_HOME: home,
-        OPENCODE_BROWSER_PORT: String(port), OPENCODE_BROWSER_UPDATE_CHECK: "0", TEST_PS: ps },
+      env: { ...process.env, HOME: home, USERPROFILE: home, APPDATA: home, LOCALAPPDATA: home, OPENCODE_BROWSEVIL_HOME: home,
+        OPENCODE_BROWSEVIL_PORT: String(port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0", TEST_PS: ps },
       cwd: home, stdout: "pipe", stderr: "pipe",
     })
     try {

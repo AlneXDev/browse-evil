@@ -261,7 +261,7 @@ Everything is a CLI too: `browse navigate https://example.com` prints the new ta
 </picture>
 
 The agent starts `browse mcp`, a small stdio proxy, which starts the relay on demand and forwards each call to it on
-`127.0.0.1:19988` (or the next free port from 19990–19997 when another program holds it). The extension connects to
+`127.0.0.1:29698` (or the next free port from 29699–29706 when another program holds it). The extension connects to
 the relay over a WebSocket and runs its commands in your browser through `chrome.debugger`.
 
 - **The relay** (`browse serve`, in `rust/`) keeps agent tabs, handoffs, recordings and network captures, talks the
@@ -335,7 +335,7 @@ when it starts: it stops after 30 minutes without use, or run `browse restart` f
 | `OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS=15000` | How long to wait for a bot check the browser clears by itself |
 | `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS=30000` | How long the relay waits for the extension to answer a command |
 | `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS=10000` | How long a ping may go unanswered before the browser counts as asleep |
-| `OPENCODE_BROWSEVIL_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browse's own ports (19988, 19990–19997) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browse install` with it set writes it into each agent's MCP entry, so agents start `browse mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
+| `OPENCODE_BROWSEVIL_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browse's own ports (29698, 29699–29706) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browse install` with it set writes it into each agent's MCP entry, so agents start `browse mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
 | `OPENCODE_BROWSEVIL_TOOLS=plain\|execute\|all` | Which tools every client gets |
 
 ## Troubleshooting
@@ -349,7 +349,7 @@ when it starts: it stops after 30 minutes without use, or run `browse restart` f
 - "The browser isn't answering" while the computer is very busy: raise `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS` and
   `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS`.
 - Logs: `~/.local/state/browse/logs/relay.log`.
-- Another program's server on port 19988: browse takes the next free port from 19990–19997 and the extension finds it
+- Another program's server on port 29698: browse takes the next free port from 29699–29706 and the extension finds it
   there. A port held by something that doesn't answer HTTP stops it; stop that program or set `OPENCODE_BROWSEVIL_PORT`.
 - The extension says it's not paired, or the relay refused it: run `browse install` again, or `browse pair` and enter
   the code in the extension's options.

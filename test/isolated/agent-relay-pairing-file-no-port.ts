@@ -2,13 +2,13 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A pairing file without a port says nothing about where the relay is: it must not pull a discovered or proven port
-// back to 19988. Run by ../isolated.test.ts.
+// back to 29698. Run by ../isolated.test.ts.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
-const PORT = 19990
+const PORT = 29699
 
 class FakeWebSocket {
   static readonly CONNECTING = 0
