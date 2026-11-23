@@ -206,7 +206,7 @@ export const AGENT_DIAGNOSTICS = "agents.diagnostics"
 /** chrome.storage.local, set on the status page: where agents open new tabs, "current" (default) or "separate". */
 export const AGENT_WINDOW_KEY = "agentTabsWindow"
 export type AgentWindowPlacement = "current" | "separate"
-export const agentWindowPlacement = (value: unknown): AgentWindowPlacement => (value === "current" ? "current" : "separate")
+export const agentWindowPlacement = (value: unknown): AgentWindowPlacement => (value === "separate" ? "separate" : "current")
 
 // The status page's other settings, all in chrome.storage.local. Each applies from the moment it changes (new tabs,
 // the next cleanup, the next handoff or input); a missing or unknown value reads as the default.
