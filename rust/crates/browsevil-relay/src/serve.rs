@@ -569,7 +569,7 @@ tokio::task_local! {
     pub static CALL: u64;
     /// The running call's tool name.
     pub static TOOL: String;
-    /// The process that made the running call (OpenCode-Browser-Client-Pid).
+    /// The process that made the running call (opencodevil-browser-client-pid).
     pub static CLIENT: Option<u32>;
 }
 

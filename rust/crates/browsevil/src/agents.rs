@@ -831,7 +831,7 @@ mod tests {
 
     #[test]
     fn workbuddy_and_trae_cn_config_paths() {
-        let locations = locations(&PathBuf::from("/tmp/opencodevil.json"), None);
+        let locations = locations(&PathBuf::from("/tmp/opencode.json"), None);
         let file = |name: &str| locations.iter().find(|l| l.name == name).map(|l| l.file.clone()).unwrap();
         assert!(file("workbuddy").ends_with(".workbuddy/mcp.json"), "{:?}", file("workbuddy"));
         assert!(file("trae-cn").ends_with("Trae CN/User/mcp.json"), "{:?}", file("trae-cn"));

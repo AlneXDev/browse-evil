@@ -43,7 +43,7 @@ pub fn request(
     stream.set_nodelay(true).ok();
     let body = body.unwrap_or_default();
     let mut head = format!(
-        "{method} {path} HTTP/1.1\r\nHost: {authority}\r\nConnection: close\r\nAccept: application/json\r\nOpenCode-Browser-Client-Pid: {}\r\n",
+        "{method} {path} HTTP/1.1\r\nHost: {authority}\r\nConnection: close\r\nAccept: application/json\r\nopencodevil-browser-client-pid: {}\r\n",
         std::process::id()
     );
     for (name, value) in headers {

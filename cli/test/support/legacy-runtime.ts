@@ -47,7 +47,7 @@ export function oldRuntimeHome(homes: string[]) {
   const current = path.join(packageDir, "dist", "cli.mjs")
   write(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version: "0.0.16-dev.130" }))
   write(current, fakeCli("0.0.16-dev.130"))
-  const opencodevil = path.join(home, ".config", "opencodevil", "opencodevil.json")
+  const opencodevil = path.join(home, ".config", "opencodevil", "opencode.json")
   write(opencodevil, JSON.stringify({ mcp: { servers: { browsevil: { type: "local", command: [node, shim, "mcp"] } } } }))
   const runtime = { kind: "npm" as const, entry: current, version: "0.0.16-dev.130" }
   return { home, oldData, shim, oldEntry, packageDir, current, opencodevil, runtime }

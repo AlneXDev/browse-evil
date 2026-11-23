@@ -501,7 +501,7 @@ const scenarios: Scenario[] = [
       if (install.status !== 0) throw new Error(`curl installer exited ${install.status}: ${(install.stdout + install.stderr).slice(-400)}`)
       const installMs = Date.now() - t
       const settings = JSON.parse(fs.readFileSync(path.join(ctx.u.configDir, "settings.json"), "utf8")) as { entry: string; version: string }
-      const opencodevil = fs.readFileSync(path.join(ctx.u.home, ".config/opencodevil/opencodevil.json"), "utf8")
+      const opencodevil = fs.readFileSync(path.join(ctx.u.home, ".config/opencodevil/opencode.json"), "utf8")
       const after = status(ctx.u)
       const connected = await waitFor(() => extensionConnected(ctx.u), { timeoutMs: 60_000, label: "extension connected after the migration" })
       const oldStill = await recovery(() => exec(oldAgent, oldSession, "return await page.title()", 30_000), 60_000).catch((error) => ({ ms: -1, attempts: 0, lastError: oneLine(error) }))
@@ -511,7 +511,7 @@ const scenarios: Scenario[] = [
       return {
         recoverMs: connected.ms,
         manual: "no",
-        note: `installer ${installMs} ms; entry ${settings.entry.endsWith("/browsevil") ? "binary" : settings.entry}; opencodevil.json ${opencodevil.includes(".local/bin/browsevil") ? "points at the binary" : "UNCHANGED"}; relay ${before.relay.buildId} -> ${after.relay.buildId} (${after.relay.running ? "running" : "down"}); old npm agent ${oldStill.ms >= 0 ? `still works (${oldStill.ms} ms)` : `broken: ${oldStill.lastError}`}; new binary agent ${fresh.ms} ms`,
+        note: `installer ${installMs} ms; entry ${settings.entry.endsWith("/browsevil") ? "binary" : settings.entry}; opencode.json ${opencodevil.includes(".local/bin/browsevil") ? "points at the binary" : "UNCHANGED"}; relay ${before.relay.buildId} -> ${after.relay.buildId} (${after.relay.running ? "running" : "down"}); old npm agent ${oldStill.ms >= 0 ? `still works (${oldStill.ms} ms)` : `broken: ${oldStill.lastError}`}; new binary agent ${fresh.ms} ms`,
       }
     },
   },

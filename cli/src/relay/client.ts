@@ -162,7 +162,7 @@ const decodeErrorMessage = Schema.decodeUnknownOption(Schema.Struct({ error: Sch
 
 export const make = Effect.fn("RelayClient.make")(function* (options?: {
   readonly endpoint?: string
-  /** Sent as OpenCode-Browser-Client-Pid so the relay can end a capture or an implicit session once this process is gone. */
+  /** Sent as opencodevil-browser-client-pid so the relay can end a capture or an implicit session once this process is gone. */
   readonly clientPid?: number
 }) {
   // Validate OPENCODE_BROWSEVIL_PORT as before; the endpoint itself is resolved on every request so a relay that moved

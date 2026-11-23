@@ -183,7 +183,7 @@ pub struct State {
     pub stopped: HashMap<u64, String>,
     /// Keys of calls cancelled before they reached the relay (POST /tools/cancel won the race), and when.
     pub cancelled_calls: HashMap<String, std::time::Instant>,
-    /// Every client process that has called (OpenCode-Browser-Client-Pid), while it lives.
+    /// Every client process that has called (opencodevil-browser-client-pid), while it lives.
     pub clients: HashSet<u32>,
     /// One handoff per tab.
     pub handoffs: HashMap<i64, Handoff>,

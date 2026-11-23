@@ -15,7 +15,7 @@ use crate::{VERSION, jsonc, relay, session, update};
 
 const MCP_NAME: &str = "browsevil";
 const LEGACY_MCP_NAME: &str = "opencodevil-browser";
-const OPENCODE_CONFIG_NAMES: &[&str] = &["opencodevil.json", "opencodevil.jsonc", ".opencodevil/opencodevil.json", ".opencodevil/opencodevil.jsonc"];
+const OPENCODE_CONFIG_NAMES: &[&str] = &["opencode.json", "opencode.jsonc", ".opencode/opencode.json", ".opencode/opencode.jsonc"];
 const CONNECTED: &str = "✓ Connected to your browser. Ask your agent to open a page.";
 const PAIRED_OFFLINE: &str = "! Not connected yet. Open the browser profile already paired with browsevil and make sure the extension is enabled. It reconnects automatically.";
 
@@ -39,7 +39,7 @@ fn flag<'a>(args: &'a [String], name: &str) -> Option<&'a str> {
     args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).map(String::as_str)
 }
 
-/// OpenCode's global config file: the first that exists, else opencodevil.json.
+/// OpenCode's global config file: the first that exists, else opencode.json.
 pub fn opencodevil_config() -> PathBuf {
     let dir = config_home().join("opencodevil");
     OPENCODE_CONFIG_NAMES.iter().map(|name| dir.join(name)).find(|f| f.is_file()).unwrap_or_else(|| dir.join(OPENCODE_CONFIG_NAMES[0]))
@@ -601,13 +601,13 @@ mod tests {
     #[test]
     fn an_unreadable_or_non_utf8_opencodevil_config_is_left_alone() {
         let dir = scratch("oc");
-        let file = dir.join("opencodevil.json");
+        let file = dir.join("opencode.json");
         let original = b"{ \"theme\": \"caf\xe9\" }".to_vec();
         std::fs::write(&file, &original).unwrap();
         let error = configure_opencodevil(&file, Path::new("/usr/bin/browsevil"), None).err().expect("a file that isn't UTF-8 is refused");
         assert!(error.to_string().contains("left unchanged"), "{error}");
         assert_eq!(std::fs::read(&file).unwrap(), original);
-        let missing = dir.join("missing/opencodevil.json");
+        let missing = dir.join("missing/opencode.json");
         assert!(matches!(configure_opencodevil(&missing, Path::new("/usr/bin/browsevil"), None).unwrap(), McpEdit::Added));
         std::fs::remove_dir_all(dir).unwrap();
     }
@@ -615,7 +615,7 @@ mod tests {
     #[test]
     fn opencodevil_gets_one_pooled_server_with_an_absolute_home_cwd() {
         let dir = scratch("pool");
-        let file = dir.join("opencodevil.json");
+        let file = dir.join("opencode.json");
         assert!(matches!(configure_opencodevil(&file, Path::new("/usr/bin/browsevil"), None).unwrap(), McpEdit::Added));
         let config = jsonc::parse(&std::fs::read_to_string(&file).unwrap()).unwrap();
         let server = &config["mcp"]["servers"]["browsevil"];
@@ -634,7 +634,7 @@ mod tests {
     #[test]
     fn an_opencodevil_entry_with_the_old_tilde_cwd_is_repaired_on_install() {
         let dir = scratch("repair-cwd");
-        let file = dir.join("opencodevil.json");
+        let file = dir.join("opencode.json");
         let stale = json!({ "mcp": { "servers": { "browsevil": {
             "type": "local",
             "command": ["/usr/bin/browsevil", "mcp"],
@@ -655,7 +655,7 @@ mod tests {
     #[test]
     fn opencodevil_environment_keeps_the_runtime_and_gains_a_pinned_port() {
         let dir = scratch("port");
-        let file = dir.join("opencodevil.json");
+        let file = dir.join("opencode.json");
         std::fs::write(&file, r#"{"mcp":{"servers":{"browsevil":{"type":"local","command":["/usr/bin/browsevil","mcp"],"environment":{"MINE":"1","OPENCODE_BROWSEVIL_RUNTIME":"auto-update"}}}}}"#).unwrap();
         assert!(matches!(configure_opencodevil(&file, Path::new("/usr/bin/browsevil"), Some(20000)).unwrap(), McpEdit::Updated));
         let config = jsonc::parse(&std::fs::read_to_string(&file).unwrap()).unwrap();
@@ -674,7 +674,7 @@ mod tests {
     #[test]
     fn an_opencodevil_config_with_a_byte_order_mark_is_updated_in_place() {
         let dir = scratch("bom");
-        let file = dir.join("opencodevil.json");
+        let file = dir.join("opencode.json");
         std::fs::write(&file, "\u{feff}{\n  // mine\n  \"theme\": \"x\"\n}\n").unwrap();
         assert!(matches!(configure_opencodevil(&file, Path::new("/usr/bin/browsevil"), None).unwrap(), McpEdit::Added));
         let after = std::fs::read_to_string(&file).unwrap();
@@ -690,12 +690,12 @@ mod tests {
         use std::os::unix::fs::symlink;
 
         let dir = scratch("symlink");
-        let target = dir.join("dotfiles/opencodevil.json");
+        let target = dir.join("dotfiles/opencode.json");
         std::fs::create_dir_all(target.parent().unwrap()).unwrap();
         std::fs::write(&target, "{\n  // mine\n}\n").unwrap();
-        let link = dir.join("config/opencodevil.json");
+        let link = dir.join("config/opencode.json");
         std::fs::create_dir_all(link.parent().unwrap()).unwrap();
-        symlink("../dotfiles/opencodevil.json", &link).unwrap();
+        symlink("../dotfiles/opencode.json", &link).unwrap();
 
         write_keeping_mode(&link, b"{\"mcp\":{}}\n").unwrap();
         assert!(std::fs::symlink_metadata(&link).unwrap().file_type().is_symlink(), "the link stays a link");
@@ -728,7 +728,7 @@ mod tests {
         let dir = scratch("read-only");
         let store = dir.join("nix/store/abc");
         std::fs::create_dir_all(&store).unwrap();
-        let target = store.join("opencodevil.json");
+        let target = store.join("opencode.json");
         std::fs::write(&target, "{\"mcp\":{}}\n").unwrap();
         std::fs::set_permissions(&store, std::fs::Permissions::from_mode(0o555)).unwrap();
         // root writes anyway; there's nothing to check there.
@@ -736,7 +736,7 @@ mod tests {
             std::fs::remove_dir_all(dir).unwrap();
             return;
         }
-        let link = dir.join("config/opencodevil.json");
+        let link = dir.join("config/opencode.json");
         std::fs::create_dir_all(link.parent().unwrap()).unwrap();
         symlink(&target, &link).unwrap();
 

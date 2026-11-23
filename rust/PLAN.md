@@ -8,7 +8,7 @@ the Rust relay must speak its exact protocol, so the store extension keeps worki
 - **No Playwright; plain tools for OpenCode.** OpenCode has code mode, so it gets plain, typed tools and composes
   them itself. Other MCP clients get `execute` (plus `status` and `tabs`) instead: JavaScript run in an embedded
   QuickJS (`browsevil-script`) that calls the same tools in-process, with a Playwright-style `page` shim on top. The
-  relay picks by the client's `clientInfo.name`, which the MCP proxy forwards in the `OpenCode-Browser-Client`
+  relay picks by the client's `clientInfo.name`, which the MCP proxy forwards in the `opencodevil-browser-client`
   header on `/tools`, `/instructions` and `/tools/call` (`OPENCODE_BROWSEVIL_TOOLS=plain|execute|all` overrides,
   relay-side).
 - **Tabs are the handle; there are no sessions.** `navigate` without `tab` (or `tabs new`) opens a background agent

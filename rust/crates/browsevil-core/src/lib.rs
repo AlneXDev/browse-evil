@@ -342,7 +342,7 @@ pub trait Tool: Send + Sync {
 }
 
 /// `browsevil mcp` → relay: POST /tools/call. `GET /tools` returns `Vec<ToolSpec>`. Both take the MCP client's name in
-/// the `OpenCode-Browser-Client` header (CLIENT_HEADER), which decides the tools and instructions it gets.
+/// the `opencodevil-browser-client` header (CLIENT_HEADER), which decides the tools and instructions it gets.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ToolCallRequest {
     pub name: String,
@@ -350,11 +350,11 @@ pub struct ToolCallRequest {
 }
 
 /// The header naming the MCP client (its `clientInfo.name`) on /tools, /instructions and /tools/call.
-pub const CLIENT_HEADER: &str = "OpenCode-Browser-Client";
+pub const CLIENT_HEADER: &str = "opencodevil-browser-client";
 
 /// A key the caller picks for one POST /tools/call, so POST /tools/cancel can stop that call (an MCP client's
 /// `notifications/cancelled`).
-pub const CALL_HEADER: &str = "OpenCode-Browser-Call";
+pub const CALL_HEADER: &str = "opencodevil-browser-call";
 
 #[cfg(test)]
 mod tests {

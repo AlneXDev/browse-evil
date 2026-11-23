@@ -102,7 +102,7 @@ export type OpenCodeBrowserSession = {
    */
   targets?: readonly SessionTarget[]
   updatedAt: string
-  /** The process that last used the session (OpenCode-Browser-Client-Pid); see OpenCodeBrowserSessions.noteClient. */
+  /** The process that last used the session (opencodevil-browser-client-pid); see OpenCodeBrowserSessions.noteClient. */
   clientPid?: number
 }
 

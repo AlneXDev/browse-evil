@@ -190,7 +190,7 @@ describe("update command", () => {
     const { clone, push } = scenario()
     const before = git(clone, "rev-parse", "HEAD")
     const latest = push("cli/bun.lock", "src/feature.ts")
-    const { code, output, setups } = update(clone, ["--opencodevil", "/tmp/opencodevil.json", "--no-open"])
+    const { code, output, setups } = update(clone, ["--opencodevil", "/tmp/opencode.json", "--no-open"])
     expect(code).toBe(0)
     expect(git(clone, "rev-parse", "HEAD")).toBe(latest)
     expect(output).toContain(`Updating browsevil ${before.slice(0, 7)} → ${latest.slice(0, 7)} (2 new commits on origin/main):`)
@@ -198,7 +198,7 @@ describe("update command", () => {
     expect(output).toContain("change src/feature.ts")
     expect(output).toContain("Restart opencodevil")
     // Only the CLI's lockfile changed; install's flags pass through and it never waits for the extension.
-    expect(setups).toEqual([{ root: false, cli: true, args: ["--opencodevil", "/tmp/opencodevil.json", "--no-open", "--no-wait"] }])
+    expect(setups).toEqual([{ root: false, cli: true, args: ["--opencodevil", "/tmp/opencode.json", "--no-open", "--no-wait"] }])
     // The update check sees it's current now.
     expect(await checkForUpdate(clone)).toMatchObject({ available: false })
   })

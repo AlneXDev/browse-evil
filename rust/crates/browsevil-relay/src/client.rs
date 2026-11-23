@@ -135,7 +135,7 @@ pub async fn call_tool(endpoint: &Endpoint, name: &str, arguments: Value) -> any
     let auth = format!("Bearer {}", endpoint.token);
     let pid = std::process::id().to_string();
     let body = serde_json::to_vec(&ToolCallRequest { name: name.into(), arguments })?;
-    let headers = [("Authorization", auth.as_str()), ("OpenCode-Browser-Client-Pid", pid.as_str())];
+    let headers = [("Authorization", auth.as_str()), ("opencodevil-browser-client-pid", pid.as_str())];
     let response = request(endpoint.port, "POST", "/tools/call", &headers, Some(&body), Duration::from_secs(24 * 3600)).await?;
     if response.status != 200 {
         let message = response.json().and_then(|v| v["error"].as_str().map(str::to_string)).unwrap_or_else(|| String::from_utf8_lossy(&response.body).into());

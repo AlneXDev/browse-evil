@@ -205,7 +205,7 @@ fn send(method: &str, path: &str, extra: &[(&str, &str)], body: Option<&[u8]>, t
     let auth = format!("Bearer {}", relay_api::token().unwrap_or_default());
     // The relay stops the calls of a process that is gone.
     let pid = std::process::id().to_string();
-    let mut headers = vec![("Authorization", auth.as_str()), ("OpenCode-Browser-Client-Pid", pid.as_str())];
+    let mut headers = vec![("Authorization", auth.as_str()), ("opencodevil-browser-client-pid", pid.as_str())];
     headers.extend_from_slice(extra);
     http::request(&relay_api::endpoint(), method, path, &headers, body, timeout)
 }

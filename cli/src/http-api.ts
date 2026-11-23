@@ -117,7 +117,7 @@ export function createHttpRequestHandler(options: {
       // The caller already proved it has the token; clients that connect to this URL without headers need it too.
       webSocketDebuggerUrl.searchParams.set(relayTokenQueryParam, options.authToken)
       sendJson(response, {
-        Browser: `OpenCode-Browser/${opencodevilBrowserVersion}`,
+        Browser: `opencodevil-browser/${opencodevilBrowserVersion}`,
         "Protocol-Version": "1.3",
         webSocketDebuggerUrl: webSocketDebuggerUrl.toString(),
       })

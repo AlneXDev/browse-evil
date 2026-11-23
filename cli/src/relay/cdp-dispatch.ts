@@ -161,9 +161,9 @@ export function createCdpDispatcher(options: {
     if (message.method === "Browser.getVersion") {
       return {
         protocolVersion: "1.3",
-        product: "OpenCode-Browser/0.0.0",
+        product: "opencodevil-browser/0.0.0",
         revision: "0",
-        userAgent: "OpenCode-Browser",
+        userAgent: "opencodevil-browser",
         jsVersion: "V8",
       }
     }

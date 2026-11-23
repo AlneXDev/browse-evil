@@ -70,7 +70,7 @@ describe("migration from the old layouts", () => {
     const oldBinary = path.join(old, "bin", "browsevil")
     const claude = path.join(home, ".claude.json")
     write(claude, JSON.stringify({ mcpServers: { browsevil: { type: "stdio", command: oldBinary, args: ["mcp"] } } }))
-    const opencodevil = path.join(home, ".config", "opencodevil", "opencodevil.json")
+    const opencodevil = path.join(home, ".config", "opencodevil", "opencode.json")
     write(opencodevil, JSON.stringify({
       mcp: { servers: { browsevil: { type: "local", command: ["/usr/bin/node", path.join(oldData, "bin", "opencodevil-browser.mjs"), "mcp"] } } },
     }))
@@ -187,13 +187,13 @@ describe("migration after the old self-managed runtime was taken over", () => {
     expect(JSON.parse(fs.readFileSync(path.join(oldData, "extension", "manifest.json"), "utf8")).version).toBe("1")
   })
 
-  test("browsevil entries in opencodevil.jsonc and in configs settings.json recorded move to `browsevil mcp` before the shim goes", () => {
+  test("browsevil entries in opencode.jsonc and in configs settings.json recorded move to `browsevil mcp` before the shim goes", () => {
     const { home, oldData, shim, opencodevil } = takenOverHome()
     fs.rmSync(opencodevil)
-    const jsonc = path.join(home, ".config", "opencodevil", "opencodevil.jsonc")
+    const jsonc = path.join(home, ".config", "opencodevil", "opencode.jsonc")
     const entry = { type: "local", command: [node, shim, "mcp"] }
     write(jsonc, `{\n  // mine\n  "mcp": { "servers": { "browsevil": ${JSON.stringify(entry)} } }\n}\n`)
-    const project = path.join(home, "project", ".opencodevil", "opencodevil.jsonc")
+    const project = path.join(home, "project", ".opencodevil", "opencode.jsonc")
     write(project, JSON.stringify({ mcp: { servers: { browsevil: entry } } }))
     write(path.join(oldData, "settings.json"), JSON.stringify({ opencodevilConfigs: [project] }))
     withoutHomeOverride(() => migrateLegacy(home, takenOver + 11 * 60_000))

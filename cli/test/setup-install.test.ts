@@ -38,7 +38,7 @@ test("identifies the calling agent, not the editor hosting a regular terminal", 
 test("OpenCode JSONC keeps comments and other servers across install, reinstall and uninstall", () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-openconfig-"))
   try {
-    const file = path.join(home, "opencodevil.jsonc"), entry = path.join(home, "cli.mjs")
+    const file = path.join(home, "opencode.jsonc"), entry = path.join(home, "cli.mjs")
     const before = '{\n// keep this\n"mcp": { "servers": { "other": {"type":"local","command":["my-server"]} } }\n}'
     fs.writeFileSync(file, before)
     expect(configureMcp(file, entry)).toContain("added")
@@ -56,7 +56,7 @@ test("OpenCode JSONC keeps comments and other servers across install, reinstall 
 test("OpenCode's cwd is the absolute home directory: older OpenCode versions don't expand ~", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-opencodevil-cwd-"))
   try {
-    const file = path.join(dir, "opencodevil.json")
+    const file = path.join(dir, "opencode.json")
     // An earlier install wrote `~`, which older OpenCode versions don't expand (it fails on Windows), so the server
     // failed to start. Everything else matches what install would write, so cwd is the only difference.
     fs.writeFileSync(file, JSON.stringify({ mcp: { servers: { browsevil: {
@@ -77,7 +77,7 @@ test("OpenCode's cwd is the absolute home directory: older OpenCode versions don
 test("OpenCode shares one browsevil server: browsevil's older entries gain pool and a fixed cwd, user entries stay", () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-openpool-"))
   try {
-    const file = path.join(home, "opencodevil.json")
+    const file = path.join(home, "opencode.json")
     // An earlier browsevil install wrote this entry without pool or cwd.
     fs.writeFileSync(file, JSON.stringify({
       mcp: {
@@ -108,7 +108,7 @@ test("a binary install's entry runs the executable itself, in OpenCode, other ag
   const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-binary-"))
   try {
     const binary = path.join(home, ".local", "bin", "browsevil")
-    const opencodevil = path.join(home, "opencodevil.json")
+    const opencodevil = path.join(home, "opencode.json")
     expect(configureMcp(opencodevil, binary)).toContain("added")
     expect(parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil).toMatchObject({ command: [binary, "mcp"], cwd: userHome, pool: true, environment: { OPENCODE_BROWSEVIL_RUNTIME: "auto-update" } })
     expect(configureMcp(opencodevil, binary, binary)).toContain("up to date")
@@ -226,7 +226,7 @@ test("every picker choice has one user-scoped destination; config dirs and binar
     fs.mkdirSync(path.join(home, ".qwen"))
     fs.mkdirSync(path.join(home, ".pi/agent"), { recursive: true })
     fs.mkdirSync(path.join(home, ".workbuddy"))
-    const locations = agentLocations(home, config, bin => bin === "droid", path.join(config, "opencodevil/opencodevil.json"))
+    const locations = agentLocations(home, config, bin => bin === "droid", path.join(config, "opencodevil/opencode.json"))
     expect(locations.map(a => a.name).sort()).toEqual([...agentNames].sort())
     expect(locations.find(a => a.name === "qwen-code")).toMatchObject({ installed: true, file: path.join(home, ".qwen/settings.json") })
     expect(locations.find(a => a.name === "droid")).toMatchObject({ installed: true, file: path.join(home, ".factory/mcp.json") })

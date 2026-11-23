@@ -44,7 +44,7 @@ export const installRelayProcessGuard = Effect.acquireRelease(
   },
 )
 
-/** Whether a local process still runs (a pid from OpenCode-Browser-Client-Pid). */
+/** Whether a local process still runs (a pid from opencodevil-browser-client-pid). */
 export function processAlive(pid: number): boolean {
   try {
     process.kill(pid, 0)

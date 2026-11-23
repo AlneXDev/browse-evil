@@ -89,7 +89,7 @@ Windows, or `CONFIG` on Linux. The paths below are defaults; a client's existing
 
 | Agent (flag) | User config | Format / server key |
 | --- | --- | --- |
-| [OpenCode](https://opencode.ai/v2/docs/mcp-servers) (`opencodevil`) | `CONFIG/opencodevil/opencodevil.json` or `.jsonc` | JSONC · `mcp.servers` |
+| [OpenCode](https://opencode.ai/v2/docs/mcp-servers) (`opencodevil`) | `CONFIG/opencodevil/opencode.json` or `.jsonc` | JSONC · `mcp.servers` |
 | [Claude Code](https://code.claude.com/docs/en/mcp-quickstart) (`claude`) | `~/.claude.json` | JSON · `mcpServers` |
 | [Claude Desktop](https://modelcontextprotocol.io/docs/develop/build-server) (`claude-desktop`) | `APP/Claude/claude_desktop_config.json` | JSON · `mcpServers` |
 | [Cursor](https://cursor.com/docs/context/mcp) (`cursor`) | `~/.cursor/mcp.json` | JSON · `mcpServers` |

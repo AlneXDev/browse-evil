@@ -12,7 +12,7 @@ import { SessionError, type OpenCodeBrowserSessions } from "../session-manager.t
 import { TargetOwnershipError, type TargetRegistry } from "../cdp/target-registry.ts"
 
 /**
- * The MCP server names its process (OpenCode-Browser-Client-Pid) on session requests; the relay remembers it per
+ * The MCP server names its process (opencodevil-browser-client-pid) on session requests; the relay remembers it per
  * session so a capture or an implicit session outlives its MCP server only briefly (relay.ts, collectOrphans).
  */
 export function noteClient(request: http.IncomingMessage, sessions: OpenCodeBrowserSessions, sessionId: string): void {

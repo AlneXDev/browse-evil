@@ -50,7 +50,7 @@ afterAll(async () => {
 
 describe("relay", () => {
   test("HTTP API needs the token; the version probe does not", async () => {
-    const compatibility = { extensionProtocol: { min: 3, version: 3 }, pairing: "opencodevil-browser-pairing-v3" }
+    const compatibility = { extensionProtocol: { min: 3, version: 3 }, pairing: "opencodevil-browsevil-pairing-v3" }
     expect(await (await fetch(`${base}/version`)).json()).toMatchObject(compatibility)
     const probe = await fetch(`${base}/version`, { headers: { "sec-fetch-site": "cross-site" } })
     expect(probe.status).toBe(403)
