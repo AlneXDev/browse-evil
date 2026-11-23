@@ -109,6 +109,7 @@ export function Brand(props: { page?: string; end?: JSX.Element }) {
     <header class="brand">
       <img src="/icons/icon-48.png" width="24" height="24" alt="" />
       <span class="brand-name">OpenCode Eʌil Browse</span>
+      <span class="brand-made">Made by <span class="settings-about-evil-gold">✧Alne</span></span>
       <Show when={props.page}>
         <span class="brand-page">{props.page}</span>
       </Show>
