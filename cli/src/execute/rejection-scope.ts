@@ -10,7 +10,7 @@ import { safeErrorMessage } from "../execute-realm/rejection-text.ts"
 const defaultRejectionOwnershipExpiryMs = 10 * 60_000
 
 /**
- * Rejection owner for full-Node execute calls (`OPENCODE_BROWSER_ALLOW_NODE=1`), where there is no realm to tag
+ * Rejection owner for full-Node execute calls (`OPENCODE_BROWSEVIL_ALLOW_NODE=1`), where there is no realm to tag
  * promises. Node's promise hook tags the promise the synchronous call creates; continuations inherit the owner from
  * their async context. Under Bun there is no promise hook, so this scope is inert and the process guard's generic
  * fallback contains rejections (logged and counted) without a per-call warning.

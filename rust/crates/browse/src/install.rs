@@ -151,7 +151,7 @@ fn needs_node(file: &Path) -> bool {
 
 /// Whether `file` is a browse executable: it answers `--version` with a version.
 fn is_browse(file: &Path) -> bool {
-    let output = std::process::Command::new(file).arg("--version").env("OPENCODE_BROWSER_AUTOSTART", "0").stdin(std::process::Stdio::null()).stderr(std::process::Stdio::null()).output();
+    let output = std::process::Command::new(file).arg("--version").env("OPENCODE_BROWSEVIL_AUTOSTART", "0").stdin(std::process::Stdio::null()).stderr(std::process::Stdio::null()).output();
     output.is_ok_and(|o| {
         let text = String::from_utf8_lossy(&o.stdout);
         let text = text.trim();
@@ -164,15 +164,15 @@ fn removal(file: &Path) -> String {
     let target = std::fs::canonicalize(file).unwrap_or_else(|_| file.to_path_buf()).to_string_lossy().replace('\\', "/");
     let text = format!("{}|{target}", file.to_string_lossy().replace('\\', "/"));
     if text.contains("/.bun/") {
-        "`bun remove -g @opencode/browse`".into()
+        "`bun remove -g @opencode/browsevil`".into()
     } else if text.contains("pnpm") {
-        "`pnpm remove -g @opencode/browse`".into()
+        "`pnpm remove -g @opencode/browsevil`".into()
     } else if text.contains("/.volta/") {
-        "`volta uninstall @opencode/browse`".into()
+        "`volta uninstall @opencode/browsevil`".into()
     } else if text.contains("yarn") {
-        "`yarn global remove @opencode/browse`".into()
-    } else if target.contains("@opencode/browse") || target.ends_with(".mjs") {
-        "`npm rm -g @opencode/browse`".into()
+        "`yarn global remove @opencode/browsevil`".into()
+    } else if target.contains("@opencode/browsevil") || target.ends_with(".mjs") {
+        "`npm rm -g @opencode/browsevil`".into()
     } else {
         format!("delete {}", file.display())
     }
@@ -514,11 +514,11 @@ pub fn uninstall(args: &[String]) -> anyhow::Result<i32> {
     }
     if let Install::Global(global) = &install {
         let words = match global.manager {
-            Manager::Npm { .. } => "npm rm -g @opencode/browse",
-            Manager::Bun { .. } => "bun remove -g @opencode/browse",
-            Manager::Pnpm { .. } => "pnpm remove -g @opencode/browse",
-            Manager::Yarn { .. } => "yarn global remove @opencode/browse",
-            Manager::Volta { .. } => "volta uninstall @opencode/browse",
+            Manager::Npm { .. } => "npm rm -g @opencode/browsevil",
+            Manager::Bun { .. } => "bun remove -g @opencode/browsevil",
+            Manager::Pnpm { .. } => "pnpm remove -g @opencode/browsevil",
+            Manager::Yarn { .. } => "yarn global remove @opencode/browsevil",
+            Manager::Volta { .. } => "volta uninstall @opencode/browsevil",
         };
         println!("browse itself is still installed with {}: run `{words}` to remove it.", global.manager.name());
     }

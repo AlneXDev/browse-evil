@@ -7,11 +7,11 @@ import { fileURLToPath } from "node:url"
 export default defineConfig(({ mode }) => ({
   // Identifies this build in the relay's log and status, so install can tell whether a reload took effect. The CLI's
   // build passes its own stamp so it can record it next to the copied extension.
-  // OPENCODE_BROWSER_TEST_HOOKS=1 builds the stress harness's hooks in (src/background/index.ts); without it they're
+  // OPENCODE_BROWSEVIL_TEST_HOOKS=1 builds the stress harness's hooks in (src/background/index.ts); without it they're
   // compiled out, so a release never carries them.
   define: {
-    __OPENCODE_BROWSER_BUILD__: JSON.stringify(process.env.OPENCODE_BROWSER_BUILD ?? new Date().toISOString()),
-    __OPENCODE_BROWSER_TEST_HOOKS__: JSON.stringify(process.env.OPENCODE_BROWSER_TEST_HOOKS === "1"),
+    __OPENCODE_BROWSEVIL_BUILD__: JSON.stringify(process.env.OPENCODE_BROWSEVIL_BUILD ?? new Date().toISOString()),
+    __OPENCODE_BROWSEVIL_TEST_HOOKS__: JSON.stringify(process.env.OPENCODE_BROWSEVIL_TEST_HOOKS === "1"),
   },
   // The onboarding and settings pages are Solid, with @opencode/ui; everything they use is bundled (MV3 runs no
   // remote code).

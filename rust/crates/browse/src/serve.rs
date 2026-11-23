@@ -1,5 +1,5 @@
 //! `browse serve`: the relay in the foreground, with every tool this build links in. It runs until it is stopped and
-//! checks for updates at launch and hourly. One browse started itself (OPENCODE_BROWSER_MANAGED_RELAY=1) also restarts
+//! checks for updates at launch and hourly. One browse started itself (OPENCODE_BROWSEVIL_MANAGED_RELAY=1) also restarts
 //! on a new executable once idle; one a person runs in a terminal keeps running the old one until they restart it.
 
 use std::sync::Arc;
@@ -32,13 +32,13 @@ async fn signalled() {
     let _ = tokio::signal::ctrl_c().await;
 }
 
-/// QUIET, or less with OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS (for tests).
+/// QUIET, or less with OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS (for tests).
 fn quiet() -> Duration {
-    std::env::var("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS").ok().and_then(|v| v.parse().ok()).map(Duration::from_millis).map_or(QUIET, |q| q.min(QUIET))
+    std::env::var("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS").ok().and_then(|v| v.parse().ok()).map(Duration::from_millis).map_or(QUIET, |q| q.min(QUIET))
 }
 
 pub fn run() -> anyhow::Result<i32> {
-    let spawned = std::env::var("OPENCODE_BROWSER_MANAGED_RELAY").as_deref() == Ok("1");
+    let spawned = std::env::var("OPENCODE_BROWSEVIL_MANAGED_RELAY").as_deref() == Ok("1");
     let quiet = quiet();
     let options = ServeOptions {
         version: VERSION.into(),

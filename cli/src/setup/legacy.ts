@@ -33,7 +33,7 @@ export function legacyRootsLeft(home = os.homedir()) {
 
 /**
  * The self-managed runtime of releases before 0.0.11: runtime/current.json names the version under runtime/versions
- * that the old shim (bin/opencode-browser.mjs, which agents' MCP entries run) starts, with OPENCODE_BROWSER_HOME set to
+ * that the old shim (bin/opencode-browser.mjs, which agents' MCP entries run) starts, with OPENCODE_BROWSEVIL_HOME set to
  * the old data root. `movedTo` is set once a relay from a current install took it over (setup/legacy-runtime.ts).
  */
 export type LegacyRuntime = {
@@ -83,11 +83,11 @@ export const samePath = (left: string, right: string) => {
 }
 
 /**
- * Settles OPENCODE_BROWSER_HOME for an old runtime before anything resolves a path. While the old shim still starts
+ * Settles OPENCODE_BROWSEVIL_HOME for an old runtime before anything resolves a path. While the old shim still starts
  * browse, every browse process shares its folder with the relay it started (as the shim's own processes do), rather than
  * migrating the folder out from under that relay. Once taken over, the old folder the shim sets is no override.
  */
 export function settleLegacyHome(env: NodeJS.ProcessEnv = process.env, runtime = legacyRuntime()) {
-  if (runtime && legacyRuntimeActive(runtime)) env.OPENCODE_BROWSER_HOME ??= runtime.root
-  else if (runtime?.movedTo && env.OPENCODE_BROWSER_HOME && samePath(env.OPENCODE_BROWSER_HOME, runtime.root)) delete env.OPENCODE_BROWSER_HOME
+  if (runtime && legacyRuntimeActive(runtime)) env.OPENCODE_BROWSEVIL_HOME ??= runtime.root
+  else if (runtime?.movedTo && env.OPENCODE_BROWSEVIL_HOME && samePath(env.OPENCODE_BROWSEVIL_HOME, runtime.root)) delete env.OPENCODE_BROWSEVIL_HOME
 }

@@ -8,7 +8,7 @@ import { installFakeRelaySocket } from "../relay-stub"
 // and a WebSocket).
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 /** This browser's token for the relay, as a code exchange left it. */
 const TOKEN = "test-token-0123456789abcdefghijklmnopqrstuv"
 const PORT = 19908

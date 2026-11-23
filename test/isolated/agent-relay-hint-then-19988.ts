@@ -5,7 +5,7 @@ import { installChrome, settle } from "../chrome-stub"
 // code goes to that port, and when that port later fails a scan can move back to 19988. Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const HINT_PORT = 19990
 const DEFAULT_PORT = 19988

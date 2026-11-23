@@ -22,11 +22,11 @@ chrome.action.onClicked.addListener((tab) => {
   if (tab.id !== undefined) agents.attachTab(tab.id)
 })
 
-declare const __OPENCODE_BROWSER_TEST_HOOKS__: boolean
-// Test builds only (OPENCODE_BROWSER_TEST_HOOKS=1 when building): the stress harness clicks the toolbar button through
+declare const __OPENCODE_BROWSEVIL_TEST_HOOKS__: boolean
+// Test builds only (OPENCODE_BROWSEVIL_TEST_HOOKS=1 when building): the stress harness clicks the toolbar button through
 // this worker's DevTools target, as CDP can't click browser UI. Pages can't reach the worker's globals, and other
 // builds compile this out.
-if (__OPENCODE_BROWSER_TEST_HOOKS__)
+if (__OPENCODE_BROWSEVIL_TEST_HOOKS__)
   Object.assign(globalThis, { __opencodeBrowserTest: { toolbarClick: (tabId: number) => agents.attachTab(tabId) } })
 
 chrome.runtime.onConnect.addListener((port) => {

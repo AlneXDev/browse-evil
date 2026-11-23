@@ -61,13 +61,13 @@ if (import.meta.main) {
   if (values["versions-only"]) process.exit(0)
   const dev = parseReleaseVersion(version).channel === "dev"
   // The Rust CLI has the public store item built in (rust/crates/browse-relay/src/protocol.rs PUBLIC_STORE_ID), where
-  // the TypeScript CLI took it from OPENCODE_BROWSER_STORE_ID (the CWS_ITEM_ID repository variable) at build time.
-  const storeId = process.env.OPENCODE_BROWSER_STORE_ID?.trim()
+  // the TypeScript CLI took it from OPENCODE_BROWSEVIL_STORE_ID (the CWS_ITEM_ID repository variable) at build time.
+  const storeId = process.env.OPENCODE_BROWSEVIL_STORE_ID?.trim()
   const builtIn = /PUBLIC_STORE_ID: &str = "([a-p]{32})"/.exec(await readFile(path.join(root, "rust", "crates", "browse-relay", "src", "protocol.rs"), "utf8"))?.[1]
-  if (storeId && storeId !== builtIn) fail([`OPENCODE_BROWSER_STORE_ID is ${storeId}, but the Rust CLI points installs at ${String(builtIn)} (PUBLIC_STORE_ID)`])
+  if (storeId && storeId !== builtIn) fail([`OPENCODE_BROWSEVIL_STORE_ID is ${storeId}, but the Rust CLI points installs at ${String(builtIn)} (PUBLIC_STORE_ID)`])
 
   // The stress harness's hooks must never be built into a release (vite.config.ts).
-  if (process.env.OPENCODE_BROWSER_TEST_HOOKS === "1") fail(["OPENCODE_BROWSER_TEST_HOOKS=1 is set; unset it, test hooks never ship"])
+  if (process.env.OPENCODE_BROWSEVIL_TEST_HOOKS === "1") fail(["OPENCODE_BROWSEVIL_TEST_HOOKS=1 is set; unset it, test hooks never ship"])
   await rm(release, { recursive: true, force: true })
   const zip = (await $`bun scripts/package.ts`.cwd(root).text()).trim().split("\n").pop()!
   const tarball = await packMain(version, release)

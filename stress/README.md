@@ -92,7 +92,7 @@ of measurements; fds and tabs after a 5-minute run warm-up), every tab a session
 tracked for idle cleanup throughout, and no leaked tabs after the run (neither held by a session nor a window's active
 tab).
 
-`toolbar-stop` clicks through a test hook the extension has only when built with `OPENCODE_BROWSER_TEST_HOOKS=1`
+`toolbar-stop` clicks through a test hook the extension has only when built with `OPENCODE_BROWSEVIL_TEST_HOOKS=1`
 (`exe/deploy.sh` builds it that way; release builds compile the hook out). It lives in the service worker's globals,
 which the harness reaches over the debugging port; pages can't.
 
@@ -115,7 +115,7 @@ node stress/installed.ts [--user curl] [--port 19988] [--debug-port 9222] [--ext
 ```
 
 The extension folders under `~/u/ext-*` are the release zips with the store's public key added to `manifest.json`, so
-loaded unpacked they get the store id (`mfnicocicmmlkpjnaffgihfjhdgjkdjg`), which is the only store origin the relay
+loaded unpacked they get the store id (`lfmeghngagemglmdnplimokblljgmnoj`), which is the only store origin the relay
 accepts. Get the key from the store's CRX header (`clients2.google.com/service/update2/crx?…x=id%3D<id>%26uc`,
 CRX3 `sha256_with_rsa.public_key`). Several users can run side by side on different relay ports and debugging ports.
 
@@ -171,9 +171,9 @@ node stress/stealth/run.ts --sites-file my-sites.json --out /tmp/stealth-run
 ```
 
 It drives browse the way an agent does, through the MCP server (`session_new`, then `execute` with `page.mouse`,
-`page.click` and `page.keyboard`, so human-like input applies), against whichever relay `OPENCODE_BROWSER_HOME` and
-`OPENCODE_BROWSER_PORT` select. Prefer a separate browser profile paired to its own relay (a different
-`OPENCODE_BROWSER_HOME` and `OPENCODE_BROWSER_PORT`) over your everyday one, and note the browser version, macOS
+`page.click` and `page.keyboard`, so human-like input applies), against whichever relay `OPENCODE_BROWSEVIL_HOME` and
+`OPENCODE_BROWSEVIL_PORT` select. Prefer a separate browser profile paired to its own relay (a different
+`OPENCODE_BROWSEVIL_HOME` and `OPENCODE_BROWSEVIL_PORT`) over your everyday one, and note the browser version, macOS
 version and network. Report a clean-profile run and a warm-profile run separately: clearance cookies change verdicts.
 
 - **Local probe** (`stress/stealth/probe.html` and `snapshot.js`, served on `127.0.0.1`): records, while browse moves,

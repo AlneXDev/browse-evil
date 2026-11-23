@@ -29,8 +29,8 @@ const storeId = storeConfig().id ?? PUBLIC_STORE_ID
 export const STORE_IDS = [storeId]
 /** The store page every channel installs the extension from. */
 export const STORE_URL = storeUrl(storeId)
-export const PACKAGE = "@opencode/browse"
-export const MCP_NAME = "browse"
+export const PACKAGE = "@opencode/browsevil"
+export const MCP_NAME = "browsevil"
 /** The MCP server's name before it was renamed to `browse`. */
 export const LEGACY_MCP_NAME = "opencode-browser"
 export const LEGACY_HOST_NAME = "ai.opencode.browser"
@@ -69,7 +69,7 @@ const here = path.dirname(fileURLToPath(import.meta.url))
 /** This package's root: dist/cli.mjs when published, src/setup/* from source. */
 export const packageRoot = path.basename(here) === "setup" ? path.dirname(path.dirname(here)) : path.dirname(here)
 /** Running from a source checkout without a package to install: the MCP server runs main.ts in place with bun. */
-export const fromSource = existsSync(path.join(packageRoot, "src", "main.ts")) && !process.env.OPENCODE_BROWSER_PACKAGE
+export const fromSource = existsSync(path.join(packageRoot, "src", "main.ts")) && !process.env.OPENCODE_BROWSEVIL_PACKAGE
 /** From a checkout, the extension folder users load unpacked (dist/) and its source (public/, copied into dist/ by every build). */
 export const checkoutExtensionDirs = (() => {
   const repo = path.dirname(packageRoot)

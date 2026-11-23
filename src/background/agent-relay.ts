@@ -53,7 +53,7 @@ import { ToolbarNotice } from "./toolbar-notice"
 
 export type { AgentBadge }
 
-declare const __OPENCODE_BROWSER_BUILD__: string
+declare const __OPENCODE_BROWSEVIL_BUILD__: string
 
 /**
  * chrome.storage.session: the toolbar clicks waiting for a relay, as `{ tabId, lending }` (see createAgentRelay). A
@@ -177,7 +177,7 @@ export function createAgentRelay(input: { changed: (state: AgentRelayState) => v
   const reloadCheckout = async (reason: string, mine: number) => {
     if (chrome.runtime.id !== unpackedExtensionId || !reason.startsWith(checkoutReloadPrefix)) return
     const build = reason.slice(checkoutReloadPrefix.length)
-    if (!(Date.parse(build) > Date.parse(__OPENCODE_BROWSER_BUILD__))) return
+    if (!(Date.parse(build) > Date.parse(__OPENCODE_BROWSEVIL_BUILD__))) return
     const file = await fetch(chrome.runtime.getURL("build.json"), { cache: "no-store" })
     if (!file.ok || (await file.json()).build !== build) return
     const key = "agentRelayReloadBuild"

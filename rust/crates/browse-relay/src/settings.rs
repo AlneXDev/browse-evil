@@ -24,11 +24,11 @@ pub fn spec(key: &str) -> Option<Spec> {
 }
 
 pub const SECURITY_VARIABLES: [&str; 5] = [
-    "OPENCODE_BROWSER_ALLOW_ALL_COOKIES",
-    "OPENCODE_BROWSER_ALLOW_FOREGROUND",
-    "OPENCODE_BROWSER_ALLOW_ALL_STORAGE",
-    "OPENCODE_BROWSER_ALLOW_FILE_URLS",
-    "OPENCODE_BROWSER_UPDATE_CHECK",
+    "OPENCODE_BROWSEVIL_ALLOW_ALL_COOKIES",
+    "OPENCODE_BROWSEVIL_ALLOW_FOREGROUND",
+    "OPENCODE_BROWSEVIL_ALLOW_ALL_STORAGE",
+    "OPENCODE_BROWSEVIL_ALLOW_FILE_URLS",
+    "OPENCODE_BROWSEVIL_UPDATE_CHECK",
 ];
 
 /// A setting value as the tool shows it: idleMinutes is a number or "never", the rest strings.
@@ -37,7 +37,7 @@ fn shown(key: &str, raw: &str) -> Value {
 }
 
 pub fn agent_window_override() -> Option<&'static str> {
-    match std::env::var("OPENCODE_BROWSER_AGENT_WINDOW").ok()?.trim().to_lowercase().as_str() {
+    match std::env::var("OPENCODE_BROWSEVIL_AGENT_WINDOW").ok()?.trim().to_lowercase().as_str() {
         "current" => Some("current"),
         "separate" => Some("separate"),
         _ => None,
@@ -45,7 +45,7 @@ pub fn agent_window_override() -> Option<&'static str> {
 }
 
 pub fn human_input_override() -> Option<bool> {
-    let value = std::env::var("OPENCODE_BROWSER_HUMAN_INPUT").ok()?;
+    let value = std::env::var("OPENCODE_BROWSEVIL_HUMAN_INPUT").ok()?;
     let value = value.trim();
     (!value.is_empty()).then(|| !matches!(value.to_lowercase().as_str(), "0" | "false" | "off" | "no"))
 }
@@ -54,10 +54,10 @@ pub fn human_input_override() -> Option<bool> {
 pub fn overrides() -> Vec<(&'static str, &'static str, String)> {
     let mut out = Vec::new();
     if let Some(window) = agent_window_override() {
-        out.push(("window", "OPENCODE_BROWSER_AGENT_WINDOW", window.to_string()));
+        out.push(("window", "OPENCODE_BROWSEVIL_AGENT_WINDOW", window.to_string()));
     }
     if let Some(human) = human_input_override() {
-        out.push(("humanInput", "OPENCODE_BROWSER_HUMAN_INPUT", if human { "on" } else { "off" }.to_string()));
+        out.push(("humanInput", "OPENCODE_BROWSEVIL_HUMAN_INPUT", if human { "on" } else { "off" }.to_string()));
     }
     out
 }

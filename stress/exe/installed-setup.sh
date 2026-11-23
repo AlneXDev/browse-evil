@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Installs browse the way users do, each into a throwaway $HOME under ~/u, for stress/installed.ts:
 #   installed-setup.sh curl [version]   # curl -fsSL https://opencode.ai/browse/install | bash  (optionally --version X)
-#   installed-setup.sh npm              # npx @opencode/browse@latest install
+#   installed-setup.sh npm              # npx @opencode/browsevil@latest install
 #   installed-setup.sh extensions       # the release zips with the store's manifest key (so their id is the store id)
 # Each install runs non-interactively (as an agent would run it) with --no-wait: pairing is the harness's job.
-# The relay it starts listens on OPENCODE_BROWSER_PORT (default 19988): stop the other user's relay first, or set a port.
+# The relay it starts listens on OPENCODE_BROWSEVIL_PORT (default 19988): stop the other user's relay first, or set a port.
 set -euo pipefail
 export PATH=/usr/local/bin:$PATH
 kind="${1:?curl|npm|extensions}"
@@ -33,7 +33,7 @@ case "$kind" in
     # A throwaway global prefix, so `npm install -g` in installRuntime stays inside this HOME.
     export npm_config_prefix="$home/.local"
     cd "$home"
-    npx -y @opencode/browse@latest install --no-wait
+    npx -y @opencode/browsevil@latest install --no-wait
     ls "$home/.local/share/browse"
     ;;
   extensions)

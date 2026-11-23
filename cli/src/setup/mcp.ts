@@ -143,7 +143,7 @@ function mergedMcpServer(existing: Servers[string] | undefined, command: string[
     command,
     cwd: home,
     pool: true,
-    environment: { ...environment, OPENCODE_BROWSER_RUNTIME: runtime },
+    environment: { ...environment, OPENCODE_BROWSEVIL_RUNTIME: runtime },
   }
 }
 
@@ -221,7 +221,7 @@ export async function installRuntime(): Promise<{ entry: string; version: string
     if (!existsSync(bundle)) fail("Build the CLI first: `bun run build` in cli/ (or `bun run setup` at the top).")
     return { entry: bundle, version: opencodeBrowserVersion, spawnEntry: bundle }
   }
-  const spec = process.env.OPENCODE_BROWSER_PACKAGE
+  const spec = process.env.OPENCODE_BROWSEVIL_PACKAGE
   const globalRoot = await npmGlobalRoot()
   const at = (...parts: string[]) => (globalRoot ? path.join(globalRoot, ...parts) : undefined)
   const globalPackage = at("@opencode", "browse")

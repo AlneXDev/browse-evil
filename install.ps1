@@ -140,7 +140,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
                 if (-not $avx2) { $target = "x64-baseline" }
             }
 
-            $package = "@opencode/browse-windows-$target"
+            $package = "@opencode/browsevil-windows-$target"
             $encoded = "@opencode%2fbrowse-windows-$target"
             if ($pinned) {
                 $version = $requested -replace "^v", ""
@@ -170,9 +170,9 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
             } else {
                 # The channel's current release from the Anomaly release service (anomalyco/release docs/protocol.md). The
                 # manifest names the file for this target; its size and SHA-256 must match before it is used.
-                $service = if ($env:OPENCODE_BROWSER_RELEASE_SERVICE) { $env:OPENCODE_BROWSER_RELEASE_SERVICE } else { "https://anoma.ly/release" }
+                $service = if ($env:OPENCODE_BROWSEVIL_RELEASE_SERVICE) { $env:OPENCODE_BROWSEVIL_RELEASE_SERVICE } else { "https://anoma.ly/release" }
                 $service = $service.TrimEnd("/")
-                if (-not $service.EndsWith("/release")) { throw "OPENCODE_BROWSER_RELEASE_SERVICE must end in /release, not $service" }
+                if (-not $service.EndsWith("/release")) { throw "OPENCODE_BROWSEVIL_RELEASE_SERVICE must end in /release, not $service" }
                 $manifestUrl = "$service/browse/cli/$channel.json"
                 # PowerShell 7 validates the User-Agent as RFC 7231 product tokens, so the channel and action live in
                 # one product and a comment instead of extra `/`-separated segments.

@@ -149,9 +149,9 @@ impl Scene {
         Scene { home: root.join("home"), calls: root.join("calls"), started: root.join("started"), root }
     }
 
-    /// @opencode/browse at `package` at the running version: its launcher.
+    /// @opencode/browsevil at `package` at the running version: its launcher.
     fn package(&self, package: &Path) -> PathBuf {
-        write(&package.join("package.json"), &format!(r#"{{"name":"@opencode/browse","version":"{}"}}"#, version()));
+        write(&package.join("package.json"), &format!(r#"{{"name":"@opencode/browsevil","version":"{}"}}"#, version()));
         let launcher = package.join("dist/cli.mjs");
         write(&launcher, "");
         launcher
@@ -176,7 +176,7 @@ impl Scene {
     /// manager replaces them (the binary by a rename: a running executable can't be written).
     fn swap(&self, package: &Path, binary: &Path) -> String {
         format!(
-            "mkdir -p '{bin}' '{package}'\nprintf '%s' '{{\"name\":\"@opencode/browse\",\"version\":\"{NEXT}\"}}' > '{package}/package.json'\ncat > '{bin}/.next' <<'EOF'\n{next}EOF\nchmod +x '{bin}/.next'\nmv -f '{bin}/.next' '{binary}'\n",
+            "mkdir -p '{bin}' '{package}'\nprintf '%s' '{{\"name\":\"@opencode/browsevil\",\"version\":\"{NEXT}\"}}' > '{package}/package.json'\ncat > '{bin}/.next' <<'EOF'\n{next}EOF\nchmod +x '{bin}/.next'\nmv -f '{bin}/.next' '{binary}'\n",
             bin = binary.parent().unwrap().display(),
             package = package.display(),
             binary = binary.display(),
@@ -192,14 +192,14 @@ impl Scene {
             "BUN_INSTALL",
             "PNPM_HOME",
             "VOLTA_HOME",
-            "OPENCODE_BROWSER_NPM_NODE",
-            "OPENCODE_BROWSER_NPM_BUN",
-            "OPENCODE_BROWSER_NPM_USER_AGENT",
-            "OPENCODE_BROWSER_NPM_EXECPATH",
-            "OPENCODE_BROWSER_NPM_LAUNCHER",
-            "OPENCODE_BROWSER_AUTO_UPDATE",
-            "OPENCODE_BROWSER_UPDATE_CHECK",
-            "OPENCODE_BROWSER_AUTO_UPDATE_INTERVAL_MS",
+            "OPENCODE_BROWSEVIL_NPM_NODE",
+            "OPENCODE_BROWSEVIL_NPM_BUN",
+            "OPENCODE_BROWSEVIL_NPM_USER_AGENT",
+            "OPENCODE_BROWSEVIL_NPM_EXECPATH",
+            "OPENCODE_BROWSEVIL_NPM_LAUNCHER",
+            "OPENCODE_BROWSEVIL_AUTO_UPDATE",
+            "OPENCODE_BROWSEVIL_UPDATE_CHECK",
+            "OPENCODE_BROWSEVIL_AUTO_UPDATE_INTERVAL_MS",
             "XDG_DATA_HOME",
             "XDG_CONFIG_HOME",
             "XDG_BIN_HOME",
@@ -208,11 +208,11 @@ impl Scene {
         }
         command
             .env("HOME", &self.home)
-            .env("OPENCODE_BROWSER_HOME", self.home.join(".browse"))
-            .env("OPENCODE_BROWSER_PORT", port.to_string())
-            .env("OPENCODE_BROWSER_AUTOSTART", "0")
-            .env("OPENCODE_BROWSER_RELEASE_SERVICE", service)
-            .env("OPENCODE_BROWSER_NPM_REGISTRY", REGISTRY);
+            .env("OPENCODE_BROWSEVIL_HOME", self.home.join(".browse"))
+            .env("OPENCODE_BROWSEVIL_PORT", port.to_string())
+            .env("OPENCODE_BROWSEVIL_AUTOSTART", "0")
+            .env("OPENCODE_BROWSEVIL_RELEASE_SERVICE", service)
+            .env("OPENCODE_BROWSEVIL_NPM_REGISTRY", REGISTRY);
     }
 
     /// `status --json`: the install it found and its "Updates:" line.
@@ -235,12 +235,12 @@ impl Scene {
 
         let status = self.status(binary, &service, port);
         let updates = status["setup"]["updates"].as_str().unwrap();
-        assert!(updates.starts_with(&format!("automatic ({manager} @opencode/browse@")), "{updates}");
+        assert!(updates.starts_with(&format!("automatic ({manager} @opencode/browsevil@")), "{updates}");
 
         let mut check = Command::new(binary);
         check.args(["update", "--check"]);
         self.isolate(&mut check, &service, port);
-        check.env("PATH", &path).env("OPENCODE_BROWSER_NPM_LAUNCHER", launcher);
+        check.env("PATH", &path).env("OPENCODE_BROWSEVIL_NPM_LAUNCHER", launcher);
         let check = run_output(&mut check);
         assert!(String::from_utf8_lossy(&check.stdout).contains(&format!("browse {NEXT} is available")), "{check:?}");
         assert!(!self.calls.exists(), "--check doesn't install");
@@ -249,11 +249,11 @@ impl Scene {
         self.isolate(&mut serve, &service, port);
         serve
             .arg("serve")
-            .env("OPENCODE_BROWSER_MANAGED_RELAY", "1")
-            .env("OPENCODE_BROWSER_AUTO_UPDATE_INTERVAL_MS", "200")
-            .env("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS", "0")
+            .env("OPENCODE_BROWSEVIL_MANAGED_RELAY", "1")
+            .env("OPENCODE_BROWSEVIL_AUTO_UPDATE_INTERVAL_MS", "200")
+            .env("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS", "0")
             .env("PATH", &path)
-            .env("OPENCODE_BROWSER_NPM_LAUNCHER", launcher)
+            .env("OPENCODE_BROWSEVIL_NPM_LAUNCHER", launcher)
             .stdin(Stdio::null())
             .stdout(Stdio::null())
             .stderr(Stdio::null());
@@ -307,14 +307,14 @@ fn binary_install_checks_the_release_service() {
 fn npx_run_checks_the_release_service() {
     let scene = Scene::new("npx");
     let modules = scene.home.join(".npm/_npx/4d2a/node_modules");
-    let launcher = scene.package(&modules.join("@opencode/browse"));
+    let launcher = scene.package(&modules.join("@opencode/browsevil"));
     let binary = scene.platform(&modules.join(format!("@opencode/{PLATFORM}")));
     let (service, requests) = release_service();
     let port = free_port();
     let mut update = Command::new(&binary);
     update.arg("update");
     scene.isolate(&mut update, &service, port);
-    update.env("OPENCODE_BROWSER_NPM_LAUNCHER", &launcher);
+    update.env("OPENCODE_BROWSEVIL_NPM_LAUNCHER", &launcher);
     let update = run_output(&mut update);
     assert!(String::from_utf8_lossy(&update.stdout).contains(&format!("browse {NEXT} is out")), "{update:?}");
     scene.requests_are(&requests, "npx");
@@ -324,14 +324,14 @@ fn npx_run_checks_the_release_service() {
 fn npm_global_install() {
     let scene = Scene::new("npm");
     let prefix = scene.home.join(".nvm/versions/node/v22.11.0");
-    let package = prefix.join("lib/node_modules/@opencode/browse");
+    let package = prefix.join("lib/node_modules/@opencode/browsevil");
     let launcher = scene.package(&package);
     let binary = scene.platform(&package.join(format!("node_modules/@opencode/{PLATFORM}")));
-    link(&prefix.join("bin/browse"), "../lib/node_modules/@opencode/browse/dist/cli.mjs");
+    link(&prefix.join("bin/browse"), "../lib/node_modules/@opencode/browsevil/dist/cli.mjs");
     let stubs = scene.root.join("stubs");
     write_executable(&stubs.join("npm"), &format!("#!/bin/sh\necho \"$*\" >> '{}'\n{}", scene.calls.display(), scene.swap(&package, &binary)));
     scene.run("npm", &binary, &launcher, Some(&stubs), |registry| {
-        format!("install --global --prefix {} --no-fund --no-audit --no-update-notifier @opencode/browse@{NEXT} --registry={registry} --@opencode:registry={registry}", prefix.display())
+        format!("install --global --prefix {} --no-fund --no-audit --no-update-notifier @opencode/browsevil@{NEXT} --registry={registry} --@opencode:registry={registry}", prefix.display())
     });
 }
 
@@ -339,17 +339,17 @@ fn npm_global_install() {
 fn npm_global_install_waits_quietly_when_npm_lags_the_release() {
     let scene = Scene::new("npm-etarget");
     let prefix = scene.home.join(".nvm/versions/node/v22.11.0");
-    let package = prefix.join("lib/node_modules/@opencode/browse");
+    let package = prefix.join("lib/node_modules/@opencode/browsevil");
     let launcher = scene.package(&package);
     let binary = scene.platform(&package.join(format!("node_modules/@opencode/{PLATFORM}")));
-    link(&prefix.join("bin/browse"), "../lib/node_modules/@opencode/browse/dist/cli.mjs");
+    link(&prefix.join("bin/browse"), "../lib/node_modules/@opencode/browsevil/dist/cli.mjs");
     // The first install gets npm's ETARGET (the service has the release, npm doesn't yet); the next one succeeds.
     let marker = scene.root.join("etarget");
     let stubs = scene.root.join("stubs");
     write_executable(
         &stubs.join("npm"),
         &format!(
-            "#!/bin/sh\necho \"$*\" >> '{calls}'\nif [ ! -f '{marker}' ]; then\n  : > '{marker}'\n  echo 'npm error code ETARGET' >&2\n  echo 'npm error notarget No matching version found for @opencode/browse@{NEXT}.' >&2\n  exit 1\nfi\n{swap}",
+            "#!/bin/sh\necho \"$*\" >> '{calls}'\nif [ ! -f '{marker}' ]; then\n  : > '{marker}'\n  echo 'npm error code ETARGET' >&2\n  echo 'npm error notarget No matching version found for @opencode/browsevil@{NEXT}.' >&2\n  exit 1\nfi\n{swap}",
             calls = scene.calls.display(),
             marker = marker.display(),
             swap = scene.swap(&package, &binary),
@@ -363,11 +363,11 @@ fn npm_global_install_waits_quietly_when_npm_lags_the_release() {
     scene.isolate(&mut serve, &service, port);
     serve
         .arg("serve")
-        .env("OPENCODE_BROWSER_MANAGED_RELAY", "1")
-        .env("OPENCODE_BROWSER_AUTO_UPDATE_INTERVAL_MS", "200")
-        .env("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS", "0")
+        .env("OPENCODE_BROWSEVIL_MANAGED_RELAY", "1")
+        .env("OPENCODE_BROWSEVIL_AUTO_UPDATE_INTERVAL_MS", "200")
+        .env("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS", "0")
         .env("PATH", &path)
-        .env("OPENCODE_BROWSER_NPM_LAUNCHER", &launcher)
+        .env("OPENCODE_BROWSEVIL_NPM_LAUNCHER", &launcher)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -377,7 +377,7 @@ fn npm_global_install_waits_quietly_when_npm_lags_the_release() {
     let calls = std::fs::read_to_string(&scene.calls).unwrap();
     let calls: Vec<&str> = calls.lines().collect();
     assert_eq!(calls.len(), 2, "{calls:?}");
-    assert!(calls[0].contains(&format!("@opencode/browse@{NEXT}")), "{calls:?}");
+    assert!(calls[0].contains(&format!("@opencode/browsevil@{NEXT}")), "{calls:?}");
     assert_eq!(calls[0], calls[1]);
     scene.requests_are(&requests, "npm");
     let state: serde_json::Value = serde_json::from_slice(&std::fs::read(scene.home.join(".browse/auto-update.json")).unwrap()).unwrap();
@@ -391,29 +391,29 @@ fn bun_global_install() {
     let scene = Scene::new("bun");
     let root = scene.home.join(".bun");
     let global = root.join("install/global");
-    write(&global.join("package.json"), r#"{"dependencies":{"@opencode/browse":"dev"}}"#);
-    let package = global.join("node_modules/@opencode/browse");
+    write(&global.join("package.json"), r#"{"dependencies":{"@opencode/browsevil":"dev"}}"#);
+    let package = global.join("node_modules/@opencode/browsevil");
     let launcher = scene.package(&package);
     let binary = scene.platform(&global.join(format!("node_modules/@opencode/{PLATFORM}")));
     // No bun on PATH: the bun folder's own bun.
     write_executable(&root.join("bin/bun"), &format!("#!/bin/sh\necho \"$BUN_INSTALL $*\" >> '{}'\n{}", scene.calls.display(), scene.swap(&package, &binary)));
-    scene.run("bun", &binary, &launcher, None, |registry| format!("{} add --global --no-progress @opencode/browse@{NEXT} --registry={registry}", root.display()));
+    scene.run("bun", &binary, &launcher, None, |registry| format!("{} add --global --no-progress @opencode/browsevil@{NEXT} --registry={registry}", root.display()));
 }
 
 #[test]
 fn yarn_global_install() {
     let scene = Scene::new("yarn");
     let folder = scene.home.join(".local/share/yarn/global");
-    write(&folder.join("package.json"), r#"{"dependencies":{"@opencode/browse":"0.1.0"}}"#);
+    write(&folder.join("package.json"), r#"{"dependencies":{"@opencode/browsevil":"0.1.0"}}"#);
     write(&folder.join("yarn.lock"), "");
-    let package = folder.join("node_modules/@opencode/browse");
+    let package = folder.join("node_modules/@opencode/browsevil");
     let launcher = scene.package(&package);
     let binary = scene.platform(&folder.join(format!("node_modules/@opencode/{PLATFORM}")));
-    link(&scene.home.join(".yarn/bin/browse"), "../../.local/share/yarn/global/node_modules/@opencode/browse/dist/cli.mjs");
+    link(&scene.home.join(".yarn/bin/browse"), "../../.local/share/yarn/global/node_modules/@opencode/browsevil/dist/cli.mjs");
     let stubs = scene.root.join("stubs");
     write_executable(&stubs.join("yarn"), &format!("#!/bin/sh\necho \"$*\" >> '{}'\n{}", scene.calls.display(), scene.swap(&package, &binary)));
     scene.run("yarn", &binary, &launcher, Some(&stubs), |registry| {
-        format!("global add @opencode/browse@{NEXT} --global-folder {} --non-interactive --no-progress --registry {registry}", folder.display())
+        format!("global add @opencode/browsevil@{NEXT} --global-folder {} --non-interactive --no-progress --registry {registry}", folder.display())
     });
 }
 
@@ -461,7 +461,7 @@ fn answers_version(port: u16) -> bool {
     response.starts_with("HTTP/1.1 200")
 }
 
-/// No client, no OPENCODE_BROWSER_* settings of its own (a person's `browse serve`): the relay checks the release
+/// No client, no OPENCODE_BROWSEVIL_* settings of its own (a person's `browse serve`): the relay checks the release
 /// service at launch, installs the release, and keeps running on the old executable with nobody connected (even with
 /// the old idle-shutdown setting): it doesn't restart itself.
 #[test]
@@ -470,7 +470,7 @@ fn a_relay_with_no_special_environment_checks_at_launch_and_stays_up() {
     let binary = scene.binary();
     let (service, requests) = release_service_with(Some(scene.tarball()));
     let port = free_port();
-    let mut relay = scene.serve(&binary, &service, port).env("OPENCODE_BROWSER_IDLE_SHUTDOWN_MS", "1").env("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS", "0").spawn().unwrap();
+    let mut relay = scene.serve(&binary, &service, port).env("OPENCODE_BROWSEVIL_IDLE_SHUTDOWN_MS", "1").env("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS", "0").spawn().unwrap();
     wait_for("the check at launch", Duration::from_secs(20), || manifest_requests(&requests, "binary") > 0);
     wait_for("the install", Duration::from_secs(20), || scene.state()["lastUpdate"]["to"] == NEXT);
     std::thread::sleep(Duration::from_secs(4));
@@ -522,7 +522,7 @@ fn a_relay_updates_without_curl() {
         let found = std::env::split_paths(&std::env::var_os("PATH").unwrap()).map(|d| d.join(tool)).find(|f| f.is_file()).unwrap();
         symlink(found, bin.join(tool)).unwrap();
     }
-    let mut relay = scene.serve(&binary, &service, port).env("PATH", &bin).env("OPENCODE_BROWSER_MANAGED_RELAY", "1").env("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS", "0").spawn().unwrap();
+    let mut relay = scene.serve(&binary, &service, port).env("PATH", &bin).env("OPENCODE_BROWSEVIL_MANAGED_RELAY", "1").env("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS", "0").spawn().unwrap();
     wait_for("the relay to restart on the new binary", Duration::from_secs(60), || scene.started.exists() && relay.try_wait().unwrap().is_some());
     assert!(relay.wait().unwrap().success());
     assert_eq!(std::fs::read_to_string(&scene.started).unwrap().trim(), "serve");
@@ -543,7 +543,7 @@ fn an_unrecognized_install_checks_in_and_installs_nothing() {
     let (service, requests) = release_service_with(Some(scene.tarball()));
     let port = free_port();
     let mut serve = scene.serve(&binary, &service, port);
-    serve.env("OPENCODE_BROWSER_MANAGED_RELAY", "1").env("OPENCODE_BROWSER_AUTO_UPDATE_QUIET_MS", "0");
+    serve.env("OPENCODE_BROWSEVIL_MANAGED_RELAY", "1").env("OPENCODE_BROWSEVIL_AUTO_UPDATE_QUIET_MS", "0");
     let deadline = Instant::now() + Duration::from_secs(5);
     let mut relay = loop {
         match serve.spawn() {

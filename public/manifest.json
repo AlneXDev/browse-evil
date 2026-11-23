@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "OpenCode Browse",
-  "description": "Lets your coding agent use your real browser: open and drive tabs, take screenshots, and hand logins back to you.",
+  "name": "OpenCode Eʌil Browse",
+  "description": "Lets your coding agent use your real browser: open and drive tabs, take screenshots, and hand logins back to you. Made by ✧Alne.",
   "version": "0.1.5",
   "minimum_chrome_version": "125",
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjWdgsBDUPCHO2u5bq3/Us1sLm+kiehLZBL0HIu3stwivGW+bgCDsD8KAEMFJcY04u3iudffTeEGdEe8pQfL7BSNRvyslszmvJrsoP7bVUKXrnRTw3CUsRjnwbqMoMElwegiCFUXPnqQ9ZeA2NGEhmWMyDXqqZxOo0z2q66GTgz9McbXOBK2QXYBPjUWxud814wSrE1lIQ2G58nQVeZenI3/PXZ4f1SACn6SdkiCR44NZwz89I1ISxftongLDED/1dlnivqJBzAtN1s2i+jWplLtOmLJJkh1LQ2jP3gWvYY1zT2RHJIw874SSrrhFt4Hguvo/L0Ge7ixvGp5tDAP2wwIDAQAB",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArbpeay2MkB8AnnTFBZCqQooh2c4UsspcaOC8P6xXOa12hy3tclLzzUXP/KJC7QgBbTVQBLySTiaQi+WxDOCR0QPstu91suWeMqy/eN72HL33QhvCUZFON5YPElTDObho0sJ0pju3yCtMRaZA5mFvnTEh19mO6zOi75dDDZsximMM7sxGBM2xruWoJYqleXmsoIk5dRkzt/nLWm+t/SQ+st0YMqh34CcpoQS9+JQ23GpRhWbWHudQMXdsE0f/nANvhJSHig3fLu4qILAyoTda0IfA+CAIhpz4Gaays8Kjox+D/BwoqeYkinCBVctUKTmjhfeO6zPK9LvrzIZexsfYowIDAQAB",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -12,7 +12,7 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "OpenCode Browse · Click to let agents use this tab",
+    "default_title": "OpenCode Eʌil Browse — Click to let agents use this tab",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png"

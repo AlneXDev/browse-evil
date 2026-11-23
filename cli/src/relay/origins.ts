@@ -24,7 +24,7 @@ export function chromeExtensionOriginForPath(extensionPath: string, platform: No
 const chromeExtensionOriginPattern = /^chrome-extension:\/\/[a-p]+$/
 
 /**
- * Parses the operator-supplied `OPENCODE_BROWSER_EXTENSION_ORIGINS` value into a
+ * Parses the operator-supplied `OPENCODE_BROWSEVIL_EXTENSION_ORIGINS` value into a
  * de-duplicated list of `chrome-extension://<id>` origins to allowlist in
  * addition to the built-ins. Entries are separated by commas or whitespace;
  * anything that is not a bare `chrome-extension://` origin (web origins, paths,

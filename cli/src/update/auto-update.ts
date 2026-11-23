@@ -5,7 +5,7 @@
 //   binary install  the install script this release shipped with (baked in by script/compile.ts) replaces
 //                   ~/.local/bin/browse by atomic rename (Windows renames the running executable aside first); running
 //                   processes keep their old inode on unix.
-//   npm global      `npm install -g @opencode/browse@<version>` replaces the package in place.
+//   npm global      `npm install -g @opencode/browsevil@<version>` replaces the package in place.
 //   npx             no-op: npx resolves the package itself, and install never writes npx entries.
 // The self-managed runtime of releases before 0.0.11 (runtime/versions under the old data root, setup/legacy.ts) runs as
 // an npm install whose updates land in npm's global folder (updateTarget); the relay restarted from there takes the old
@@ -16,7 +16,7 @@
 // install reads the npm dist-tag (latest, or dev for a dev build, which every push to dev publishes). Mode "on"
 // (default) waits for idle before running the installer in its own process and again before restarting the relay from
 // the same entry path. "notify" only shows the update; "off" doesn't check.
-// OPENCODE_BROWSER_AUTO_UPDATE overrides the stored mode. An installed binary or npm global install runs its MCP
+// OPENCODE_BROWSEVIL_AUTO_UPDATE overrides the stored mode. An installed binary or npm global install runs its MCP
 // server directly (mcp.ts), so a running server keeps its old build until the agent restarts it; the relay it talks to
 // may already be the newer build, and still serves older clients. The installer and npm do their own integrity checks
 // (the release service's size and SHA-256 for a binary); there is no separate checksum path here.
@@ -29,7 +29,7 @@ import { insidePath, legacyDataRoot } from "../setup/legacy.ts"
 import { opencodeBrowserVersion } from "../version.ts"
 import { checkRelease, releaseChannel, runningServiceTarget, type ReleaseChannel, type ReleaseDecision } from "./release-service.ts"
 
-export const PACKAGE_NAME = "@opencode/browse"
+export const PACKAGE_NAME = "@opencode/browsevil"
 const HOUR_MS = 60 * 60 * 1000
 const DEFAULT_REGISTRY = "https://registry.npmjs.org"
 
@@ -131,7 +131,7 @@ export async function npmGlobalRoot(run: Run = runCommand, env: NodeJS.ProcessEn
 /** The version currently on disk at the runtime's stable entry (a binary reports it with --version). */
 export function installedVersion(runtime: Runtime): string | undefined {
   if (runtime.kind === "binary") {
-    const result = spawnSync(runtime.entry, ["--version"], { encoding: "utf8", timeout: 15_000, env: { ...process.env, OPENCODE_BROWSER_AUTOSTART: "0" }, windowsHide: true })
+    const result = spawnSync(runtime.entry, ["--version"], { encoding: "utf8", timeout: 15_000, env: { ...process.env, OPENCODE_BROWSEVIL_AUTOSTART: "0" }, windowsHide: true })
     return result.status === 0 ? result.stdout.trim() || undefined : undefined
   }
   return packageVersion(runtime.entry)
@@ -184,13 +184,13 @@ export function updateState(change: (state: AutoUpdateState) => AutoUpdateState)
 
 // ---- settings -----------------------------------------------------------------------------------------
 
-/** The mode OPENCODE_BROWSER_AUTO_UPDATE (or OPENCODE_BROWSER_UPDATE_CHECK=0, which turns checks off) fixes. */
+/** The mode OPENCODE_BROWSEVIL_AUTO_UPDATE (or OPENCODE_BROWSEVIL_UPDATE_CHECK=0, which turns checks off) fixes. */
 export function autoUpdateOverride(env: NodeJS.ProcessEnv = process.env): AutoUpdateMode | undefined {
-  const value = env.OPENCODE_BROWSER_AUTO_UPDATE?.trim().toLowerCase()
+  const value = env.OPENCODE_BROWSEVIL_AUTO_UPDATE?.trim().toLowerCase()
   if (value === "on" || value === "1" || value === "true") return "on"
   if (value === "notify") return "notify"
   if (value === "off" || value === "0" || value === "false") return "off"
-  if (env.OPENCODE_BROWSER_UPDATE_CHECK === "0") return "off"
+  if (env.OPENCODE_BROWSEVIL_UPDATE_CHECK === "0") return "off"
   return undefined
 }
 
@@ -235,7 +235,7 @@ export function autoUpdateStatus(options: { readonly env?: NodeJS.ProcessEnv; re
     cli: cliPrefix(),
     mode: storedMode(),
     effective: install === "binary" || install === "npm" ? (override ?? storedMode()) : "off",
-    ...(override ? { overriddenBy: env.OPENCODE_BROWSER_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSER_AUTO_UPDATE" : "OPENCODE_BROWSER_UPDATE_CHECK" } : {}),
+    ...(override ? { overriddenBy: env.OPENCODE_BROWSEVIL_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSEVIL_AUTO_UPDATE" : "OPENCODE_BROWSEVIL_UPDATE_CHECK" } : {}),
     ...(runtime ? { version: runtime.version, channel: channelOf(runtime.version) } : {}),
     ...(state.latest ? { latest: state.latest } : {}),
     ...(state.latestAt ? { latestAt: new Date(state.latestAt).toISOString() } : {}),
@@ -300,9 +300,9 @@ export const runCommand: Run = (command, args, options = {}) =>
     })
   })
 
-/** The registry npm installs from: OPENCODE_BROWSER_NPM_REGISTRY, else npm's own configuration, else npmjs.org. */
+/** The registry npm installs from: OPENCODE_BROWSEVIL_NPM_REGISTRY, else npm's own configuration, else npmjs.org. */
 export async function registryUrl(run: Run = runCommand, env: NodeJS.ProcessEnv = process.env): Promise<string> {
-  const override = env.OPENCODE_BROWSER_NPM_REGISTRY?.trim()
+  const override = env.OPENCODE_BROWSEVIL_NPM_REGISTRY?.trim()
   // A binary install doesn't need npm, which may not be there.
   const configured = override || (compiledBinary() ? "" : (await run("npm", ["config", "get", "registry"], { timeoutMs: 15_000 })).stdout.trim())
   return /^https?:\/\//.test(configured) ? configured.replace(/\/+$/, "") : DEFAULT_REGISTRY
@@ -368,9 +368,9 @@ export async function runInstaller(options: InstallerOptions): Promise<string> {
       throw new Error(`npm install -g ${spec} left ${version}, not the requested ${options.version}`)
     return version
   }
-  // OPENCODE_BROWSER_INSTALL_SCRIPT is the explicit override tests and developers use (a local file or a URL); every
+  // OPENCODE_BROWSEVIL_INSTALL_SCRIPT is the explicit override tests and developers use (a local file or a URL); every
   // other binary install runs the installer this release shipped with, never one fetched at update time.
-  const override = env.OPENCODE_BROWSER_INSTALL_SCRIPT
+  const override = env.OPENCODE_BROWSEVIL_INSTALL_SCRIPT
   const script = override
     ? existsSync(override)
       ? readFileSync(override, "utf8")
@@ -378,7 +378,7 @@ export async function runInstaller(options: InstallerOptions): Promise<string> {
           if (!response.ok) throw new Error(`couldn't download the installer (${response.status})`)
           return response.text()
         })
-    : (options.installer ?? globalThis.__OPENCODE_BROWSER_INSTALLER__)
+    : (options.installer ?? globalThis.__OPENCODE_BROWSEVIL_INSTALLER__)
   if (!script) throw new Error("this build has no installer to run; install browse again with the install script")
   const directory = mkdtempSync(path.join(os.tmpdir(), "browse-install-"))
   const file = path.join(directory, platform === "win32" ? "install.ps1" : "install")
@@ -447,7 +447,7 @@ export function createAutoUpdater(deps: AutoUpdaterDeps) {
   const now = deps.now ?? Date.now
   const { runtime } = deps
   const running = runtime.version
-  const checkIntervalMs = Math.min(Number(env.OPENCODE_BROWSER_AUTO_UPDATE_INTERVAL_MS) || HOUR_MS, HOUR_MS)
+  const checkIntervalMs = Math.min(Number(env.OPENCODE_BROWSEVIL_AUTO_UPDATE_INTERVAL_MS) || HOUR_MS, HOUR_MS)
   const spawnChild = deps.spawnChild ?? ((args, onExit, from) => spawnRuntimeChild(from, args, onExit, env))
   /** Where updates land (updateTarget), found on the first tick that needs it. */
   let updates: Runtime | undefined
@@ -607,7 +607,7 @@ export function createAutoUpdater(deps: AutoUpdaterDeps) {
 
   return {
     tick,
-    start(intervalMs = Number(env.OPENCODE_BROWSER_AUTO_UPDATE_TICK_MS) || 10 * 60_000) {
+    start(intervalMs = Number(env.OPENCODE_BROWSEVIL_AUTO_UPDATE_TICK_MS) || 10 * 60_000) {
       timer = setInterval(() => void tick(), intervalMs)
       timer.unref()
       // First check shortly after startup, not during it.
@@ -621,7 +621,7 @@ export function createAutoUpdater(deps: AutoUpdaterDeps) {
 
 /** Starts `<entry> <args>` detached, logging to stateRoot/logs/auto-update.log; returns its pid. */
 export function spawnRuntimeChild(runtime: Runtime, args: readonly string[], onExit: (code: number | null) => void, env: NodeJS.ProcessEnv = process.env): number | undefined {
-  const { OPENCODE_BROWSER_MANAGED_RELAY: _managed, OPENCODE_BROWSER_RESTART_REQUEST_ID: _request, ...rest } = env
+  const { OPENCODE_BROWSEVIL_MANAGED_RELAY: _managed, OPENCODE_BROWSEVIL_RESTART_REQUEST_ID: _request, ...rest } = env
   const directory = path.join(stateRoot(), "logs")
   mkdirSync(directory, { recursive: true, mode: 0o700 })
   const log = openSync(path.join(directory, "auto-update.log"), "a", 0o600)

@@ -17,7 +17,7 @@ const staging = path.join(root, "release", "staging")
 const version: string = (await Bun.file(path.join(root, "cli", "package.json")).json()).version
 const dev = version.includes("-dev.")
 const build = new Date().toISOString()
-await $`bun run build`.cwd(root).env({ ...process.env, OPENCODE_BROWSER_BUILD: build })
+await $`bun run build`.cwd(root).env({ ...process.env, OPENCODE_BROWSEVIL_BUILD: build })
 await rm(staging, { recursive: true, force: true })
 await mkdir(staging, { recursive: true })
 await cp(path.join(root, "dist"), staging, { recursive: true })

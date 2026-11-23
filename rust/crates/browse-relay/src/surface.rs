@@ -1,6 +1,6 @@
 //! What an MCP client sees, decided here so the MCP proxy only forwards the client's name (CLIENT_HEADER): OpenCode
 //! composes plain tools in its own code mode; other clients get `execute` plus `status` and `tabs`.
-//! OPENCODE_BROWSER_TOOLS=plain|execute|all overrides it. A caller that names no client (the CLI) gets every tool.
+//! OPENCODE_BROWSEVIL_TOOLS=plain|execute|all overrides it. A caller that names no client (the CLI) gets every tool.
 
 use browse_core::ToolSpec;
 
@@ -17,9 +17,9 @@ pub enum Surface {
     All,
 }
 
-/// The surface for a client by its `clientInfo.name`, honoring OPENCODE_BROWSER_TOOLS.
+/// The surface for a client by its `clientInfo.name`, honoring OPENCODE_BROWSEVIL_TOOLS.
 pub fn for_client(client: &str) -> Surface {
-    choose(std::env::var("OPENCODE_BROWSER_TOOLS").ok().as_deref(), client)
+    choose(std::env::var("OPENCODE_BROWSEVIL_TOOLS").ok().as_deref(), client)
 }
 
 fn choose(choice: Option<&str>, client: &str) -> Surface {
@@ -69,7 +69,7 @@ mod tests {
         assert_eq!(choose(Some("EXECUTE"), "opencode"), Surface::Execute);
         let all = || ["status", "tabs", "navigate", "click", "execute", "settings"].map(spec).to_vec();
         let names = |list: Vec<ToolSpec>| list.into_iter().map(|s| s.name).collect::<Vec<_>>();
-        if std::env::var_os("OPENCODE_BROWSER_TOOLS").is_none() {
+        if std::env::var_os("OPENCODE_BROWSEVIL_TOOLS").is_none() {
             assert_eq!(names(tools(Some("opencode"), all())), ["status", "tabs", "navigate", "click", "settings"]);
             assert_eq!(names(tools(Some("claude-code"), all())), ["execute", "status", "tabs"]);
             assert!(instructions("opencode").contains("navigate"));

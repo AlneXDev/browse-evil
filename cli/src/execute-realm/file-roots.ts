@@ -19,11 +19,11 @@ import { legacyRoots } from "../setup/legacy.ts"
 
 export { ExecuteFileAccessError } from "./errors.ts"
 
-export const allowNodeEnvironmentVariable = "OPENCODE_BROWSER_ALLOW_NODE"
-export const allowForegroundEnvironmentVariable = "OPENCODE_BROWSER_ALLOW_FOREGROUND"
-export const fileRootsEnvironmentVariable = "OPENCODE_BROWSER_FILE_ROOTS"
+export const allowNodeEnvironmentVariable = "OPENCODE_BROWSEVIL_ALLOW_NODE"
+export const allowForegroundEnvironmentVariable = "OPENCODE_BROWSEVIL_ALLOW_FOREGROUND"
+export const fileRootsEnvironmentVariable = "OPENCODE_BROWSEVIL_FILE_ROOTS"
 
-export const executeSliceEnvironmentVariable = "OPENCODE_BROWSER_EXECUTE_SLICE_MS"
+export const executeSliceEnvironmentVariable = "OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS"
 
 /**
  * Longest synchronous run of execute JavaScript (one VM entry: the initial code, a callback,
@@ -39,7 +39,7 @@ export function executeSliceMs(): number {
 export const executeAllowsNode = (): boolean => process.env[allowNodeEnvironmentVariable] === "1"
 export const executeAllowsForeground = (): boolean => process.env[allowForegroundEnvironmentVariable] === "1"
 
-export const bringToFrontBlockedMessage = "page.bringToFront() is blocked: it raises the user's browser window over their work. Use handoff(message) when the user needs to act in the tab, or set OPENCODE_BROWSER_ALLOW_FOREGROUND=1 for the relay to allow it."
+export const bringToFrontBlockedMessage = "page.bringToFront() is blocked: it raises the user's browser window over their work. Use handoff(message) when the user needs to act in the tab, or set OPENCODE_BROWSEVIL_ALLOW_FOREGROUND=1 for the relay to allow it."
 
 /** Harmless compute modules available as `modules.*` and top-level aliases in sandboxed execute code. */
 export const sandboxModules = { path, url, util, crypto, buffer, zlib, events, stream }
@@ -176,7 +176,7 @@ function realTarget(target: string): string {
 
 /**
  * Browse's own folders, whose contents execute code may not read or write even when they sit inside a file root.
- * The default roots cover an everyday install while OPENCODE_BROWSER_HOME points this relay elsewhere, and the legacy
+ * The default roots cover an everyday install while OPENCODE_BROWSEVIL_HOME points this relay elsewhere, and the legacy
  * roots count too: migration copies them into the live roots on the next run.
  */
 function browseDirectories(): readonly string[] {
@@ -221,7 +221,7 @@ function browseOwnedDirectories(): readonly string[] {
 /** True for browse's folders, its binaries and the files installs stage beside them. */
 function isBrowseOwned(target: string, platform: NodeJS.Platform = process.platform, browse = browseOwnedDirectories()): boolean {
   if (browse.some((root) => isInside(target, root, platform))) return true
-  // The installer and updater write the installer binary even when OPENCODE_BROWSER_HOME points the CLI elsewhere.
+  // The installer and updater write the installer binary even when OPENCODE_BROWSEVIL_HOME points the CLI elsewhere.
   return [installedBinaryPath(), installerBinaryPath()].some((binary) => isBinaryOrStaging(target, binary, platform))
 }
 

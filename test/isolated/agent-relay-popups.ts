@@ -8,7 +8,7 @@ import { installFakeRelaySocket } from "../relay-stub"
 // relay it creates registers chrome listeners and a WebSocket that must not meet the other files' relays.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 /** This browser's token for the relay, as a code exchange left it. */
 const TOKEN = "test-token-0123456789abcdefghijklmnopqrstuv"
 const PORT = 19907
@@ -135,7 +135,7 @@ describe("tabs.create", () => {
     nothingActivated()
   })
 
-  test("the relay's window param (OPENCODE_BROWSER_AGENT_WINDOW) overrides the setting", async () => {
+  test("the relay's window param (OPENCODE_BROWSEVIL_AGENT_WINDOW) overrides the setting", async () => {
     const user = await stub.chrome.windows.create({ url: "https://user.example/", focused: true })
     const separate = await command("tabs.create", { url: "https://example.com/", active: false, window: "separate" })
     expect(stub.state.tabs.get((separate.result as { tabId: number }).tabId)!.windowId).not.toBe(user.id)

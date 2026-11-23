@@ -106,8 +106,8 @@ function rethrowProcessFault(cause: unknown): never {
 function logProcessFault(kind: RelayProcessFaultKind, cause: unknown, detail: Record<string, unknown>, disposition: string): void {
   const message = `[browse relay] ${kind}; ${disposition}\n${safeErrorStack(cause) ?? safeErrorMessage(cause)}`
   console.error(message)
-  if (process.env.OPENCODE_BROWSER_MANAGED_RELAY === "1") appendManagedRelayProcessLog(message)
-  if (debugEnvironmentEnabled(process.env.OPENCODE_BROWSER_DEBUG)) {
+  if (process.env.OPENCODE_BROWSEVIL_MANAGED_RELAY === "1") appendManagedRelayProcessLog(message)
+  if (debugEnvironmentEnabled(process.env.OPENCODE_BROWSEVIL_DEBUG)) {
     console.error(`[browse relay] ${kind} detail`, detail)
   }
 }

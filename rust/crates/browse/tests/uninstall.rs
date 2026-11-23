@@ -34,10 +34,10 @@ fn browse(home: &Path, port: u16) -> Command {
         .env("XDG_STATE_HOME", home.join("xdg-state"))
         .env("XDG_CACHE_HOME", home.join("xdg-cache"))
         .env("XDG_BIN_HOME", home.join("bin"))
-        .env("OPENCODE_BROWSER_HOME", home.join("browse-home"))
-        .env("OPENCODE_BROWSER_PORT", port.to_string())
-        .env("OPENCODE_BROWSER_AUTO_UPDATE", "off")
-        .env("OPENCODE_BROWSER_UPDATE_CHECK", "0")
+        .env("OPENCODE_BROWSEVIL_HOME", home.join("browse-home"))
+        .env("OPENCODE_BROWSEVIL_PORT", port.to_string())
+        .env("OPENCODE_BROWSEVIL_AUTO_UPDATE", "off")
+        .env("OPENCODE_BROWSEVIL_UPDATE_CHECK", "0")
         .env("CODEX_HOME", home.join("codex"))
         .env("CLAUDE_CONFIG_DIR", home.join("claude"))
         .env("OPENCODE_CONFIG_DIR", home.join("opencode"));
@@ -73,7 +73,7 @@ fn uninstall_leaves_no_browse_files_behind_the_relay() {
     // waits for /version can't get away with deleting the root before that write lands.
     let mut relay = Guard(
         browse(&home, port)
-            .env("OPENCODE_BROWSER_TEST_SHUTDOWN_DELAY_MS", "1000")
+            .env("OPENCODE_BROWSEVIL_TEST_SHUTDOWN_DELAY_MS", "1000")
             .arg("serve")
             .stdout(Stdio::null())
             .stderr(Stdio::null())

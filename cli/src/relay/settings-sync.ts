@@ -36,9 +36,9 @@ export function createRelaySettingsSync(options: {
     const human = humanInputOverride()
     const autoUpdate = autoUpdateOverride()
     return {
-      ...(autoUpdate ? { autoUpdate: { variable: process.env.OPENCODE_BROWSER_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSER_AUTO_UPDATE" : "OPENCODE_BROWSER_UPDATE_CHECK", value: autoUpdate } } : {}),
-      ...(agentWindow ? { window: { variable: "OPENCODE_BROWSER_AGENT_WINDOW", value: agentWindow } } : {}),
-      ...(human === undefined ? {} : { humanInput: { variable: "OPENCODE_BROWSER_HUMAN_INPUT", value: human ? "on" : "off" } }),
+      ...(autoUpdate ? { autoUpdate: { variable: process.env.OPENCODE_BROWSEVIL_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSEVIL_AUTO_UPDATE" : "OPENCODE_BROWSEVIL_UPDATE_CHECK", value: autoUpdate } } : {}),
+      ...(agentWindow ? { window: { variable: "OPENCODE_BROWSEVIL_AGENT_WINDOW", value: agentWindow } } : {}),
+      ...(human === undefined ? {} : { humanInput: { variable: "OPENCODE_BROWSEVIL_HUMAN_INPUT", value: human ? "on" : "off" } }),
     }
   }
 

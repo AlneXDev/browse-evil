@@ -1,10 +1,10 @@
 // Packs the npm packages of the Rust browse (rust/):
 //   bun scripts/npm-package.ts main --out <dir>
-//       @opencode/browse: opencode-browse-<version>.tgz, the launcher (rust/npm/browse.mjs as dist/cli.mjs, the bin the
+//       @opencode/browsevil: opencode-browse-<version>.tgz, the launcher (rust/npm/browse.mjs as dist/cli.mjs, the bin the
 //       TypeScript package had) with an optional dependency on each platform package, which npm installs by os, cpu and
 //       libc
 //   bun scripts/npm-package.ts platforms --binaries <dir> --out <dir>
-//       @opencode/browse-<target>: opencode-browse-<target>-<version>.tgz for every install script target, from
+//       @opencode/browsevil-<target>: opencode-browse-<target>-<version>.tgz for every install script target, from
 //       <dir>/<build>/browse[.exe] (rust/script/release.sh's layout). package/bin/browse, package.json and LICENSE,
 //       which the install script (../install) and npm both read. The -baseline targets carry the same binary as their
 //       base target: Rust's x86-64 target doesn't use AVX2.
@@ -50,7 +50,7 @@ export const TARGETS: readonly Target[] = [
   target("windows-x64-baseline", "windows-x64"),
 ]
 
-/** The platform packages @opencode/browse depends on: one per build (a baseline package is the same binary). */
+/** The platform packages @opencode/browsevil depends on: one per build (a baseline package is the same binary). */
 export const LAUNCHER_TARGETS = TARGETS.filter((item) => item.name === item.build)
 
 export const BUILDS = [...new Set(TARGETS.map((item) => item.build))]
@@ -73,7 +73,7 @@ async function staging<T>(use: (directory: string) => Promise<T>) {
   }
 }
 
-/** @opencode/browse at `version`, packed into `out`. */
+/** @opencode/browsevil at `version`, packed into `out`. */
 export async function packMain(version: string, out: string) {
   await mkdir(out, { recursive: true })
   const template = JSON.parse(await readFile(path.join(root, "rust", "npm", "package.json"), "utf8")) as Record<string, unknown>
@@ -82,7 +82,7 @@ export async function packMain(version: string, out: string) {
     name,
     version,
     ...rest,
-    optionalDependencies: Object.fromEntries(LAUNCHER_TARGETS.map((item) => [`@opencode/browse-${item.name}`, version])),
+    optionalDependencies: Object.fromEntries(LAUNCHER_TARGETS.map((item) => [`@opencode/browsevil-${item.name}`, version])),
   }
   return staging(async (directory) => {
     await mkdir(path.join(directory, "dist"))
@@ -154,7 +154,7 @@ export async function packPlatforms(binaries: string, version: string, out: stri
       await utimes(binary, epoch, epoch)
       await cp(path.join(root, "LICENSE"), path.join(directory, "LICENSE"))
       const pkg = {
-        name: `@opencode/browse-${item.name}`,
+        name: `@opencode/browsevil-${item.name}`,
         version,
         description: `The browse binary for ${item.name}.`,
         license: "MIT",

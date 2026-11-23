@@ -11,7 +11,7 @@
 // flicks instead of a one-frame jump.
 //
 // On by default. The extension's status page can turn it off ("Human-like input": off, faster but easier for sites to
-// flag); the setting applies from the next input, without a relay restart. OPENCODE_BROWSER_HUMAN_INPUT on the relay
+// flag); the setting applies from the next input, without a relay restart. OPENCODE_BROWSEVIL_HUMAN_INPUT on the relay
 // overrides it (0/false/off/no: off, anything else: on; for example 0 for fast test runs).
 import type { JsonObject } from "../protocol.ts"
 import { relayLog } from "../relay/log.ts"
@@ -22,9 +22,9 @@ type Send = (method: string, params: JsonObject) => Promise<unknown>
 /** The extension's setting; undefined until one arrives (an older extension sends none), which means on. */
 let setting: boolean | undefined
 
-/** OPENCODE_BROWSER_HUMAN_INPUT, when set: it wins over the extension's setting. */
+/** OPENCODE_BROWSEVIL_HUMAN_INPUT, when set: it wins over the extension's setting. */
 export function humanInputOverride(): boolean | undefined {
-  const value = process.env.OPENCODE_BROWSER_HUMAN_INPUT?.trim()
+  const value = process.env.OPENCODE_BROWSEVIL_HUMAN_INPUT?.trim()
   if (!value) return undefined
   return !/^(0|false|off|no)$/i.test(value)
 }

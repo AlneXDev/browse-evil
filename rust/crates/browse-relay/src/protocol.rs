@@ -5,13 +5,13 @@ use serde_json::Value;
 pub const EXTENSION_PROTOCOL_VERSION: i64 = 3;
 pub const MIN_EXTENSION_PROTOCOL_VERSION: i64 = 3;
 pub const CAPABILITY_TAB_RELEASE: &str = "tab-release";
-pub const PAIRING_SCHEME: &str = "opencode-browser-pairing-v3";
+pub const PAIRING_SCHEME: &str = "opencode-browsevil-pairing-v3";
 
-pub const UNPACKED_EXTENSION_ID: &str = "afeafocngkodbmaipcngoamamfmekgfo";
-pub const PUBLIC_STORE_ID: &str = "mfnicocicmmlkpjnaffgihfjhdgjkdjg";
-pub const DEFAULT_PORT: u16 = 19988;
-/// After 19988; not 19989, which is Browser Control's. Must match the extension's relayFallbackPorts.
-pub const FALLBACK_PORTS: [u16; 8] = [19990, 19991, 19992, 19993, 19994, 19995, 19996, 19997];
+pub const UNPACKED_EXTENSION_ID: &str = "lfmeghngagemglmdnplimokblljgmnoj";
+pub const PUBLIC_STORE_ID: &str = "lfmeghngagemglmdnplimokblljgmnoj";
+pub const DEFAULT_PORT: u16 = 29698;
+/// After 29698; must match the extension's relayFallbackPorts.
+pub const FALLBACK_PORTS: [u16; 8] = [29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706];
 pub const BROWSER_UNRESPONSIVE: &str =
     "The browser isn't answering (asleep, frozen or very busy?). Wake it or wait a moment, then try again.";
 pub const BROWSER_RELOADING: &str = "browse stopped answering in this browser for over a minute, so the relay asked it to reload. Try again in a few seconds.";
@@ -40,9 +40,9 @@ pub fn stable_unpacked_origin() -> String {
     format!("chrome-extension://{UNPACKED_EXTENSION_ID}")
 }
 
-/// The store item this install trusts: OPENCODE_BROWSER_STORE_ID when it is a store id, else the public item.
+/// The store item this install trusts: OPENCODE_BROWSEVIL_STORE_ID when it is a store id, else the public item.
 pub fn store_id() -> String {
-    std::env::var("OPENCODE_BROWSER_STORE_ID")
+    std::env::var("OPENCODE_BROWSEVIL_STORE_ID")
         .ok()
         .filter(|id| id.len() == 32 && id.bytes().all(|b| (b'a'..=b'p').contains(&b)))
         .unwrap_or_else(|| PUBLIC_STORE_ID.to_string())

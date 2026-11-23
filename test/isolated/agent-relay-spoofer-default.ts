@@ -6,7 +6,7 @@ import { installChrome, settle } from "../chrome-stub"
 // proof and reach 19990. Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const SPOOF_PORT = 19988
 const REAL_PORT = 19990

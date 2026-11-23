@@ -272,7 +272,7 @@ pub fn definition(name: &str, command: &str, args: &[String], port: Option<u16>)
         _ => json!({ "command": command, "args": args }),
     };
     if let (Some(port), Some(key)) = (port, env_key(name)) {
-        server[key] = json!({ "OPENCODE_BROWSER_PORT": port.to_string() });
+        server[key] = json!({ "OPENCODE_BROWSEVIL_PORT": port.to_string() });
     }
     server
 }
@@ -288,7 +288,7 @@ pub fn command_line(server: &Value) -> Vec<String> {
 }
 
 /// Whether a server entry runs a browse MCP server some install wrote: `<browse> mcp`, `node <.../cli.mjs> mcp` or
-/// `npx @opencode/browse mcp`.
+/// `npx @opencode/browsevil mcp`.
 pub fn owned(server: &Value) -> bool {
     let line = command_line(server);
     if line.len() < 2 || line.last().map(String::as_str) != Some("mcp") {
@@ -296,7 +296,7 @@ pub fn owned(server: &Value) -> bool {
     }
     line[..line.len() - 1].iter().any(|part| {
         let name = Path::new(part).file_name().and_then(|n| n.to_str()).unwrap_or_default();
-        ["browse", "browse.exe", "browse.cmd", "cli.mjs", "opencode-browser.mjs", "opencode-browser"].contains(&name) || part.starts_with("@opencode/browse")
+        ["browse", "browse.exe", "browse.cmd", "cli.mjs", "opencode-browser.mjs", "opencode-browser"].contains(&name) || part.starts_with("@opencode/browsevil")
     })
 }
 
@@ -683,7 +683,7 @@ pub fn manual_entry(command: &[String], port: Option<u16>) -> String {
     let (program, args) = command.split_first().map_or(("browse", &[][..]), |(p, a)| (p.as_str(), a));
     let mut server = json!({ "command": program, "args": args });
     if let Some(port) = port {
-        server["env"] = json!({ "OPENCODE_BROWSER_PORT": port.to_string() });
+        server["env"] = json!({ "OPENCODE_BROWSEVIL_PORT": port.to_string() });
     }
     format!("{{\n  \"mcpServers\": {{\n    \"browse\": {}\n  }}\n}}", serde_json::to_string(&server).unwrap_or_default())
 }
@@ -846,11 +846,11 @@ mod tests {
         let codex = loc("codex", dir.join("codex/config.toml"));
         assert_eq!(edit(&codex, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Added);
         let text = std::fs::read_to_string(&codex.file).unwrap();
-        assert_eq!(text, "[mcp_servers.browse]\ncommand = \"/bin/browse\"\nargs = [\"mcp\"]\n\n[mcp_servers.browse.env]\nOPENCODE_BROWSER_PORT = \"20000\"\n");
+        assert_eq!(text, "[mcp_servers.browse]\ncommand = \"/bin/browse\"\nargs = [\"mcp\"]\n\n[mcp_servers.browse.env]\nOPENCODE_BROWSEVIL_PORT = \"20000\"\n");
         // The same port again changes nothing; a different one updates it; no port leaves it.
         assert_eq!(edit(&codex, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Unchanged);
         assert_eq!(edit(&codex, &command("/bin/browse"), false, Some(20001)).unwrap(), Edit::Updated);
-        assert!(std::fs::read_to_string(&codex.file).unwrap().contains("OPENCODE_BROWSER_PORT = \"20001\""));
+        assert!(std::fs::read_to_string(&codex.file).unwrap().contains("OPENCODE_BROWSEVIL_PORT = \"20001\""));
         assert_eq!(edit(&codex, &command("/bin/browse"), false, None).unwrap(), Edit::Unchanged);
 
         // A JSON entry with the user's own env keeps it and gains the port.
@@ -858,18 +858,18 @@ mod tests {
         std::fs::write(&claude.file, r#"{"mcpServers":{"browse":{"type":"stdio","command":"/bin/browse","args":["mcp"],"env":{"MINE":"1"}}}}"#).unwrap();
         assert_eq!(edit(&claude, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Updated);
         let parsed = jsonc::parse(&std::fs::read_to_string(&claude.file).unwrap()).unwrap();
-        assert_eq!(parsed["mcpServers"]["browse"]["env"], json!({ "MINE": "1", "OPENCODE_BROWSER_PORT": "20000" }));
+        assert_eq!(parsed["mcpServers"]["browse"]["env"], json!({ "MINE": "1", "OPENCODE_BROWSEVIL_PORT": "20000" }));
         assert_eq!(edit(&claude, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Unchanged);
 
         // Goose's envs, Kilo's environment.
         let goose = loc("goose", dir.join("goose.yaml"));
         assert_eq!(edit(&goose, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Added);
         let parsed: serde_yaml::Value = serde_yaml::from_str(&std::fs::read_to_string(&goose.file).unwrap()).unwrap();
-        assert_eq!(parsed["extensions"]["browse"]["envs"]["OPENCODE_BROWSER_PORT"].as_str(), Some("20000"));
+        assert_eq!(parsed["extensions"]["browse"]["envs"]["OPENCODE_BROWSEVIL_PORT"].as_str(), Some("20000"));
         let kilo = loc("kilo", dir.join("kilo.json"));
         assert_eq!(edit(&kilo, &command("/bin/browse"), false, Some(20000)).unwrap(), Edit::Added);
         let parsed = jsonc::parse(&std::fs::read_to_string(&kilo.file).unwrap()).unwrap();
-        assert_eq!(parsed["mcp"]["browse"]["environment"], json!({ "OPENCODE_BROWSER_PORT": "20000" }));
+        assert_eq!(parsed["mcp"]["browse"]["environment"], json!({ "OPENCODE_BROWSEVIL_PORT": "20000" }));
         let _ = std::fs::remove_dir_all(dir);
     }
 
@@ -894,7 +894,7 @@ mod tests {
     fn manual_entry_carries_a_pinned_port() {
         let entry = manual_entry(&command("/home/u/.local/bin/browse"), Some(20000));
         let parsed = jsonc::parse(&entry).unwrap();
-        assert_eq!(parsed["mcpServers"]["browse"]["env"], json!({ "OPENCODE_BROWSER_PORT": "20000" }));
+        assert_eq!(parsed["mcpServers"]["browse"]["env"], json!({ "OPENCODE_BROWSEVIL_PORT": "20000" }));
         let parsed = jsonc::parse(&manual_entry(&command("/bin/browse"), None)).unwrap();
         assert!(parsed["mcpServers"]["browse"].get("env").is_none());
     }
@@ -902,8 +902,8 @@ mod tests {
     #[test]
     fn owned_entries() {
         assert!(owned(&json!({ "command": "/home/u/.local/bin/browse", "args": ["mcp"] })));
-        assert!(owned(&json!({ "command": "node", "args": ["/x/@opencode/browse/dist/cli.mjs", "mcp"] })));
-        assert!(owned(&json!({ "command": "npx", "args": ["-y", "@opencode/browse@dev", "mcp"] })));
+        assert!(owned(&json!({ "command": "node", "args": ["/x/@opencode/browsevil/dist/cli.mjs", "mcp"] })));
+        assert!(owned(&json!({ "command": "npx", "args": ["-y", "@opencode/browsevil@dev", "mcp"] })));
         assert!(owned(&json!({ "type": "local", "command": ["browse", "mcp"] })));
         assert!(owned(&json!({ "cmd": "browse", "args": ["mcp"] })));
         assert!(!owned(&json!({ "command": "playwright-mcp", "args": [] })));

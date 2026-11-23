@@ -8,7 +8,7 @@ import path from "node:path"
 import { agentHelp } from "./agent-guide.ts"
 import { legacyRootsLeft, legacyRuntime, legacyRuntimeActive, settleLegacyHome } from "./setup/legacy.ts"
 
-const embeddedVersion = globalThis.__OPENCODE_BROWSER_VERSION__
+const embeddedVersion = globalThis.__OPENCODE_BROWSEVIL_VERSION__
 const setupCommands = new Set(["install", "uninstall", "extension", "pair", "set"])
 const command = process.argv[2]
 const args = process.argv.slice(3)
@@ -24,7 +24,7 @@ const preCliHelp = askedForHelp && (command === "update" || (command !== undefin
 
 // The old self-managed runtime (setup/legacy.ts): a relay started from this install takes it over once it owns the port
 // (setup/legacy-runtime.ts). Every other process shares its folder while it's active, and stops treating that folder as
-// OPENCODE_BROWSER_HOME once it's taken over.
+// OPENCODE_BROWSEVIL_HOME once it's taken over.
 const oldRuntime = legacyRuntime()
 const takingOver = command === "serve" && !askedForHelp && legacyRuntimeActive(oldRuntime) &&
   (await import("./setup/legacy-runtime.ts").then((module) => module.prepareLegacyTakeover(oldRuntime)).catch(() => false))
@@ -53,7 +53,7 @@ if (command === "serve" && !askedForHelp) {
 // Earlier layouts (~/.browse, and the old opencode-browser data root) move to the XDG folders on the first run.
 // opencode briefly shows the update, and no other command pays for the import.
 // A takeover migrates once its relay owns the port.
-if (command !== "--version" && command !== "-v" && !askedForHelp && !takingOver && !process.env.OPENCODE_BROWSER_HOME && legacyRootsLeft()) {
+if (command !== "--version" && command !== "-v" && !askedForHelp && !takingOver && !process.env.OPENCODE_BROWSEVIL_HOME && legacyRootsLeft()) {
   try {
     const { migrateLegacy } = await import("./setup/migrate.ts")
     migrateLegacy()

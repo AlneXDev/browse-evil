@@ -6,7 +6,7 @@ import { installChrome, settle } from "../chrome-stub"
 // port, so the first connection goes to the relay instead of scanning for it. Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
 const BROWSER_PORT = 19990

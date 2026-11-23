@@ -3,7 +3,7 @@
 // every later connection proves the token with an HMAC over fresh nonces and the relay link's endpoint (its port), so
 // a program on another port can't pass the handshake through to the real relay.
 
-const CONTEXT = "opencode-browser-pairing-v3"
+const CONTEXT = "opencode-browsevil-pairing-v3"
 const CROCKFORD = "[0-9A-HJKMNP-TV-Z]"
 /** `pair` prints 8 characters (shown as XXXX-XXXX); earlier versions shared one of 32. */
 const CODE = new RegExp(`^${CROCKFORD}{8}$`)

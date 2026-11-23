@@ -130,9 +130,9 @@ pub fn configure_opencode(file: &Path, entry: &Path, port: Option<u16>) -> anyho
     server["cwd"] = json!(mcp_cwd());
     server["pool"] = json!(true);
     server["environment"] = environment;
-    server["environment"]["OPENCODE_BROWSER_RUNTIME"] = json!("auto-update");
+    server["environment"]["OPENCODE_BROWSEVIL_RUNTIME"] = json!("auto-update");
     if let Some(port) = port {
-        server["environment"]["OPENCODE_BROWSER_PORT"] = json!(port.to_string());
+        server["environment"]["OPENCODE_BROWSEVIL_PORT"] = json!(port.to_string());
     }
     if existing == Some(&server) {
         return Ok(McpEdit::UpToDate);
@@ -297,7 +297,7 @@ fn pair_in_browser(browser: &Browser, profile: &str, open: bool) -> anyhow::Resu
     let port = if listen == relay_api::DEFAULT_PORT { String::new() } else { format!("&port={listen}") };
     let url = format!("chrome-extension://{}/welcome.html#code={code}{port}", browsers::store_id());
     // The extension takes a port from the link only when it's one of browse's own (19988, 19990-19997); a relay pinned
-    // elsewhere with OPENCODE_BROWSER_PORT is entered by hand, with its address.
+    // elsewhere with OPENCODE_BROWSEVIL_PORT is entered by hand, with its address.
     let known = listen == relay_api::DEFAULT_PORT || browse_relay::protocol::FALLBACK_PORTS.contains(&listen);
     if open && known && browsers::open_in(browser, &url, Some(profile)) {
         println!("✓ Opened browse in {} to connect it", browser.name);
@@ -640,7 +640,7 @@ mod tests {
             "command": ["/usr/bin/browse", "mcp"],
             "cwd": "~",
             "pool": true,
-            "environment": { "OPENCODE_BROWSER_RUNTIME": "auto-update" },
+            "environment": { "OPENCODE_BROWSEVIL_RUNTIME": "auto-update" },
         } } } });
         std::fs::write(&file, serde_json::to_string_pretty(&stale).unwrap()).unwrap();
         assert!(matches!(configure_opencode(&file, Path::new("/usr/bin/browse"), None).unwrap(), McpEdit::Updated));
@@ -656,18 +656,18 @@ mod tests {
     fn opencode_environment_keeps_the_runtime_and_gains_a_pinned_port() {
         let dir = scratch("port");
         let file = dir.join("opencode.json");
-        std::fs::write(&file, r#"{"mcp":{"servers":{"browse":{"type":"local","command":["/usr/bin/browse","mcp"],"environment":{"MINE":"1","OPENCODE_BROWSER_RUNTIME":"auto-update"}}}}}"#).unwrap();
+        std::fs::write(&file, r#"{"mcp":{"servers":{"browse":{"type":"local","command":["/usr/bin/browse","mcp"],"environment":{"MINE":"1","OPENCODE_BROWSEVIL_RUNTIME":"auto-update"}}}}}"#).unwrap();
         assert!(matches!(configure_opencode(&file, Path::new("/usr/bin/browse"), Some(20000)).unwrap(), McpEdit::Updated));
         let config = jsonc::parse(&std::fs::read_to_string(&file).unwrap()).unwrap();
         let environment = &config["mcp"]["servers"]["browse"]["environment"];
         assert_eq!(environment["MINE"], "1");
-        assert_eq!(environment["OPENCODE_BROWSER_RUNTIME"], "auto-update");
-        assert_eq!(environment["OPENCODE_BROWSER_PORT"], "20000");
+        assert_eq!(environment["OPENCODE_BROWSEVIL_RUNTIME"], "auto-update");
+        assert_eq!(environment["OPENCODE_BROWSEVIL_PORT"], "20000");
         assert!(matches!(configure_opencode(&file, Path::new("/usr/bin/browse"), Some(20000)).unwrap(), McpEdit::UpToDate));
         // An install without the variable set leaves the port an earlier one wrote.
         assert!(matches!(configure_opencode(&file, Path::new("/usr/bin/browse"), None).unwrap(), McpEdit::UpToDate));
         let config = jsonc::parse(&std::fs::read_to_string(&file).unwrap()).unwrap();
-        assert_eq!(config["mcp"]["servers"]["browse"]["environment"]["OPENCODE_BROWSER_PORT"], "20000");
+        assert_eq!(config["mcp"]["servers"]["browse"]["environment"]["OPENCODE_BROWSEVIL_PORT"], "20000");
         std::fs::remove_dir_all(dir).unwrap();
     }
 

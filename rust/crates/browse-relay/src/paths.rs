@@ -4,7 +4,7 @@
 //!   data    $XDG_DATA_HOME/browse     relay-token, browser-tokens.json, browsers.json, relays/<port>/tabs.json
 //!   state   $XDG_STATE_HOME/browse    logs/relay.log, pairing-codes.json, relays/<port>/relay.json
 //!   cache   $XDG_CACHE_HOME/browse
-//! OPENCODE_BROWSER_HOME overrides all four (isolated test relays).
+//! OPENCODE_BROWSEVIL_HOME overrides all four (isolated test relays).
 
 use std::fs;
 use std::io::Write;
@@ -23,7 +23,7 @@ pub struct Paths {
 impl Paths {
     pub fn from_env() -> Self {
         let home = home_dir();
-        if let Some(root) = std::env::var_os("OPENCODE_BROWSER_HOME").filter(|value| !value.is_empty()) {
+        if let Some(root) = std::env::var_os("OPENCODE_BROWSEVIL_HOME").filter(|value| !value.is_empty()) {
             return Self::rooted(PathBuf::from(root));
         }
         let xdg = |variable: &str, fallback: &str| {
@@ -38,7 +38,7 @@ impl Paths {
         }
     }
 
-    /// Every root in one folder, as OPENCODE_BROWSER_HOME does.
+    /// Every root in one folder, as OPENCODE_BROWSEVIL_HOME does.
     pub fn rooted(root: PathBuf) -> Self {
         Self { config: root.clone(), data: root.clone(), state: root.clone(), cache: root }
     }

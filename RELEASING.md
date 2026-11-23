@@ -1,23 +1,23 @@
 # Releasing browse
 
-One version ships an extension zip, the npm package `@opencode/browse` (`opencode-browse-<version>.tgz`: a Node
+One version ships an extension zip, the npm package `@opencode/browsevil` (`opencode-browse-<version>.tgz`: a Node
 launcher, for `npx` and `npm install -g`) and the `browse` binaries. The npm package carries no extension.
 
 The CLI, relay and MCP server are the Rust `browse` binary (crate `rust/crates/browse`, workspace `rust/`; the
-TypeScript CLI in `cli/` is kept as the reference and isn't built or released anymore). `@opencode/browse` holds only
+TypeScript CLI in `cli/` is kept as the reference and isn't built or released anymore). `@opencode/browsevil` holds only
 `dist/cli.mjs` ([rust/npm/browse.mjs](rust/npm/browse.mjs)), which runs the binary of the optional dependency npm
-installed for the machine, `@opencode/browse-<target>`; `dist/cli.mjs` stays the bin path because agent configs written
+installed for the machine, `@opencode/browsevil-<target>`; `dist/cli.mjs` stays the bin path because agent configs written
 by the TypeScript CLI run `node .../dist/cli.mjs mcp`. The version is baked into the binary at build time
 (`BROWSE_VERSION`, with the run's `BROWSE_BUILD_ID`), and `rust/Cargo.toml`/`Cargo.lock` carry it too
 (`scripts/version.ts`). Each binary is published two ways:
-as an npm package `@opencode/browse-<target>` holding `bin/browse` (`bin/browse.exe` on Windows) and a package.json with
+as an npm package `@opencode/browsevil-<target>` holding `bin/browse` (`bin/browse.exe` on Windows) and a package.json with
 `os`, `cpu` and, on Linux, `libc`; and as one target per binary on Anomaly's release service, which the [install
 script](install) downloads. The [release service](#the-release-service) file is
 `opencode-browse-<target>-<version>.tgz`; it carries the same verified bytes as the npm package. Targets:
 `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl`,
 `darwin-arm64`, `darwin-x64`, `darwin-x64-baseline`, `windows-x64`, `windows-x64-baseline` (Windows on ARM64 runs x64).
 The service names macOS `macos-*`. A `-baseline` target carries the same binary as its base target (Rust's x86-64
-target doesn't use AVX2), and `@opencode/browse` depends only on the seven base targets. Locally:
+target doesn't use AVX2), and `@opencode/browsevil` depends only on the seven base targets. Locally:
 `cd rust && BROWSE_VERSION=<version> script/release.sh linux-x64 linux-x64-musl`, then
 `bun scripts/npm-package.ts platforms --binaries rust/dist --out <dir>` (with `--target <name>` for only some) and
 `bun scripts/npm-package.ts main --out <dir>`.
@@ -27,7 +27,7 @@ secrets locally, and nothing is built, tagged or published from a laptop. Work l
 
 | Mode | Starts from | Version | Publishes |
 | --- | --- | --- | --- |
-| dev | every push to `dev` (not Markdown-only) | `<next patch>-dev.<run>`, e.g. `0.2.1-dev.57` | the [release service](#the-release-service) channel `dev` (`browse-extension-<version>.zip`, loaded unpacked, and every CLI binary target), then npm dist-tag `dev` (the binaries, then `@opencode/browse`) |
+| dev | every push to `dev` (not Markdown-only) | `<next patch>-dev.<run>`, e.g. `0.2.1-dev.57` | the [release service](#the-release-service) channel `dev` (`browse-extension-<version>.zip`, loaded unpacked, and every CLI binary target), then npm dist-tag `dev` (the binaries, then `@opencode/browsevil`) |
 | stable | **Actions → Release → Run workflow** on `dev` with a bump or version and release notes | `x.y.z` | tag `v<version>`, the [release service](#the-release-service) channel `stable` (the extension zip and every CLI binary target), npm `latest`, the public Chrome Web Store item (`browse-extension-<version>.zip`), the GitHub release |
 | check | the same button with bump `check` and no version, on any branch (`gh workflow run release.yml --ref <branch>`) | `cli/package.json` | nothing: builds, checks and attests the stable artifacts and runs every publish script, the release service included, as a dry run |
 
@@ -55,9 +55,9 @@ build   from the tag: install, typecheck, extension and cargo tests, release:che
         artifact checks), SHA256SUMS digest
 build-binary    one job per Rust build (linux gnu/musl x64/arm64 with cargo-zigbuild, glibc 2.17; macOS arm64/x64 on
         macos-15; windows-x64 with a static C runtime), version and build id baked in; no secrets
-build-binaries  packs and checks the @opencode/browse-<target> tarballs (every target; baseline = base binary), runs
+build-binaries  packs and checks the @opencode/browsevil-<target> tarballs (every target; baseline = base binary), runs
         the linux-x64 ones: the install script against a local release service, relay + MCP, npm install of
-        @opencode/browse with its platform package
+        @opencode/browsevil with its platform package
 sign-macos      optional (repository variable MACOS_SIGNING=true): Developer ID signs the macOS binaries; skipped now
 sign-windows    optional (repository variable WINDOWS_SIGNING=true): Authenticode signs the Windows binaries (Azure
         Trusted Signing; Smart App Control blocks an unsigned browse.exe); skipped now
@@ -65,7 +65,7 @@ attest  build provenance for the zip and every tarball (Sigstore)
 publish-release-service       the extension and every CLI binary target to the release service (channel dev or
         stable); a check run prints the list and publishes nothing
 publish-npm  +  publish-cws   npm latest (--ignore-scripts, provenance; the platform packages first, then
-        @opencode/browse) and Chrome Web Store upload + submit (none when the extension is unchanged)
+        @opencode/browsevil) and Chrome Web Store upload + submit (none when the extension is unchanged)
 publish-github-release        the release on v<version>: notes, zip, tarball, SHA256SUMS, attestation
 push-release-to-dev           pushes the release commit to dev (deploy key), so dev builds count up from it
 ```
@@ -133,7 +133,7 @@ file's size and SHA-256 and installs it; every relay (except a checkout build) p
 and hourly, even with updates off, with User-Agent `browse/<channel>/<version>/cli/<kind>` (`binary`, `npm`, `bun`,
 `pnpm`, `yarn`, `volta`, `npx`, `bunx`, `pnpm-dlx`, `yarn-dlx`, `other` for an install browse didn't make, which only checks), which the protocol allows after its artifact segment
 and lets analytics split installs by kind. A binary install downloads the manifest's file; a global install runs its
-package manager for `@opencode/browse@<the manifest's version>`, and retries quietly while npm doesn't have that version
+package manager for `@opencode/browsevil@<the manifest's version>`, and retries quietly while npm doesn't have that version
 yet. `--version` stays on npm because the protocol has one current release per channel and no version lookup.
 
 A TypeScript binary install's updater (0.0.17 and earlier) runs the install script baked into the binary it is running,
@@ -156,7 +156,7 @@ older installers: relative `url`s, flat target objects, and `release.version` be
    stable channel, and the installer has no stable manifest to read.
 3. **Chrome Web Store item.** The API can't create items, so create it in the
    [developer dashboard](https://chrome.google.com/webstore/devconsole) with Anomaly's publisher (or reuse
-   `mfnicocicmmlkpjnaffgihfjhdgjkdjg` if it's Anomaly's): upload the zip from `bun run release:check`, fill in the
+   `lfmeghngagemglmdnplimokblljgmnoj` if it's Anomaly's): upload the zip from `bun run release:check`, fill in the
    listing from [store/listing.md](store/listing.md), set it **Public**. Then the repository variables (IDs, not
    secrets): `gh variable set CWS_PUBLISHER_ID --body <id>` and `gh variable set CWS_ITEM_ID --body <id>`.
 4. **Chrome Web Store API.** In an Anomaly Google Cloud project enable the Chrome Web Store API, set the OAuth consent
@@ -179,19 +179,19 @@ older installers: relative `url`s, flat target objects, and `release.version` be
      *Repository admin* and *Deploy keys* (the release commit comes back to dev with the deploy key).
    - tags `v*`: restrict creation, updates and deletion; bypass: *Repository admin* and *Deploy keys* (the tag job).
 8. **Actions** (Settings → Actions → General): require actions pinned to a full-length commit SHA.
-9. **npm.** Every package publishes with trusted publishing: `@opencode/browse` and each `@opencode/browse-<target>`
+9. **npm.** Every package publishes with trusted publishing: `@opencode/browsevil` and each `@opencode/browsevil-<target>`
    trust GitHub Actions in `anomalyco/browse`, workflow `release.yml`. There is no npm token anywhere.
 
    The eleven platform packages are set up already (November 2026): trusted publishing can only be configured on a
-   package that exists, so each `@opencode/browse-<target>` was published once by hand as an empty `0.0.0` on the
-   `placeholder` tag, then trusted like `@opencode/browse`, with no environment restriction. A new target needs the same:
+   package that exists, so each `@opencode/browsevil-<target>` was published once by hand as an empty `0.0.0` on the
+   `placeholder` tag, then trusted like `@opencode/browsevil`, with no environment restriction. A new target needs the same:
 
    ```sh
    npm publish --access public --tag placeholder   # in a folder with just package.json (name, version 0.0.0) and a README
-   npm trust github "@opencode/browse-<target>" --file release.yml --repository anomalyco/browse --allow-publish -y
+   npm trust github "@opencode/browsevil-<target>" --file release.yml --repository anomalyco/browse --allow-publish -y
    ```
 
-   `npm trust list @opencode/browse-<target>` checks one.
+   `npm trust list @opencode/browsevil-<target>` checks one.
 10. **macOS signing (optional).** Without it the macOS binaries carry the ad-hoc signature the Rust linker gives
     them, which runs fine from the install script and npm (neither sets quarantine). To sign with a Developer ID:
     the certificate is `shared/APPLE_SIGNING_CERTIFICATE` in AWS (a Developer ID Application certificate exported
@@ -230,7 +230,7 @@ are the signing switches (`MACOS_SIGNING`, `WINDOWS_SIGNING`) and the Azure ids 
 
 ## Undoing a bad release
 
-- **npm.** npm users move forward, so release a fixed patch. `npm deprecate @opencode/browse@<bad> "<why>"`
+- **npm.** npm users move forward, so release a fixed patch. `npm deprecate @opencode/browsevil@<bad> "<why>"`
   warns new installs; a user can rerun the installer with `--version <good>` (which installs from npm) to go back.
 - **Chrome Web Store.** Roll back in the dashboard ([how](https://developer.chrome.com/docs/webstore/rollback)), or
   cancel a pending review.

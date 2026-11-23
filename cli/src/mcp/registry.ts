@@ -101,7 +101,7 @@ export function createMcpToolContext(options: {
       return known
     }
     if (callers.size >= maxRememberedCallers) callers.delete(callers.keys().next().value!)
-    // A session the user pinned for this server (OPENCODE_BROWSER_SESSION) stays every caller's starting session.
+    // A session the user pinned for this server (OPENCODE_BROWSEVIL_SESSION) stays every caller's starting session.
     const created = newCaller(options.currentSession.established ? options.currentSession : { id: callerSessionId(id), established: false }, false)
     callers.set(id, created)
     return created

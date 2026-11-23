@@ -288,7 +288,7 @@ function linkLegacyExtension(root: string, home: string) {
 /** Idempotent, never throws: migration must not stop browse from starting. */
 export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationResult {
   const result: MigrationResult = { moved: 0, rewritten: 0, removed: [] }
-  if (process.env.OPENCODE_BROWSER_HOME) return result
+  if (process.env.OPENCODE_BROWSEVIL_HOME) return result
   removeStoredSecrets(home)
   const roots = legacyRoots(home)
   const oldData = legacyDataRoot(home)

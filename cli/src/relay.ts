@@ -72,10 +72,10 @@ export {
 } from "./relay/process-guard.ts"
 
 /**
- * OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS when the relay was given one: the default budget for an execute that didn't
+ * OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS when the relay was given one: the default budget for an execute that didn't
  * choose its own, and the action budget that comes with it. Unset keeps the 60s fallback in session-manager.
  */
-export const configuredExecuteTimeoutMs = Config.Int("OPENCODE_BROWSER_EXECUTE_TIMEOUT_MS").pipe(
+export const configuredExecuteTimeoutMs = Config.Int("OPENCODE_BROWSEVIL_EXECUTE_TIMEOUT_MS").pipe(
   Config.option,
   Config.map(Option.getOrUndefined),
 )
@@ -132,8 +132,8 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     },
     catch: (cause) => new Error("Create the relay token", { cause }),
   })
-  const extensionTimeoutEnv = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSER_EXTENSION_TIMEOUT_MS")))
-  const pingTimeoutEnv = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSER_PING_TIMEOUT_MS")))
+  const extensionTimeoutEnv = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS")))
+  const pingTimeoutEnv = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSEVIL_PING_TIMEOUT_MS")))
   const extensionCommandTimeoutMs = configuredTimeoutMs(extensionTimeoutEnv, extensionCommandTimeout)
   const extensionPingTimeoutMs = configuredTimeoutMs(pingTimeoutEnv, extensionPingTimeout)
   const browsers = new BrowserLinks({
@@ -144,7 +144,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
   })
   const { sendToExtension, sendExtensionBestEffort, sendToEveryBrowser, sendToEach, cleanupTabs } = createExtensionCommands({ browsers, registry, onTabGone: forgetMissingTab })
 
-  const debugEnabled = yield* Config.Boolean("OPENCODE_BROWSER_DEBUG").pipe(Config.withDefault(false))
+  const debugEnabled = yield* Config.Boolean("OPENCODE_BROWSEVIL_DEBUG").pipe(Config.withDefault(false))
   const debugLog = debugEnabled ? (line: string) => console.error(`[bc ${new Date().toISOString().slice(11, 23)}] ${line}`) : undefined
   const contextDebugLog = debugLog ? (line: string) => debugLog(`[bc:ctx] ${line}`) : undefined
 
@@ -200,7 +200,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
   })
   const isTabRecorded = (tabId: number) => recordingRelay.isRecordingTab(tabId)
 
-  const agentWindowSetting = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSER_AGENT_WINDOW")))?.trim().toLowerCase()
+  const agentWindowSetting = Option.getOrUndefined(yield* Config.option(Config.String("OPENCODE_BROWSEVIL_AGENT_WINDOW")))?.trim().toLowerCase()
   const agentWindow = agentWindowSetting === "current" || agentWindowSetting === "separate" ? agentWindowSetting : undefined
 
   const tabActivity = new TabActivity((tabId, enabled) => sendDebuggerCommand({
@@ -270,8 +270,8 @@ const makeRelay = Effect.fnUntraced(function* (options: {
   })
 
   const executeTimeoutMs = yield* configuredExecuteTimeoutMs
-  const keepaliveIntervalMs = yield* Config.Int("OPENCODE_BROWSER_KEEPALIVE_MS").pipe(Config.withDefault(20_000))
-  const idleTabTtlMs = yield* Config.Int("OPENCODE_BROWSER_IDLE_TAB_TTL_MS").pipe(Config.withDefault(15 * 60_000))
+  const keepaliveIntervalMs = yield* Config.Int("OPENCODE_BROWSEVIL_KEEPALIVE_MS").pipe(Config.withDefault(20_000))
+  const idleTabTtlMs = yield* Config.Int("OPENCODE_BROWSEVIL_IDLE_TAB_TTL_MS").pipe(Config.withDefault(15 * 60_000))
   const journalBaseDir = defaultJournalBaseDir()
   // Tabs that received a device-metrics override; the execute end clears only these.
   const deviceMetricsOverrides = new DeviceMetricsOverrides()
@@ -437,7 +437,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
   }
 
   // An attach command may run on an existing tab that is still loading, so it gets more time than the reconnect inventory.
-  const attachTimeoutMs = yield* Config.Int("OPENCODE_BROWSER_ATTACH_TIMEOUT_MS").pipe(Config.withDefault(10_000))
+  const attachTimeoutMs = yield* Config.Int("OPENCODE_BROWSEVIL_ATTACH_TIMEOUT_MS").pipe(Config.withDefault(10_000))
 
   const rootLifecycle = yield* RootTargetLifecycle.make({
     registry,
@@ -495,10 +495,10 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     sendExtensionBestEffort,
   })
 
-  const managed = yield* Config.Boolean("OPENCODE_BROWSER_MANAGED_RELAY").pipe(Config.withDefault(false))
-  const restartTimeoutMs = yield* Config.Int("OPENCODE_BROWSER_RESTART_TIMEOUT_MS").pipe(Config.withDefault(10_000))
-  const clientGoneGraceMs = yield* Config.Int("OPENCODE_BROWSER_CLIENT_GONE_GRACE_MS").pipe(Config.withDefault(60_000))
-  const restartRequestId = yield* Config.option(Config.String("OPENCODE_BROWSER_RESTART_REQUEST_ID"))
+  const managed = yield* Config.Boolean("OPENCODE_BROWSEVIL_MANAGED_RELAY").pipe(Config.withDefault(false))
+  const restartTimeoutMs = yield* Config.Int("OPENCODE_BROWSEVIL_RESTART_TIMEOUT_MS").pipe(Config.withDefault(10_000))
+  const clientGoneGraceMs = yield* Config.Int("OPENCODE_BROWSEVIL_CLIENT_GONE_GRACE_MS").pipe(Config.withDefault(60_000))
+  const restartRequestId = yield* Config.option(Config.String("OPENCODE_BROWSEVIL_RESTART_REQUEST_ID"))
   const lifecycleLogPath = path.join(stateRoot(), "relays", String(configuredPort), "lifecycle.jsonl")
   const audit = (event: RelayLifecycleEvent) => Effect.try(() => appendRelayLifecycleEvent(lifecycleLogPath, event))
 

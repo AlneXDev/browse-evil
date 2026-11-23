@@ -26,7 +26,7 @@ import { createExecuteLogCapture, createSandboxConsole } from "./log-capture.ts"
 import { delay, timedOut, withTimeout } from "./page-recovery.ts"
 import { safePageUrl } from "./target-selection.ts"
 
-// Full Node modules, only with OPENCODE_BROWSER_ALLOW_NODE=1. Sandboxed execute code gets sandboxModules.
+// Full Node modules, only with OPENCODE_BROWSEVIL_ALLOW_NODE=1. Sandboxed execute code gets sandboxModules.
 export const nodeModules = { ...sandboxModules, fs, os, http, https }
 
 export type HandoffCallOptions = {
@@ -100,10 +100,10 @@ const challengePollMs = 1_000
 const defaultChallengeWaitMs = 15_000
 const maxTrackedNavigations = 25
 
-/** How long execute waits for a non-interactive challenge to clear (OPENCODE_BROWSER_CHALLENGE_WAIT_MS, 0 to 60000). */
+/** How long execute waits for a non-interactive challenge to clear (OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS, 0 to 60000). */
 export function challengeWaitMs(): number {
-  const value = Number(process.env.OPENCODE_BROWSER_CHALLENGE_WAIT_MS)
-  return Number.isInteger(value) && value >= 0 && value <= 60_000 && process.env.OPENCODE_BROWSER_CHALLENGE_WAIT_MS !== "" ? value : defaultChallengeWaitMs
+  const value = Number(process.env.OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS)
+  return Number.isInteger(value) && value >= 0 && value <= 60_000 && process.env.OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS !== "" ? value : defaultChallengeWaitMs
 }
 
 async function probeChallengePage(page: Page): Promise<ChallengeProbe | undefined> {

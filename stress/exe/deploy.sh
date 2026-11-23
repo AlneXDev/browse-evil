@@ -2,7 +2,7 @@
 # Copies this working tree (committed or not) to the box and rebuilds there, for testing fixes without pushing.
 #   stress/exe/deploy.sh [host]        # default host: browse-stress.exe.xyz, reached with `wssh`
 # Leaves the box's .git, node_modules, builds and pairing code alone, restarts the relay on the new build and reloads
-# the extension. The extension is built with the harness's test hooks (OPENCODE_BROWSER_TEST_HOOKS=1).
+# the extension. The extension is built with the harness's test hooks (OPENCODE_BROWSEVIL_TEST_HOOKS=1).
 set -euo pipefail
 HOST="${1:-browse-stress.exe.xyz}"
 SSH="${BROWSE_STRESS_SSH:-wssh}"
@@ -13,9 +13,9 @@ rsync -az --delete -e "$SSH" \
   ./ "$HOST:browse/"
 "$SSH" "$HOST" 'bash -se' <<'REMOTE'
 set -uo pipefail
-export PATH=/usr/local/bin:$HOME/.bun/bin:$PATH OPENCODE_BROWSER_UPDATE_CHECK=0
+export PATH=/usr/local/bin:$HOME/.bun/bin:$PATH OPENCODE_BROWSEVIL_UPDATE_CHECK=0
 cd ~/browse
-(cd cli && OPENCODE_BROWSER_TEST_HOOKS=1 bun build.ts)
+(cd cli && OPENCODE_BROWSEVIL_TEST_HOOKS=1 bun build.ts)
 # Restart first: `pair` runs `session list`, which refuses a relay of another build (lifecycle.ts relayBuildProblem).
 node cli/dist/cli.mjs relay restart --force   # a stress box: nothing a fuzz run left is worth keeping
 # Feed the unpacked extension a real one-time code without running install (which edits the user's MCP config).

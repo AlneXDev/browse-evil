@@ -3,10 +3,10 @@
 use std::collections::HashSet;
 
 /// The chrome-extension origins allowed to open the extension socket: the unpacked build, the store item, and
-/// OPENCODE_BROWSER_EXTENSION_ORIGINS (comma or space separated, bare chrome-extension:// origins only).
+/// OPENCODE_BROWSEVIL_EXTENSION_ORIGINS (comma or space separated, bare chrome-extension:// origins only).
 pub fn allowed_extension_origins() -> HashSet<String> {
     let mut origins: HashSet<String> = [crate::protocol::stable_unpacked_origin(), format!("chrome-extension://{}", crate::protocol::store_id())].into();
-    if let Ok(raw) = std::env::var("OPENCODE_BROWSER_EXTENSION_ORIGINS") {
+    if let Ok(raw) = std::env::var("OPENCODE_BROWSEVIL_EXTENSION_ORIGINS") {
         for token in raw.split(|c: char| c == ',' || c.is_whitespace()) {
             let value = token.trim();
             let id = value.strip_prefix("chrome-extension://").unwrap_or("");

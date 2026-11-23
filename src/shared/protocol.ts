@@ -28,7 +28,7 @@ export type AgentRelayState = {
   tabs: { tabId: number; status?: PageStatus }[]
   /** A newer browse on the clone's remote branch, as the relay's update check found it, and the command to update. */
   update?: AgentRelayUpdate
-  /** Settings the connected relay's environment variables fix (OPENCODE_BROWSER_AGENT_WINDOW, …). */
+  /** Settings the connected relay's environment variables fix (OPENCODE_BROWSEVIL_AGENT_WINDOW, …). */
   overrides?: RelayOverrides
   /** How the connected relay's install updates (cli/src/auto-update.ts), as it reported it in `relay.settings`. */
   autoUpdate?: RelayAutoUpdate
@@ -123,7 +123,7 @@ export type RelayAutoUpdate = {
   method?: RelayInstallMethod
   /** The command that updates this install in a terminal (or switches one that can't update to one that can). */
   updateCommand?: string
-  /** The command that runs the relay's CLI in a terminal: `browse` for a binary install, `npx @opencode/browse` for npm. */
+  /** The command that runs the relay's CLI in a terminal: `browse` for a binary install, `npx @opencode/browsevil` for npm. */
   cli?: string
   mode: AutoUpdateMode
   effective: AutoUpdateMode
@@ -158,8 +158,8 @@ export type CliUpdateNotice = {
  */
 export function cliUpdateCommand(update: Pick<RelayAutoUpdate, "install" | "cli" | "updateCommand">): string {
   if (update.updateCommand?.trim()) return update.updateCommand.trim()
-  if (update.install === "npm") return "npm install -g @opencode/browse@latest"
-  if (update.install === "npx") return "npx @opencode/browse@latest install"
+  if (update.install === "npm") return "npm install -g @opencode/browsevil@latest"
+  if (update.install === "npx") return "npx @opencode/browsevil@latest install"
   return `${update.cli?.trim() || "browse"} update`
 }
 

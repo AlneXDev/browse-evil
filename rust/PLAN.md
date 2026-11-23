@@ -9,7 +9,7 @@ the Rust relay must speak its exact protocol, so the store extension keeps worki
   them itself. Other MCP clients get `execute` (plus `status` and `tabs`) instead: JavaScript run in an embedded
   QuickJS (`browse-script`) that calls the same tools in-process, with a Playwright-style `page` shim on top. The
   relay picks by the client's `clientInfo.name`, which the MCP proxy forwards in the `OpenCode-Browser-Client`
-  header on `/tools`, `/instructions` and `/tools/call` (`OPENCODE_BROWSER_TOOLS=plain|execute|all` overrides,
+  header on `/tools`, `/instructions` and `/tools/call` (`OPENCODE_BROWSEVIL_TOOLS=plain|execute|all` overrides,
   relay-side).
 - **Tabs are the handle; there are no sessions.** `navigate` without `tab` (or `tabs new`) opens a background agent
   tab and returns its id; every other page and capture tool requires `tab`. Options are fixed when a tab opens:

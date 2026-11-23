@@ -15,7 +15,7 @@ use sha2::Sha256;
 use crate::paths::{self, Paths};
 use crate::util::{b64url, from_b64url, now_ms, random_bytes};
 
-pub const CONTEXT: &str = "opencode-browser-pairing-v3";
+pub const CONTEXT: &str = "opencode-browsevil-pairing-v3";
 const LEGACY_CONTEXT: &str = "opencode-browser-pairing-v2";
 const CROCKFORD: &[u8; 32] = b"0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 const CODE_LENGTH: usize = 8;

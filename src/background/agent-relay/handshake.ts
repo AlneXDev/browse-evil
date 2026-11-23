@@ -44,7 +44,7 @@ import {
   type Handshake,
 } from "./wire"
 
-declare const __OPENCODE_BROWSER_BUILD__: string
+declare const __OPENCODE_BROWSEVIL_BUILD__: string
 
 /** A tab's ownership lookup must not hold `ready` on a hung storage read. */
 const OWNER_TIMEOUT_MS = 2_000
@@ -259,7 +259,7 @@ export function createRelayHandshake(deps: {
         method: "hello",
         params: {
           version: chrome.runtime.getManifest().version,
-          build: __OPENCODE_BROWSER_BUILD__,
+          build: __OPENCODE_BROWSEVIL_BUILD__,
           protocolVersion: extensionProtocolVersion,
           // Optional additions an older relay ignores. `tab-release` keeps an agent tab open (and on idle cleanup)
           // when a relay releases it instead of closing it.
@@ -535,7 +535,7 @@ export function createRelayHandshake(deps: {
     const stored = await chrome.storage.local.get([RELAY_ADDRESS_KEY, PAIRING_KEY])
     const saved = relayAddress(stored[RELAY_ADDRESS_KEY])
     // A link with no browse-range port is still for this computer. Keep a saved loopback address only when it pins a
-    // port outside the relay range (OPENCODE_BROWSER_PORT=9222, say): that browser is deliberately pinned there. Every
+    // port outside the relay range (OPENCODE_BROWSEVIL_PORT=9222, say): that browser is deliberately pinned there. Every
     // other address (remote, or an in-range loopback) is cleared so the link dials its port or 19988.
     const keepPinned = port === undefined && saved?.host === "127.0.0.1" &&
       saved.port !== undefined && !relayPorts.includes(saved.port)

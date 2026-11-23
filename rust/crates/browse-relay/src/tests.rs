@@ -456,7 +456,7 @@ async fn serves_the_tool_api_behind_the_token() {
 /// The relay picks a client's tools and instructions by the name the MCP proxy forwards.
 #[tokio::test]
 async fn the_client_name_decides_tools_and_instructions() {
-    if std::env::var_os("OPENCODE_BROWSER_TOOLS").is_some() {
+    if std::env::var_os("OPENCODE_BROWSEVIL_TOOLS").is_some() {
         return;
     }
     let h = harness().await;

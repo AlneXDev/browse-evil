@@ -39,7 +39,7 @@ const DRAIN_TIMEOUT: Duration = Duration::from_secs(5);
 
 #[derive(Clone)]
 pub struct ServeOptions {
-    /// Listen here, with no fallback. None: OPENCODE_BROWSER_PORT, else 19988 falling back to 19990–19997.
+    /// Listen here, with no fallback. None: OPENCODE_BROWSEVIL_PORT, else 19988 falling back to 19990–19997.
     pub port: Option<u16>,
     pub paths: Paths,
     pub version: String,
@@ -252,7 +252,7 @@ async fn run(relay: Arc<Relay>, listener: TcpListener) {
 /// uninstall test sees the writes a client that only waits for /version would miss.
 #[cfg(debug_assertions)]
 fn test_shutdown_delay() -> Option<Duration> {
-    std::env::var("OPENCODE_BROWSER_TEST_SHUTDOWN_DELAY_MS").ok()?.trim().parse::<u64>().ok().filter(|ms| *ms > 0).map(Duration::from_millis)
+    std::env::var("OPENCODE_BROWSEVIL_TEST_SHUTDOWN_DELAY_MS").ok()?.trim().parse::<u64>().ok().filter(|ms| *ms > 0).map(Duration::from_millis)
 }
 
 /// Release builds never delay shutdown for tests.
@@ -741,7 +741,7 @@ pub(crate) async fn sweep_clients(relay: &Arc<Relay>) {
 
 /// Keepalive pings, idle tabs and calls whose client exited.
 async fn housekeeping(relay: Arc<Relay>) {
-    let keepalive = std::env::var("OPENCODE_BROWSER_KEEPALIVE_MS").ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(20_000);
+    let keepalive = std::env::var("OPENCODE_BROWSEVIL_KEEPALIVE_MS").ok().and_then(|v| v.parse::<u64>().ok()).unwrap_or(20_000);
     let started = Instant::now();
     let (mut last_ping, mut last_reap, mut last_orphans, mut last_memory) = (started, started, started, started);
     let mut interval = tokio::time::interval(Duration::from_secs(1));

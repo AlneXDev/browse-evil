@@ -6,7 +6,7 @@ import { installChrome, settle } from "../chrome-stub"
 // entry the guess came from (the relay on the old port still trusts it). Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const STORED_TOKEN = "this-browser-token-0123456789abcdefghijklmn"
 const OTHER_RELAY_TOKEN = "another-relay-token-0123456789abcdefghijklmn"

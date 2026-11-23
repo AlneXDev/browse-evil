@@ -13,7 +13,7 @@ const serve = Command.make(
       Promise.all([import("../relay.ts"), import("../relay/helpers.ts")]),
     )
     // Unset, the relay falls back from 19988 to a free browse port (relay/port.ts); an explicit port pins it.
-    const port = process.env.OPENCODE_BROWSER_PORT === undefined ? undefined : yield* RelayClient.portConfig
+    const port = process.env.OPENCODE_BROWSEVIL_PORT === undefined ? undefined : yield* RelayClient.portConfig
     const additionalExtensionOrigins = parseAdditionalExtensionOrigins(yield* RelayClient.extensionOriginsConfig)
     yield* Effect.scoped(
       Effect.gen(function* () {

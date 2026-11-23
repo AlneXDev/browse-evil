@@ -16,7 +16,7 @@ export function serviceTarget(target: string): string {
 
 /** This executable's service target; undefined outside a compiled binary (an npm install has no service manifest). */
 export function runningServiceTarget(): string | undefined {
-  return globalThis.__OPENCODE_BROWSER_TARGET__ ? serviceTarget(globalThis.__OPENCODE_BROWSER_TARGET__) : undefined
+  return globalThis.__OPENCODE_BROWSEVIL_TARGET__ ? serviceTarget(globalThis.__OPENCODE_BROWSEVIL_TARGET__) : undefined
 }
 
 /** The service channel for a build: npm's `latest` tag is the service's `stable` channel. */
@@ -26,7 +26,7 @@ export function releaseChannel(channel: string): ReleaseChannel {
 }
 
 export const releaseService = (env: NodeJS.ProcessEnv = process.env) =>
-  (env.OPENCODE_BROWSER_RELEASE_SERVICE?.trim() || RELEASE_SERVICE).replace(/\/+$/, "")
+  (env.OPENCODE_BROWSEVIL_RELEASE_SERVICE?.trim() || RELEASE_SERVICE).replace(/\/+$/, "")
 
 // ---- the protocol's manifest and client rules -----------------------------------------------------
 

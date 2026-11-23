@@ -9,7 +9,7 @@ import { installChrome, settle, type StubEvent } from "./chrome-stub"
 // timers for the rest of the run, and must never reach a real port.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 class FakeWebSocket {
   static readonly CONNECTING = 0

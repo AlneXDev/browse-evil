@@ -18,9 +18,9 @@ static SIGNALS: std::sync::Once = std::sync::Once::new();
 const SIGNAL_GRACE: Duration = Duration::from_secs(5);
 const TICK: Duration = Duration::from_millis(250);
 
-/// The state lock may be held this long (OPENCODE_BROWSER_WATCHDOG_MS, 0 turns the watchdog off).
+/// The state lock may be held this long (OPENCODE_BROWSEVIL_WATCHDOG_MS, 0 turns the watchdog off).
 fn lock_limit() -> Option<Duration> {
-    let ms = std::env::var("OPENCODE_BROWSER_WATCHDOG_MS").ok().and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(10_000);
+    let ms = std::env::var("OPENCODE_BROWSEVIL_WATCHDOG_MS").ok().and_then(|v| v.trim().parse::<u64>().ok()).unwrap_or(10_000);
     (ms > 0).then(|| Duration::from_millis(ms))
 }
 

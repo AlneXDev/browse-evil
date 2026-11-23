@@ -364,16 +364,16 @@ impl Relay {
             .and_then(|v| v.get("mode").and_then(Value::as_str).map(str::to_string))
             .filter(|m| matches!(m.as_str(), "on" | "notify" | "off"))
             .unwrap_or_else(|| "on".into());
-        let override_mode = match std::env::var("OPENCODE_BROWSER_AUTO_UPDATE").ok().map(|v| v.trim().to_lowercase()).as_deref() {
+        let override_mode = match std::env::var("OPENCODE_BROWSEVIL_AUTO_UPDATE").ok().map(|v| v.trim().to_lowercase()).as_deref() {
             Some("on" | "1" | "true") => Some("on"),
             Some("notify") => Some("notify"),
             Some("off" | "0" | "false") => Some("off"),
-            _ if std::env::var("OPENCODE_BROWSER_UPDATE_CHECK").is_ok_and(|v| v == "0") => Some("off"),
+            _ if std::env::var("OPENCODE_BROWSEVIL_UPDATE_CHECK").is_ok_and(|v| v == "0") => Some("off"),
             _ => None,
         };
         let mut status = json!({ "install": "binary", "cli": "browse", "mode": stored, "effective": override_mode.unwrap_or(&stored), "version": self.version });
         if override_mode.is_some() {
-            status["overriddenBy"] = if std::env::var_os("OPENCODE_BROWSER_AUTO_UPDATE").is_some() { "OPENCODE_BROWSER_AUTO_UPDATE" } else { "OPENCODE_BROWSER_UPDATE_CHECK" }.into();
+            status["overriddenBy"] = if std::env::var_os("OPENCODE_BROWSEVIL_AUTO_UPDATE").is_some() { "OPENCODE_BROWSEVIL_AUTO_UPDATE" } else { "OPENCODE_BROWSEVIL_UPDATE_CHECK" }.into();
         }
         status
     }

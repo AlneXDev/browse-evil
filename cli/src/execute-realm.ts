@@ -29,7 +29,7 @@
  *
  * Execute JavaScript shares the relay's event loop with every session, so each
  * synchronous slice (initial code, callback, timer, promise continuation and the
- * microtasks it queues) is cut off after OPENCODE_BROWSER_EXECUTE_SLICE_MS, and
+ * microtasks it queues) is cut off after OPENCODE_BROWSEVIL_EXECUTE_SLICE_MS, and
  * callbacks that use the relay thread's CPU more than half the time (over a
  * window of three slices) are stopped too. Async entries are queued fairly
  * between sessions and paced so the relay keeps answering (cpu-scheduler.ts).
@@ -48,7 +48,7 @@
  * reaches the host in a way not covered here could still escape, and the
  * agent keeps everything the browser itself can do (navigate anywhere, read
  * any attached page, exfiltrate through page requests). Set
- * OPENCODE_BROWSER_ALLOW_NODE=1 to run execute code with full Node access.
+ * OPENCODE_BROWSEVIL_ALLOW_NODE=1 to run execute code with full Node access.
  */
 import buffer from "node:buffer"
 import crypto from "node:crypto"
@@ -298,7 +298,7 @@ export class ExecuteRealm {
     // Node rejects import() in a vm context with an error created in the relay's realm, which would hand the
     // sandbox the relay's Function constructor. With code generation from strings off, a static check sees all code.
     if (containsDynamicImport(options.source)) {
-      throw new Error("import() is not available in execute code. Set OPENCODE_BROWSER_ALLOW_NODE=1 on the relay for full Node access.")
+      throw new Error("import() is not available in execute code. Set OPENCODE_BROWSEVIL_ALLOW_NODE=1 on the relay for full Node access.")
     }
     let rejectRun!: (error: Error) => void
     const stopped = new Promise<never>((_resolve, reject) => { rejectRun = reject })

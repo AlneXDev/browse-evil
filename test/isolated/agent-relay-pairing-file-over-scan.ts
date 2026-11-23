@@ -5,7 +5,7 @@ import { installChrome, settle } from "../chrome-stub"
 // hint wins over a scanned port, and the code is tried there. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
 const SCANNED_PORT = 19991

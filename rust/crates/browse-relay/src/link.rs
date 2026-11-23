@@ -33,8 +33,8 @@ fn configured(variable: &str, fallback: u64, min: u64, max: u64) -> Duration {
 impl Timeouts {
     pub fn from_env() -> Self {
         Self {
-            command: configured("OPENCODE_BROWSER_EXTENSION_TIMEOUT_MS", 30_000, 15_000, 300_000),
-            ping: configured("OPENCODE_BROWSER_PING_TIMEOUT_MS", 10_000, 1_000, 30_000),
+            command: configured("OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS", 30_000, 15_000, 300_000),
+            ping: configured("OPENCODE_BROWSEVIL_PING_TIMEOUT_MS", 10_000, 1_000, 30_000),
             debugger: Duration::from_secs(60),
             await_promise: Duration::from_secs(300),
             liveness: Duration::from_secs(10),

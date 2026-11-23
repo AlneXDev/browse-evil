@@ -5,7 +5,7 @@ import { installChrome, settle } from "../chrome-stub"
 // an address means that one, and a scan could find someone else's relay. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const PORT_KEY_PORT = 19925
 const probes: string[] = []

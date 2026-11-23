@@ -412,8 +412,8 @@ const primaryAction = (state: AgentRelayState | undefined) =>
 
 // A setting the relay's environment fixes wins over the page's; say so, with the value in effect.
 const overrideNotes: { [Key in keyof RelayOverrides]-?: { variable: string; labels: Record<NonNullable<RelayOverrides[Key]>, string> } } = {
-  agentWindow: { variable: "OPENCODE_BROWSER_AGENT_WINDOW", labels: { current: "in your window", separate: "in a separate window" } },
-  humanInput: { variable: "OPENCODE_BROWSER_HUMAN_INPUT", labels: { on: "on", off: "off" } },
+  agentWindow: { variable: "OPENCODE_BROWSEVIL_AGENT_WINDOW", labels: { current: "in your window", separate: "in a separate window" } },
+  humanInput: { variable: "OPENCODE_BROWSEVIL_HUMAN_INPUT", labels: { on: "on", off: "off" } },
 }
 function Override(props: { overrides: RelayOverrides | undefined; setting: keyof RelayOverrides }) {
   const value = () => props.overrides?.[props.setting]

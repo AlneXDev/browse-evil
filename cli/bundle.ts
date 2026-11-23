@@ -38,10 +38,10 @@ export async function bundleCli(options: {
       },
     ],
     define: {
-      "globalThis.__OPENCODE_BROWSER_VERSION__": JSON.stringify(options.version),
-      "globalThis.__OPENCODE_BROWSER_BUILD_ID__": JSON.stringify(options.buildId ?? new Date().toISOString()),
-      "globalThis.__OPENCODE_BROWSER_STORE__": JSON.stringify(options.store ?? {}),
-      "globalThis.__OPENCODE_BROWSER_EXTENSION__": options.extension ? JSON.stringify(options.extension) : "undefined",
+      "globalThis.__OPENCODE_BROWSEVIL_VERSION__": JSON.stringify(options.version),
+      "globalThis.__OPENCODE_BROWSEVIL_BUILD_ID__": JSON.stringify(options.buildId ?? new Date().toISOString()),
+      "globalThis.__OPENCODE_BROWSEVIL_STORE__": JSON.stringify(options.store ?? {}),
+      "globalThis.__OPENCODE_BROWSEVIL_EXTENSION__": options.extension ? JSON.stringify(options.extension) : "undefined",
     },
   })
   if (!result.success) throw new AggregateError(result.logs, "build failed")

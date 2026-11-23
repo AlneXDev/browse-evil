@@ -66,7 +66,7 @@ fi
 cd "$REPO"
 # `setup` builds the extension and CLI, writes the pairing file into dist/, and adds the MCP server to the box's own
 # opencode config. Over SSH it doesn't wait for a browser.
-OPENCODE_BROWSER_UPDATE_CHECK=0 bun run setup </dev/null
+OPENCODE_BROWSEVIL_UPDATE_CHECK=0 bun run setup </dev/null
 
 log "Chrome for Testing (stable)"
 mkdir -p "$CFT_DIR"
@@ -90,7 +90,7 @@ sudo systemctl restart browse-chrome browse-novnc
 
 log "relay + extension"
 # Any relay-backed command starts the relay; the extension connects once it's up.
-OPENCODE_BROWSER_UPDATE_CHECK=0 node cli/dist/cli.mjs session list --json >/dev/null 2>&1 || true
+OPENCODE_BROWSEVIL_UPDATE_CHECK=0 node cli/dist/cli.mjs session list --json >/dev/null 2>&1 || true
 for _ in $(seq 1 60); do
   if node cli/dist/cli.mjs status --json 2>/dev/null | jq -e '.extension.connected == true' >/dev/null 2>&1; then break; fi
   sleep 1

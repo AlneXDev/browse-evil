@@ -12,7 +12,7 @@
 //                              [--out dir] [--wait-ms 8000] [--session stealth] [--keep-session]
 //
 // Results go to <out>/ (default ~/stress-results/<time>-stealth/): results.json, summary.md, probe.json and PNGs.
-// The CLI is this checkout's cli/dist/cli.mjs (or $BROWSE_REPO's); OPENCODE_BROWSER_HOME / OPENCODE_BROWSER_PORT pick
+// The CLI is this checkout's cli/dist/cli.mjs (or $BROWSE_REPO's); OPENCODE_BROWSEVIL_HOME / OPENCODE_BROWSEVIL_PORT pick
 // the relay, as for every browse command. Run it on a dedicated browser profile when you can (see stress/README.md).
 import fs from "node:fs"
 import http from "node:http"

@@ -156,7 +156,7 @@ const execute = Command.make(
       const executeCode = filePath ? yield* readExecuteFile(filePath) : code.join(" ")
       const explicitSessionId = Option.getOrUndefined(session) ?? Option.getOrUndefined(yield* sessionIdConfig)
       if (rm && explicitSessionId) {
-        return yield* Effect.fail(new Error("Use --rm without --session or OPENCODE_BROWSER_SESSION"))
+        return yield* Effect.fail(new Error("Use --rm without --session or OPENCODE_BROWSEVIL_SESSION"))
       }
       const agentWorkSessionId = agentDefaultSessionId(Option.getOrUndefined(yield* agentSessionIdConfig))
       const workSessionId = explicitSessionId ?? (rm ? undefined : agentWorkSessionId)
@@ -169,7 +169,7 @@ const execute = Command.make(
       if (targetUrlValue && targetIndexValue !== undefined) {
         return yield* Effect.fail(
           new Error(
-            "Use only one target selector: --target-url/OPENCODE_BROWSER_TARGET_URL or --target-index/OPENCODE_BROWSER_TARGET_INDEX",
+            "Use only one target selector: --target-url/OPENCODE_BROWSEVIL_TARGET_URL or --target-index/OPENCODE_BROWSEVIL_TARGET_INDEX",
           ),
         )
       }

@@ -55,7 +55,7 @@ import {
  * the relay's own error message as the top-level message.
  */
 
-export const portConfig = Config.Int("OPENCODE_BROWSER_PORT").pipe(Config.withDefault(defaultPort))
+export const portConfig = Config.Int("OPENCODE_BROWSEVIL_PORT").pipe(Config.withDefault(defaultPort))
 
 /**
  * Extra `chrome-extension://<id>` origins to allowlist for the extension
@@ -63,7 +63,7 @@ export const portConfig = Config.Int("OPENCODE_BROWSER_PORT").pipe(Config.withDe
  * installs whose path-derived id cannot match the relay's bundled path. Parsed
  * by `parseAdditionalExtensionOrigins`.
  */
-export const extensionOriginsConfig = Config.String("OPENCODE_BROWSER_EXTENSION_ORIGINS").pipe(Config.withDefault(""))
+export const extensionOriginsConfig = Config.String("OPENCODE_BROWSEVIL_EXTENSION_ORIGINS").pipe(Config.withDefault(""))
 
 export { endpointForPort } from "./port.ts"
 
@@ -165,11 +165,11 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
   /** Sent as OpenCode-Browser-Client-Pid so the relay can end a capture or an implicit session once this process is gone. */
   readonly clientPid?: number
 }) {
-  // Validate OPENCODE_BROWSER_PORT as before; the endpoint itself is resolved on every request so a relay that moved
+  // Validate OPENCODE_BROWSEVIL_PORT as before; the endpoint itself is resolved on every request so a relay that moved
   // to a fallback port is found without recreating this client (relay/port.ts).
   yield* portConfig.pipe(
     Effect.mapError((cause) => new RelayConfigInvalid({
-      message: `Invalid OPENCODE_BROWSER_PORT configuration: ${cause.message}`,
+      message: `Invalid OPENCODE_BROWSEVIL_PORT configuration: ${cause.message}`,
       cause,
     })),
   )
@@ -542,7 +542,7 @@ export const layerFetch: Layer.Layer<Service, RelayConfigInvalid> = layer.pipe(L
  * (it outlives the server it swaps on an update, so the session and its tabs survive), else this process.
  */
 function mcpClientPid(): number {
-  const supervisor = Number(process.env.OPENCODE_BROWSER_CLIENT_PID)
+  const supervisor = Number(process.env.OPENCODE_BROWSEVIL_CLIENT_PID)
   return Number.isSafeInteger(supervisor) && supervisor > 1 && supervisor === process.ppid ? supervisor : process.pid
 }
 

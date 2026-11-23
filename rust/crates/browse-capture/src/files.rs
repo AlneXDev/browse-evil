@@ -16,7 +16,7 @@ use std::sync::{LazyLock, Mutex};
 
 use crate::bail_user;
 
-pub(crate) const FILE_ROOTS_VARIABLE: &str = "OPENCODE_BROWSER_FILE_ROOTS";
+pub(crate) const FILE_ROOTS_VARIABLE: &str = "OPENCODE_BROWSEVIL_FILE_ROOTS";
 const FILES_DIRECTORY_PREFIX: &str = "opencode-browser-files-";
 
 fn describe(roots: &[PathBuf]) -> String {
@@ -81,7 +81,7 @@ fn root_of<'a>(real: &Path, roots: &'a [PathBuf]) -> Option<&'a PathBuf> {
 /// browse's own folders (cli/src/paths.ts layout), whose contents tools never read or write.
 fn browse_owned() -> Vec<PathBuf> {
     let mut folders = Vec::new();
-    if let Some(home) = std::env::var_os("OPENCODE_BROWSER_HOME").filter(|value| !value.is_empty()) {
+    if let Some(home) = std::env::var_os("OPENCODE_BROWSEVIL_HOME").filter(|value| !value.is_empty()) {
         folders.push(PathBuf::from(home));
     }
     if let Some(home) = std::env::var_os("HOME").map(PathBuf::from) {

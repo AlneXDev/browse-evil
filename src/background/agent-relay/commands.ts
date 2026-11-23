@@ -31,7 +31,7 @@ import {
   type AgentRelayLog,
 } from "./wire"
 
-// The relay's tabs.create RPC waits 30 s by default (cli/src/relay/rpc.ts, OPENCODE_BROWSER_EXTENSION_TIMEOUT_MS); the
+// The relay's tabs.create RPC waits 30 s by default (cli/src/relay/rpc.ts, OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS); the
 // handler answers within 12 s so the reply still has time to arrive. A Chrome call that never settles (tab groups in
 // Dia) must not use that up.
 // The budget includes beginCreate and opening the tab, so a slow open shortens the about:blank load wait.

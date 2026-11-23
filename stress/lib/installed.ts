@@ -11,14 +11,14 @@ import { sleep } from "./env.ts"
 import { McpClient } from "./mcp.ts"
 
 /** The Chrome Web Store item (cli/src/paths.ts PUBLIC_STORE_ID); the release zip gets its key, so this is its id. */
-export const STORE_EXTENSION_ID = "mfnicocicmmlkpjnaffgihfjhdgjkdjg"
+export const STORE_EXTENSION_ID = "lfmeghngagemglmdnplimokblljgmnoj"
 export const CHROME = process.env.BROWSE_STRESS_CHROME ?? path.join(os.homedir(), "chrome-for-testing/current")
 export const DISPLAY = process.env.DISPLAY ?? ":99"
 
 export type User = {
   readonly name: string
   readonly home: string
-  /** The relay's port for this install (OPENCODE_BROWSER_PORT; 19988 by default). */
+  /** The relay's port for this install (OPENCODE_BROWSEVIL_PORT; 19988 by default). */
   readonly port: number
   /** Chrome's --remote-debugging-port for this user's browser (harness only). */
   readonly debugPort: number
@@ -51,7 +51,7 @@ export function user(name: string, options: { port?: number; debugPort?: number;
 
 /** The environment a command of this user runs with: its HOME and XDG folders, its relay port, no update check noise. */
 export function userEnv(u: User, extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
-  const { OPENCODE_BROWSER_HOME: _home, XDG_CONFIG_HOME: _config, XDG_DATA_HOME: _data, XDG_STATE_HOME: _state, XDG_CACHE_HOME: _cache, XDG_BIN_HOME: _bin, ...base } = process.env
+  const { OPENCODE_BROWSEVIL_HOME: _home, XDG_CONFIG_HOME: _config, XDG_DATA_HOME: _data, XDG_STATE_HOME: _state, XDG_CACHE_HOME: _cache, XDG_BIN_HOME: _bin, ...base } = process.env
   return {
     ...base,
     HOME: u.home,
@@ -61,8 +61,8 @@ export function userEnv(u: User, extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessE
     XDG_CACHE_HOME: path.join(u.home, ".cache"),
     XDG_BIN_HOME: path.join(u.home, ".local/bin"),
     DISPLAY,
-    OPENCODE_BROWSER_PORT: String(u.port),
-    OPENCODE_BROWSER_UPDATE_CHECK: process.env.OPENCODE_BROWSER_UPDATE_CHECK ?? "0",
+    OPENCODE_BROWSEVIL_PORT: String(u.port),
+    OPENCODE_BROWSEVIL_UPDATE_CHECK: process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK ?? "0",
     ...extra,
   }
 }

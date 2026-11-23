@@ -1,5 +1,5 @@
 {
-  "name": "@opencode/browse",
+  "name": "@opencode/browsevil",
   "version": "0.1.5",
   "description": "browse: connect the extension to opencode, and drive your browser from any agent (CLI, MCP, Playwright).",
   "type": "module",

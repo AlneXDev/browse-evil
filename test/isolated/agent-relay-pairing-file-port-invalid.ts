@@ -5,7 +5,7 @@ import { installChrome, settle } from "../chrome-stub"
 // value: the extension still dials 19988 and doesn't move. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const CODE = "0123ABCD"
 const OTHER_PORT = 19989

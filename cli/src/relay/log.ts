@@ -29,7 +29,7 @@ export function appendManagedRelayProcessLog(message: string, home = os.homedir(
 /**
  * The relay's operational log: one line per lifecycle event (start, extension connects and disconnects, HTTP
  * requests with status and duration, faults), always on, in <state root>/logs/relay.log. Per-CDP-message
- * tracing stays behind OPENCODE_BROWSER_DEBUG.
+ * tracing stays behind OPENCODE_BROWSEVIL_DEBUG.
  */
 export function relayLog(event: string, fields: Record<string, unknown> = {}): void {
   const detail = Object.entries(fields)

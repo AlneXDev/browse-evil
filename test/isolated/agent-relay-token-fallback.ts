@@ -7,7 +7,7 @@ import { installFakeRelaySocket } from "../relay-stub"
 // refuses it. A successful handshake then stores the token under the new port too. Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const TOKEN = "test-token-0123456789abcdefghijklmnopqrstuv"
 const STALE_TOKEN = "stale-token-0123456789abcdefghijklmnopqrstu"

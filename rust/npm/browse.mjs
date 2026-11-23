@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// The `browse` command of the npm package @opencode/browse: finds the native browse binary npm installed for this
-// computer (the optional dependency @opencode/browse-<target>) and runs it with the same arguments, stdio and exit
+// The `browse` command of the npm package @opencode/browsevil: finds the native browse binary npm installed for this
+// computer (the optional dependency @opencode/browsevil-<target>) and runs it with the same arguments, stdio and exit
 // code. Shipped as dist/cli.mjs, the path installs of the TypeScript CLI wrote into agent configs
 // (`node .../dist/cli.mjs mcp`), so those keep working after `npm install -g` moves them to this package.
 import { spawn } from "node:child_process"
@@ -26,7 +26,7 @@ function musl() {
 function binary() {
   if (!os || !arch) return undefined
   const executable = os === "windows" ? "browse.exe" : "browse"
-  const base = `@opencode/browse-${os}-${arch}`
+  const base = `@opencode/browsevil-${os}-${arch}`
   // The libc npm picked may not be the one detected (npm before 10.4 ignores `libc`), so the other is a fallback.
   const names = os === "linux" ? (musl() ? [`${base}-musl`, base] : [base, `${base}-musl`]) : [base]
   for (const name of names) {
@@ -53,11 +53,11 @@ if (!file) {
 const bun = process.versions.bun !== undefined
 const env = {
   ...process.env,
-  OPENCODE_BROWSER_NPM_LAUNCHER: fileURLToPath(import.meta.url),
-  OPENCODE_BROWSER_NPM_NODE: bun ? "" : process.execPath,
-  OPENCODE_BROWSER_NPM_BUN: bun ? process.execPath : "",
-  OPENCODE_BROWSER_NPM_USER_AGENT: process.env.npm_config_user_agent ?? "",
-  OPENCODE_BROWSER_NPM_EXECPATH: process.env.npm_execpath ?? "",
+  OPENCODE_BROWSEVIL_NPM_LAUNCHER: fileURLToPath(import.meta.url),
+  OPENCODE_BROWSEVIL_NPM_NODE: bun ? "" : process.execPath,
+  OPENCODE_BROWSEVIL_NPM_BUN: bun ? process.execPath : "",
+  OPENCODE_BROWSEVIL_NPM_USER_AGENT: process.env.npm_config_user_agent ?? "",
+  OPENCODE_BROWSEVIL_NPM_EXECPATH: process.env.npm_execpath ?? "",
 }
 const child = spawn(file, process.argv.slice(2), { stdio: "inherit", windowsHide: true, env })
 for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {

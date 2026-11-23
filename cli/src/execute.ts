@@ -184,7 +184,7 @@ export type ExecuteOptions = {
 
 export class ExecuteSandbox extends DefaultPageHost {
   private browser: Browser | undefined
-  /** Full Node access for execute code (OPENCODE_BROWSER_ALLOW_NODE=1); otherwise code runs in a vm realm. */
+  /** Full Node access for execute code (OPENCODE_BROWSEVIL_ALLOW_NODE=1); otherwise code runs in a vm realm. */
   private readonly allowNode = executeAllowsNode()
   private readonly snapshotRefs: SnapshotRefRegistry = { selectors: new Map() }
   private readonly networkCapture = new NetworkCapture.Recorder()

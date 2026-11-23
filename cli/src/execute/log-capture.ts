@@ -144,7 +144,7 @@ export function formatNodeContextWarning(error: Error): string | undefined {
   }
   const nodeGlobal = error.name === "ReferenceError" ? nodeOnlyGlobalPattern.exec(error.message)?.[1] : undefined
   if (nodeGlobal) {
-    return `Execute code runs in a sandbox without \`${nodeGlobal}\` (no process, require, fs, os, child_process, http/https or Node fetch). Save or read files with files.write(name, data) / files.read(path), fetch through page.evaluate(() => fetch(...)), or ask the user to set OPENCODE_BROWSER_ALLOW_NODE=1 on the relay for full Node access.`
+    return `Execute code runs in a sandbox without \`${nodeGlobal}\` (no process, require, fs, os, child_process, http/https or Node fetch). Save or read files with files.write(name, data) / files.read(path), fetch through page.evaluate(() => fetch(...)), or ask the user to set OPENCODE_BROWSEVIL_ALLOW_NODE=1 on the relay for full Node access.`
   }
   if (error.name === "TypeError" && error.message.startsWith("Failed to parse URL from ")) {
     return "Execute code runs in Node, so fetch has no page origin or cookies. Use page.evaluate(() => fetch(...)) for same-origin requests."

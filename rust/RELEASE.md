@@ -33,7 +33,7 @@ The TS build's `-baseline` (no AVX2) variants aren't needed: Rust's default x86-
 release publishes the same binary under the baseline names, which the install script still asks for.
 
 Each target ships as `opencode-browse-<target>-<version>.tgz` holding `package/bin/browse[.exe]`, `package.json` and
-`LICENSE`: the npm package `@opencode/browse-<target>` and the release service file are the same tarball. Its size and
+`LICENSE`: the npm package `@opencode/browsevil-<target>` and the release service file are the same tarball. Its size and
 SHA-256 go into the channel manifest's `release.targets` at `https://anoma.ly/release/browse/cli/<channel>.json`.
 Every relay polls it at launch and hourly, in every mode (`off` checks and installs nothing). Versions are only tested
 for equality (the release protocol's client rules, `crates/browse/src/protocol.rs`, checked against the release repo's test vectors
@@ -42,18 +42,18 @@ download their target's tarball in-process (ureq, rustls), check size and SHA-25
 `~/.local/bin/browse` in place. A relay browse started restarts on the new file once no agent is using the browser (a
 foreground `browse serve` doesn't); `browse mcp` proxies reconnect to it on their own.
 
-`@opencode/browse` (npm) is `npm/browse.mjs`, shipped as `dist/cli.mjs`: it runs the binary of whichever
-`@opencode/browse-<target>` npm installed, passing its own path and node's (`OPENCODE_BROWSER_NPM_LAUNCHER`,
-`OPENCODE_BROWSER_NPM_NODE`). A global install reads the channel's manifest from the release service at launch and
+`@opencode/browsevil` (npm) is `npm/browse.mjs`, shipped as `dist/cli.mjs`: it runs the binary of whichever
+`@opencode/browsevil-<target>` npm installed, passing its own path and node's (`OPENCODE_BROWSEVIL_NPM_LAUNCHER`,
+`OPENCODE_BROWSEVIL_NPM_NODE`). A global install reads the channel's manifest from the release service at launch and
 hourly, like a binary install, and once no agent is using the browser runs
-`npm install -g --prefix <its prefix> @opencode/browse@<the manifest's version>` with the npm beside that node, then
+`npm install -g --prefix <its prefix> @opencode/browsevil@<the manifest's version>` with the npm beside that node, then
 restarts on the platform package's new binary. npm's registry can lag the service by a few minutes; a version it doesn't
 have is retried on the same backoff without landing in `lastError`. Real failures do land in `auto-update.json`
 (`lastError`) for the options page. npx runs only check the manifest, and checkout builds don't update; `browse install`
 moves any install to the self-updating binary in `~/.local/bin`.
 
-Update settings: `browse update --mode on|notify|off`, overridden by `OPENCODE_BROWSER_AUTO_UPDATE`
-(`OPENCODE_BROWSER_UPDATE_CHECK=0` means off). `OPENCODE_BROWSER_RELEASE_SERVICE` and `OPENCODE_BROWSER_NPM_REGISTRY` point
+Update settings: `browse update --mode on|notify|off`, overridden by `OPENCODE_BROWSEVIL_AUTO_UPDATE`
+(`OPENCODE_BROWSEVIL_UPDATE_CHECK=0` means off). `OPENCODE_BROWSEVIL_RELEASE_SERVICE` and `OPENCODE_BROWSEVIL_NPM_REGISTRY` point
 at another release service or npm registry for tests.
 
 MCP servers of the TypeScript browse that OpenCode started before the update keep running until OpenCode restarts

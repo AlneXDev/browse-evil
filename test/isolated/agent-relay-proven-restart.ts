@@ -7,7 +7,7 @@ import { installFakeRelaySocket } from "../relay-stub"
 // goes to 19988 (never a scan-only port). Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const PORT = 19990
 const TOKEN = "proven-token-0123456789abcdefghijklmnopqrst"

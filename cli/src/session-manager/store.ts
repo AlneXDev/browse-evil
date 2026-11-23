@@ -5,7 +5,7 @@ import { endpointForPort, portConfig } from "../relay/client.ts"
 
 /**
  * SessionStore persists the CLI's current browse session id, scoped
- * by relay endpoint so switching `OPENCODE_BROWSER_PORT` cannot silently reuse
+ * by relay endpoint so switching `OPENCODE_BROWSEVIL_PORT` cannot silently reuse
  * a session id created against a different relay.
  *
  * File format (v2): `{ "endpoints": { "<endpoint>": { "id": "..." } } }`.
@@ -52,7 +52,7 @@ export const make = Effect.fn("SessionStore.make")(function* (options?: {
   const filePath = options?.filePath ?? defaultFilePath()
   const port = yield* portConfig.pipe(
     Effect.mapError((cause) => new SessionStoreError({
-      message: `Invalid OPENCODE_BROWSER_PORT configuration: ${cause.message}`,
+      message: `Invalid OPENCODE_BROWSEVIL_PORT configuration: ${cause.message}`,
       operation: "configure",
       cause,
     })),

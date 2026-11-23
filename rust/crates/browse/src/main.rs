@@ -67,7 +67,7 @@ SETUP
   set hostname <127.0.0.1|0.0.0.0>
                               Who can reach the relay: this computer only (default), or other computers too
   update [--check]            Update now, or only check
-    --mode <on|notify|off>    Automatic updates (OPENCODE_BROWSER_AUTO_UPDATE overrides)
+    --mode <on|notify|off>    Automatic updates (OPENCODE_BROWSEVIL_AUTO_UPDATE overrides)
   status [--json]             Setup, relay and extension state
   uninstall                   Remove browse from your agents, stop the relay and delete its files
   version                     Print the version

@@ -26,7 +26,7 @@ pub fn relay_log(event: &str, fields: &[(&str, Value)]) {
         .collect::<Vec<_>>()
         .join(" ");
     let line = if detail.is_empty() { event.to_string() } else { format!("{event} {detail}") };
-    if std::env::var_os("OPENCODE_BROWSER_DEBUG").is_some() {
+    if std::env::var_os("OPENCODE_BROWSEVIL_DEBUG").is_some() {
         eprintln!("[browse relay] {line}");
     }
     let Some(path) = LOG.lock().unwrap_or_else(|poisoned| poisoned.into_inner()).clone() else { return };

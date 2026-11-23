@@ -1,8 +1,8 @@
 name: Release
 run-name: "${{ github.event_name == 'workflow_dispatch' && format('Release {0} {1}', inputs.bump, inputs.version) || '' }}"
 
-# Releases browse: the extension zip, the @opencode/browse npm package (a Node launcher for the native binary) and the
-# browse binaries, built from the Rust workspace in rust/ (an npm package @opencode/browse-<target> per platform, and
+# Releases browse: the extension zip, the @opencode/browsevil npm package (a Node launcher for the native binary) and the
+# browse binaries, built from the Rust workspace in rust/ (an npm package @opencode/browsevil-<target> per platform, and
 # the same targets on Anomaly's release service, which the install script downloads). RELEASING.md has the flow and the
 # setup.
 #
@@ -204,7 +204,7 @@ jobs:
       # build-binaries, once there is a binary for it to launch.
       - name: Build and check the extension zip and npm tarball
         env:
-          OPENCODE_BROWSER_STORE_ID: ${{ vars.CWS_ITEM_ID }}
+          OPENCODE_BROWSEVIL_STORE_ID: ${{ vars.CWS_ITEM_ID }}
         run: |
           if [ "$MODE" = stable ]; then bun scripts/release-check.ts --tag "v$VERSION" --require-changelog
           else bun scripts/release-check.ts; fi
@@ -316,7 +316,7 @@ jobs:
   # The platform packages: opencode-browse-<target>-<version>.tgz for every install script target (scripts/npm-package.ts,
   # which checks each binary's format, CPU, C library and glibc floor), from build-binary's executables. Then the
   # linux-x64 ones as users get them: the install script against a local copy of the release service, the relay and MCP
-  # server, and `npm install` of build's @opencode/browse next to its platform package.
+  # server, and `npm install` of build's @opencode/browsevil next to its platform package.
   build-binaries:
     name: Build binaries
     needs: [plan, tag, build, build-binary]
@@ -397,7 +397,7 @@ jobs:
           trap 'kill "$server"' EXIT
           sleep 1
           home=$(mktemp -d)
-          env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSER_RELEASE_SERVICE=http://127.0.0.1:29987/release \
+          env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_RELEASE_SERVICE=http://127.0.0.1:29987/release \
             sh ./install --channel "$channel" --no-setup
           actual=$("$home/.local/bin/browse" --version)
           [ "$actual" = "$VERSION" ] || { echo "::error::the install script installed $actual, expected $VERSION"; exit 1; }
@@ -414,7 +414,7 @@ jobs:
           port=29988
           relay=
           trap 'if [ -n "$relay" ]; then kill "$relay" 2>/dev/null || true; fi' EXIT
-          env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSER_PORT="$port" OPENCODE_BROWSER_MANAGED_RELAY=1 \
+          env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_PORT="$port" OPENCODE_BROWSEVIL_MANAGED_RELAY=1 \
             "$binary" serve > "$RUNNER_TEMP/relay.log" 2>&1 &
           relay=$!
           up=
@@ -437,7 +437,7 @@ jobs:
             printf '%s\n' '{"jsonrpc":"2.0","method":"notifications/initialized"}'
             printf '%s\n' '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
             sleep 5
-          } | env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSER_PORT="$port" timeout 60 "$binary" mcp > "$RUNNER_TEMP/mcp.json" || true
+          } | env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_PORT="$port" timeout 60 "$binary" mcp > "$RUNNER_TEMP/mcp.json" || true
           tools=$(grep -o '"name":"[a-z0-9_-]*"' "$RUNNER_TEMP/mcp.json" | wc -l)
           if [ "$tools" -lt 1 ]; then
             cat "$RUNNER_TEMP/mcp.json"
@@ -448,7 +448,7 @@ jobs:
         env:
           BUILD_ID: ${{ needs.plan.outputs.build_id }}
 
-      - name: npm install of @opencode/browse with its linux-x64 package
+      - name: npm install of @opencode/browsevil with its linux-x64 package
         run: >-
           bun scripts/check-artifacts.ts --version "$VERSION"
           --tarball "$RUNNER_TEMP/in/build/opencode-browse-$VERSION.tgz"
@@ -721,7 +721,7 @@ jobs:
           NOTES_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
 
   # After the release service has the extension zip the dev package fetches. A check run publishes with --dry-run and
-  # no environment. The platform packages @opencode/browse-<target> first, then @opencode/browse.
+  # no environment. The platform packages @opencode/browsevil-<target> first, then @opencode/browsevil.
   publish-npm:
     name: Publish to npm
     needs: [plan, build, build-binaries, sign-macos, sign-windows, attest, publish-release-service]

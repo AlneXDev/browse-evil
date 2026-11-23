@@ -35,9 +35,9 @@ pub struct InputState {
     last_key_at: Option<Instant>,
 }
 
-/// OPENCODE_BROWSER_HUMAN_INPUT, when set, wins over the extension's setting (0/false/off/no: off).
+/// OPENCODE_BROWSEVIL_HUMAN_INPUT, when set, wins over the extension's setting (0/false/off/no: off).
 pub fn override_from_env() -> Option<bool> {
-    let value = std::env::var("OPENCODE_BROWSER_HUMAN_INPUT").ok()?;
+    let value = std::env::var("OPENCODE_BROWSEVIL_HUMAN_INPUT").ok()?;
     let value = value.trim();
     if value.is_empty() {
         return None;

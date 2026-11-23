@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// A saved loopback address pins a port outside the browse range (OPENCODE_BROWSER_PORT=9222). A welcome link without
+// A saved loopback address pins a port outside the browse range (OPENCODE_BROWSEVIL_PORT=9222). A welcome link without
 // a browse-range port must keep that pin, and its code must go to 9222. Run by ../isolated.test.ts.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const PINNED_PORT = 9222
 const ADDRESS = `127.0.0.1:${PINNED_PORT}`

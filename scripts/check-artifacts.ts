@@ -3,7 +3,7 @@
 //   extension zip  no `update_url`, no relay-pairing.json, no source maps, no test-only hooks, the default relay port,
 //                  the release version, and exactly the capabilities in store/permissions.json; the store zip (stable)
 //                  has no manifest `key`, the dev zip (loaded unpacked) has the checkout's key and a build.json
-//   npm tarball    @opencode/browse at the release version: the launcher dist/cli.mjs and package metadata, an optional
+//   npm tarball    @opencode/browsevil at the release version: the launcher dist/cli.mjs and package metadata, an optional
 //                  dependency on each platform package, no install scripts; with --platform-tarball, it installs with
 //                  npm next to that platform package and starts its relay and MCP server
 //   bun scripts/check-artifacts.ts --version 0.1.0 --zip release/browse-extension-0.1.0.zip --tarball release/opencode-browse-0.1.0.tgz \
@@ -17,7 +17,7 @@ import { parseArgs } from "node:util"
 import { manifestVersionFields } from "./version.ts"
 
 const root = path.resolve(import.meta.dir, "..")
-export const PACKAGE_NAME = "@opencode/browse"
+export const PACKAGE_NAME = "@opencode/browsevil"
 const DEFAULT_RELAY_PORT = "19988"
 
 /** Strings that only development or test builds contain. */
@@ -26,10 +26,10 @@ const TEST_ONLY_MARKERS = [
   "@vite/client",
   "import.meta.hot",
   "__vite_ping",
-  "OPENCODE_BROWSER_TEST",
-  "__OPENCODE_BROWSER_TEST",
+  "OPENCODE_BROWSEVIL_TEST",
+  "__OPENCODE_BROWSEVIL_TEST",
   "BROWSE_TEST_",
-  // The stress harness's hooks (vite.config.ts OPENCODE_BROWSER_TEST_HOOKS).
+  // The stress harness's hooks (vite.config.ts OPENCODE_BROWSEVIL_TEST_HOOKS).
   "__opencodeBrowserTest",
 ]
 const STORE_FILE_TYPES = /\.(js|css|html|json|png|svg)$/
@@ -154,7 +154,7 @@ export async function checkStoreZip(zip: string, version: string, allowlist?: Al
 }
 
 /**
- * @opencode/browse (scripts/npm-package.ts): only the launcher dist/cli.mjs and package metadata, the bins the
+ * @opencode/browsevil (scripts/npm-package.ts): only the launcher dist/cli.mjs and package metadata, the bins the
  * TypeScript package had (agent configs it wrote run `node .../dist/cli.mjs mcp`), an exact optional dependency on
  * every platform package, no other dependencies and no install scripts.
  */
@@ -184,7 +184,7 @@ export async function checkPackageTarball(tarball: string, version: string): Pro
     if (Object.keys(pkg.publishConfig ?? {}).some((key) => key !== "access")) problems.push(`${label}: sets publishConfig beyond access`)
     for (const bin of ["browse", "opencode-browser", "opencode-browser-cli"]) if (pkg.bin?.[bin] !== "dist/cli.mjs") problems.push(`${label}: bin ${bin} should be dist/cli.mjs`)
     const { LAUNCHER_TARGETS } = await import("./npm-package.ts")
-    const expected = Object.fromEntries(LAUNCHER_TARGETS.map((item) => [`@opencode/browse-${item.name}`, version]))
+    const expected = Object.fromEntries(LAUNCHER_TARGETS.map((item) => [`@opencode/browsevil-${item.name}`, version]))
     if (JSON.stringify(pkg.optionalDependencies ?? {}) !== JSON.stringify(expected))
       problems.push(`${label}: optionalDependencies are ${JSON.stringify(pkg.optionalDependencies ?? {})}, expected ${JSON.stringify(expected)}`)
     if (!names.includes("dist/cli.mjs")) problems.push(`${label}: missing dist/cli.mjs`)
@@ -198,7 +198,7 @@ export async function checkPackageTarball(tarball: string, version: string): Pro
 }
 
 /**
- * @opencode/browse installed the way users get it (`npm install`, no lockfile) together with this machine's platform
+ * @opencode/browsevil installed the way users get it (`npm install`, no lockfile) together with this machine's platform
  * package from the same build (`platformTarball`: npm doesn't have it yet), then through the launcher: `--version`, the
  * relay started on a free port with a throwaway home, and its MCP server asked for its tools.
  */
@@ -215,10 +215,10 @@ export async function checkPackageInstall(tarball: string, version: string, plat
     const cli = path.join(directory, "node_modules", PACKAGE_NAME, "dist", "cli.mjs")
     const port = await freePort()
     const env = {
-      ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("OPENCODE_BROWSER_"))),
-      OPENCODE_BROWSER_HOME: path.join(directory, "home"),
-      OPENCODE_BROWSER_PORT: String(port),
-      OPENCODE_BROWSER_UPDATE_CHECK: "0",
+      ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("OPENCODE_BROWSEVIL_"))),
+      OPENCODE_BROWSEVIL_HOME: path.join(directory, "home"),
+      OPENCODE_BROWSEVIL_PORT: String(port),
+      OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
       TMPDIR: directory,
     }
     const reported = await $`node ${cli} --version`.cwd(directory).env(env).quiet().nothrow()
@@ -313,7 +313,7 @@ function freePort() {
 }
 
 /**
- * A platform package (scripts/npm-package.ts): @opencode/browse-<target> at the release version with exactly
+ * A platform package (scripts/npm-package.ts): @opencode/browsevil-<target> at the release version with exactly
  * package/bin/browse (browse.exe on Windows, mode 755), package.json and LICENSE, the os/cpu/libc npm installs by, and
  * no install scripts. The install script (../install) downloads it from npm and runs package/bin/browse.
  */
@@ -340,7 +340,7 @@ export async function checkBinaryTarball(tarball: string, version: string, targe
     scripts?: Record<string, string>
     publishConfig?: Record<string, unknown>
   }
-  const want = { name: `@opencode/browse-${target}`, version, os: [os === "windows" ? "win32" : os], cpu: [arch], libc: os === "linux" ? [musl ? "musl" : "glibc"] : undefined }
+  const want = { name: `@opencode/browsevil-${target}`, version, os: [os === "windows" ? "win32" : os], cpu: [arch], libc: os === "linux" ? [musl ? "musl" : "glibc"] : undefined }
   for (const key of ["name", "version", "os", "cpu", "libc"] as const)
     if (JSON.stringify(pkg[key]) !== JSON.stringify(want[key])) problems.push(`${label}: ${key} is ${JSON.stringify(pkg[key])}, expected ${JSON.stringify(want[key])}`)
   if (pkg.scripts && Object.keys(pkg.scripts).length) problems.push(`${label}: has scripts; installs must not run code`)

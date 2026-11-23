@@ -483,7 +483,7 @@ impl Relay {
             origins: crate::origins::allowed_extension_origins(),
             file_roots,
             auto_update: config.auto_update,
-            idle_tab_ttl: env_ms("OPENCODE_BROWSER_IDLE_TAB_TTL_MS", 15 * 60_000),
+            idle_tab_ttl: env_ms("OPENCODE_BROWSEVIL_IDLE_TAB_TTL_MS", 15 * 60_000),
             state: Mutex::new(State {
                 links: Vec::new(),
                 generation: 0,
@@ -761,13 +761,13 @@ pub fn unattachable_message(tab: i64, url: &str) -> String {
     )
 }
 
-/// Folders tools may read and write: the temp folders and OPENCODE_BROWSER_FILE_ROOTS (path-list separated).
+/// Folders tools may read and write: the temp folders and OPENCODE_BROWSEVIL_FILE_ROOTS (path-list separated).
 pub fn file_roots() -> Vec<PathBuf> {
     let mut roots = vec![std::env::temp_dir()];
     if cfg!(unix) {
         roots.push(PathBuf::from("/tmp"));
     }
-    if let Some(extra) = std::env::var_os("OPENCODE_BROWSER_FILE_ROOTS") {
+    if let Some(extra) = std::env::var_os("OPENCODE_BROWSEVIL_FILE_ROOTS") {
         roots.extend(std::env::split_paths(&extra).filter(|p| p.is_absolute()));
     }
     let mut out: Vec<PathBuf> = Vec::new();

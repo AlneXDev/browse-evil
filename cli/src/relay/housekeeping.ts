@@ -88,7 +88,7 @@ export function createRelayHousekeeping(options: {
 
   const clientGoneSince = new Map<string, number>()
   let lastAgentActivity = Date.now()
-  const autoUpdateIdleMs = Number(process.env.OPENCODE_BROWSER_AUTO_UPDATE_IDLE_MS) || 15 * 60_000
+  const autoUpdateIdleMs = Number(process.env.OPENCODE_BROWSEVIL_AUTO_UPDATE_IDLE_MS) || 15 * 60_000
   let stopJournalRetention: (() => void) | undefined
   let updateTimer: NodeJS.Timeout | undefined
   let orphanTimer: NodeJS.Timeout | undefined

@@ -1,6 +1,6 @@
 // Where the relay listens, and where the CLI finds it.
 //
-// The configured port is OPENCODE_BROWSER_PORT, else 19988. Everything an install keeps by port (the session catalog,
+// The configured port is OPENCODE_BROWSEVIL_PORT, else 19988. Everything an install keeps by port (the session catalog,
 // the lifecycle log, the current-session key) stays on the configured port, so a fallback never moves data. Only the
 // listen port changes: another product (Playwriter) also uses 19988, and an unpinned relay steps to the next free
 // browse port instead of failing onboarding. The extension learns the listen port when it pairs.
@@ -15,21 +15,21 @@ import { stateRoot } from "../paths.ts"
 import { defaultPort } from "./helpers.ts"
 
 /** The ports an unpinned relay falls back to after 19988. Not 19989: that is Browser Control's (helpers.ts). */
-export const fallbackPorts = [19990, 19991, 19992, 19993, 19994, 19995, 19996, 19997] as const
+export const fallbackPorts = [29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706] as const
 
 export const endpointForPort = (port: number): string => `http://127.0.0.1:${port}`
 
 function envPort(env: NodeJS.ProcessEnv = process.env): number | undefined {
-  const raw = env.OPENCODE_BROWSER_PORT
+  const raw = env.OPENCODE_BROWSEVIL_PORT
   if (raw === undefined || raw.trim() === "") return undefined
   const port = Number(raw)
   return Number.isSafeInteger(port) && port > 0 && port < 65_536 ? port : undefined
 }
 
-/** The port this install is configured for: OPENCODE_BROWSER_PORT, else 19988. State paths and keys use this one. */
+/** The port this install is configured for: OPENCODE_BROWSEVIL_PORT, else 19988. State paths and keys use this one. */
 export const configuredRelayPort = (env: NodeJS.ProcessEnv = process.env): number => envPort(env) ?? defaultPort
 
-/** Whether OPENCODE_BROWSER_PORT pins the relay to one port, with no fallback. */
+/** Whether OPENCODE_BROWSEVIL_PORT pins the relay to one port, with no fallback. */
 export const relayPortPinned = (env: NodeJS.ProcessEnv = process.env): boolean => envPort(env) !== undefined
 
 const isPort = (value: unknown): value is number =>
@@ -118,7 +118,7 @@ export function processAlive(pid: number): boolean {
 }
 
 /**
- * The port clients should dial. A pinned OPENCODE_BROWSER_PORT wins; otherwise the relay.json a live relay wrote for
+ * The port clients should dial. A pinned OPENCODE_BROWSEVIL_PORT wins; otherwise the relay.json a live relay wrote for
  * this install; otherwise 19988. Cheap: an environment read, a small file read and one `kill(pid, 0)`.
  */
 export function resolveRelayPort(root = stateRoot()): number {
@@ -274,7 +274,7 @@ async function canListen(host: string, port: number): Promise<boolean> {
 
 export type ChooseRelayPortOptions = {
   readonly configuredPort?: number
-  /** An explicit port (or OPENCODE_BROWSER_PORT): bind only it, with no fallback. */
+  /** An explicit port (or OPENCODE_BROWSEVIL_PORT): bind only it, with no fallback. */
   readonly pinned?: boolean
   readonly host?: string
   /** Replaces the built-in list. Tests pass free ports so they never touch the real 19988–19997 range. */
@@ -319,6 +319,6 @@ export async function chooseRelayPort(options: ChooseRelayPortOptions = {}): Pro
     if (owner === "nobody") throw alreadyInUse(host, port)
   }
   throw new Error(
-    `browse relay ports ${portListText(candidates)} are all in use. Set OPENCODE_BROWSER_PORT to a free port, or stop the program holding them.`,
+    `browse relay ports ${portListText(candidates)} are all in use. Set OPENCODE_BROWSEVIL_PORT to a free port, or stop the program holding them.`,
   )
 }

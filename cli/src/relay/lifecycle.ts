@@ -144,9 +144,9 @@ export const ensureRelay = Effect.fn("RelayLifecycle.ensureRelay")(function* (op
   }
 
   if (relayWasAbsent) {
-    const autoStart = yield* Config.Boolean("OPENCODE_BROWSER_AUTOSTART").pipe(
+    const autoStart = yield* Config.Boolean("OPENCODE_BROWSEVIL_AUTOSTART").pipe(
       Config.withDefault(true),
-      Effect.mapError((cause) => new Error("Invalid OPENCODE_BROWSER_AUTOSTART configuration", { cause })),
+      Effect.mapError((cause) => new Error("Invalid OPENCODE_BROWSEVIL_AUTOSTART configuration", { cause })),
     )
     if (!autoStart) {
       return yield* Effect.fail(new Error(`Automatic relay startup is disabled; no relay is available at ${options.relay.endpoint}`))
@@ -425,12 +425,12 @@ export function startManagedRelay(
         throw new Error("Cannot locate the browse CLI entrypoint")
       }
       const launch = managedRelayLaunch(entrypoint, executable, execArgv)
-      // relayEnvironment keeps every OPENCODE_BROWSER_ name, whatever its casing, so strip the inherited restart id
+      // relayEnvironment keeps every OPENCODE_BROWSEVIL_ name, whatever its casing, so strip the inherited restart id
       // case-insensitively here (the option below is then the only one).
       const env = Object.fromEntries(
-        Object.entries(relayEnvironment(process.env)).filter(([name]) => name.toUpperCase() !== "OPENCODE_BROWSER_RESTART_REQUEST_ID"),
+        Object.entries(relayEnvironment(process.env)).filter(([name]) => name.toUpperCase() !== "OPENCODE_BROWSEVIL_RESTART_REQUEST_ID"),
       )
-      const childEnv = { ...env, OPENCODE_BROWSER_MANAGED_RELAY: "1", ...(options.restartRequestId ? { OPENCODE_BROWSER_RESTART_REQUEST_ID: options.restartRequestId } : {}) }
+      const childEnv = { ...env, OPENCODE_BROWSEVIL_MANAGED_RELAY: "1", ...(options.restartRequestId ? { OPENCODE_BROWSEVIL_RESTART_REQUEST_ID: options.restartRequestId } : {}) }
       if (process.platform === "win32") {
         // Under Bun, kernel32 CreateProcessW starts the relay in its own invisible console without inheriting this
         // process's handles (windows-launch.ts). Otherwise, and when that fails: a detached spawn can still inherit
@@ -468,7 +468,7 @@ const relayEnvironmentNames = new Set([
   "SYSTEMROOT", "SYSTEMDRIVE", "WINDIR", "COMSPEC", "PATHEXT", "USERPROFILE", "APPDATA", "LOCALAPPDATA",
   "PROGRAMDATA", "PROGRAMFILES", "PROGRAMFILES(X86)", "HOMEDRIVE", "HOMEPATH", "USERNAME",
 ])
-const relayEnvironmentPrefixes = ["OPENCODE_BROWSER_", "LC_"]
+const relayEnvironmentPrefixes = ["OPENCODE_BROWSEVIL_", "LC_"]
 
 /** The allowlisted subset of `env` the managed relay is started with. */
 export function relayEnvironment(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {

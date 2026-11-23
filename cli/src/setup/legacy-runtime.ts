@@ -1,11 +1,11 @@
 // Taking over the self-managed runtime of releases before 0.0.11 (setup/legacy.ts). Its shim, bin/opencode-browser.mjs,
-// starts runtime/versions/<current.json version>/node_modules/@opencode/browse/dist/cli.mjs, and an agent's running
+// starts runtime/versions/<current.json version>/node_modules/@opencode/browsevil/dist/cli.mjs, and an agent's running
 // shim swaps its MCP server once current.json names another version and the relay reports that version. A relay
 // started from a current install (the npm global package or the binary) while that runtime is active takes it over, in
 // two steps around binding the relay port:
 //   prepare  (main.ts, before `serve` starts) only for the default home and a port without a browse relay on it: copies
 //            the old folder's data into the XDG folders, the old files winning, and stops treating the old folder as
-//            OPENCODE_BROWSER_HOME.
+//            OPENCODE_BROWSEVIL_HOME.
 //   commit   (cli/relay.ts, once the relay listens) writes a forwarder for this version that runs the current install,
 //            points current.json at it so running agents follow, then migrates (setup/migrate.ts): agents' entries
 //            become `browse mcp`, and the old folder goes after a grace period.
@@ -27,7 +27,7 @@ export const legacyEntry = (root: string, version: string) =>
   path.join(root, "runtime", "versions", version, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
 
 /**
- * The install this process runs. A binary is the installer's executable only: under the old shim OPENCODE_BROWSER_HOME
+ * The install this process runs. A binary is the installer's executable only: under the old shim OPENCODE_BROWSEVIL_HOME
  * points at the old folder, whose bin/ holds the shim, not an executable.
  */
 export function currentInstall(options: { readonly compiled?: boolean; readonly execPath?: string; readonly home?: string } = {}): Runtime | undefined {
@@ -50,13 +50,13 @@ export async function prepareLegacyTakeover(legacy: LegacyRuntime | undefined, o
   const env = options.env ?? process.env
   const install = "install" in options ? options.install : currentInstall()
   if (!legacy || !legacyRuntimeActive(legacy) || !install || install.kind === "npx" || insidePath(install.entry, legacy.root)) return false
-  // An isolated relay (its own OPENCODE_BROWSER_HOME) leaves the old runtime alone.
-  if (env.OPENCODE_BROWSER_HOME && !samePath(env.OPENCODE_BROWSER_HOME, legacy.root)) return false
+  // An isolated relay (its own OPENCODE_BROWSEVIL_HOME) leaves the old runtime alone.
+  if (env.OPENCODE_BROWSEVIL_HOME && !samePath(env.OPENCODE_BROWSEVIL_HOME, legacy.root)) return false
   // Another relay holds the port: this one won't start, so it mustn't take anything over. Pinned keeps the old rule:
   // anything listening blocks. Unpinned lets a definite non-browse HTTP reply through, since the relay would then fall
   // back (relay/port.ts), and takes a free port. A browse relay blocks, and so does a port that is bound but silent or
   // times out: a probe that fails to answer is a doubt, not a free port.
-  const port = options.relayPort ?? (Number(env.OPENCODE_BROWSER_PORT) || resolveRelayPort())
+  const port = options.relayPort ?? (Number(env.OPENCODE_BROWSEVIL_PORT) || resolveRelayPort())
   if (options.pinned ?? relayPortPinned(env)) {
     if (await portInUse(port)) return false
   } else {
@@ -66,7 +66,7 @@ export async function prepareLegacyTakeover(legacy: LegacyRuntime | undefined, o
   const home = options.home ?? os.homedir()
   const { copyLegacyData } = await import("./migrate.ts")
   // First, or the XDG paths the copy writes to would still resolve to the old folder.
-  delete env.OPENCODE_BROWSER_HOME
+  delete env.OPENCODE_BROWSEVIL_HOME
   copyLegacyData(home)
   pending = { legacy, install, home }
   return true
@@ -107,7 +107,7 @@ export function adoptLegacyRuntime(legacy: LegacyRuntime | undefined, runtime = 
 function writeForwarder(entry: string, runtime: Runtime) {
   const packageDir = path.dirname(path.dirname(entry))
   fs.mkdirSync(path.dirname(entry), { recursive: true })
-  writeAtomic(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browse", version: runtime.version, private: true }) + "\n")
+  writeAtomic(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version: runtime.version, private: true }) + "\n")
   const target = JSON.stringify(runtime.entry)
   const run = runtime.kind === "binary"
     ? [

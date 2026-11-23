@@ -4,7 +4,7 @@
 //                       [--no-sites] [--sample-every 30] [--recovery-bound 120] [--only scenario,scenario]
 // Writes tasks.jsonl, chaos.jsonl, metrics.jsonl and summary.md under ~/stress-results/<stamp>-soak/.
 // Chaos types: relay-kill9, sw-stop, close-agent-tabs, close-windows, chrome-restart, network-drop, session-delete,
-// mcp-kill, tabs-cleanup, toolbar-stop (needs an extension built with OPENCODE_BROWSER_TEST_HOOKS=1, as deploy.sh does).
+// mcp-kill, tabs-cleanup, toolbar-stop (needs an extension built with OPENCODE_BROWSEVIL_TEST_HOOKS=1, as deploy.sh does).
 import fs from "node:fs"
 import path from "node:path"
 import { execFileSync } from "node:child_process"
@@ -262,7 +262,7 @@ const chaosActions: Record<string, () => Promise<Record<string, unknown>>> = {
       return { tabId: victim.tabId }
     }
     const hooked = await c.evalInExtension<boolean>(`typeof globalThis.__opencodeBrowserTest?.toolbarClick === "function"`)
-    if (!hooked) throw new Error("the extension has no test hooks; build it with OPENCODE_BROWSER_TEST_HOOKS=1 (stress/exe/deploy.sh does)")
+    if (!hooked) throw new Error("the extension has no test hooks; build it with OPENCODE_BROWSEVIL_TEST_HOOKS=1 (stress/exe/deploy.sh does)")
     await c.evalInExtension(`globalThis.__opencodeBrowserTest.toolbarClick(${Number(victim.tabId)})`)
     return { tabId: victim.tabId, session: victim.opencodeBrowserSessionId }
   },

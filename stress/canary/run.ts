@@ -14,11 +14,11 @@ import { command, readJson, record, root, saveJson, type Evidence, type Metrics,
 const { values } = parseArgs({ options: { once: { type: "boolean" }, "soak-minutes": { type: "string" } } })
 const once = !!values.once, short = Number(values["soak-minutes"] ?? 2), minute = 60_000
 const binary = binaryPath, stress = path.resolve(import.meta.dirname, "..")
-assert(!process.env.OPENCODE_BROWSER_HOME && process.env.BROWSE_STRESS_BINARY === binary && dataDir === path.join(os.homedir(), ".local/share/browse"), "requires the canary install's XDG paths without OPENCODE_BROWSER_HOME")
+assert(!process.env.OPENCODE_BROWSEVIL_HOME && process.env.BROWSE_STRESS_BINARY === binary && dataDir === path.join(os.homedir(), ".local/share/browse"), "requires the canary install's XDG paths without OPENCODE_BROWSEVIL_HOME")
 assert([relayPort, chromeDebugPort, fixturePort].every(p => Number.isInteger(p) && p >= 19700 && p <= 19799) && new Set([relayPort, chromeDebugPort, fixturePort]).size === 3, "dedicated canary ports required")
 assert(once ? fs.realpathSync(os.homedir()).startsWith(path.join(fs.realpathSync(os.tmpdir()), "opencode/browse-canary.")) : os.userInfo().username === "canary", "--once requires a temp opencode/browse-canary.* HOME; service requires user canary")
 assert(!once || (Number.isFinite(short) && short > 0 && short <= 30))
-assert(process.env.OPENCODE_BROWSER_AUTO_UPDATE === undefined && process.env.OPENCODE_BROWSER_UPDATE_CHECK === "1", "the stored mode must control auto-update, including after MCP respawns the relay")
+assert(process.env.OPENCODE_BROWSEVIL_AUTO_UPDATE === undefined && process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK === "1", "the stored mode must control auto-update, including after MCP respawns the relay")
 process.umask(0o077)
 const webhook = process.env.CANARY_SLACK_WEBHOOK
 delete process.env.CANARY_SLACK_WEBHOOK // never pass it to browsers, fuzz, npm or the product

@@ -6,7 +6,7 @@ import { BrowserCdp } from "../lib/cdp.ts"
 import { relayJson, sleep } from "../lib/env.ts"
 
 const browser = process.argv[2]
-assert((browser === "chrome" || browser === "brave") && process.env.HOME === "/home/canary" && process.env.OPENCODE_BROWSER_PORT === "19770")
+assert((browser === "chrome" || browser === "brave") && process.env.HOME === "/home/canary" && process.env.OPENCODE_BROWSEVIL_PORT === "19770")
 const port = browser === "chrome" ? 19771 : 19773, id = `canary-${browser}`
 const deadline = Date.now() + 65_000
 let configured = false

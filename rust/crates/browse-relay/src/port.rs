@@ -1,4 +1,4 @@
-//! Where the relay listens (cli/src/relay/port.ts). The configured port is OPENCODE_BROWSER_PORT, else 19988; state
+//! Where the relay listens (cli/src/relay/port.ts). The configured port is OPENCODE_BROWSEVIL_PORT, else 19988; state
 //! kept by port stays on the configured port. An unpinned relay whose port another program holds steps to the next
 //! free browse port and records the one it bound in <state>/relays/<configured>/relay.json, which clients resolve.
 
@@ -21,7 +21,7 @@ pub struct RelayState {
 }
 
 pub fn env_port() -> Option<u16> {
-    std::env::var("OPENCODE_BROWSER_PORT").ok().and_then(|raw| raw.trim().parse::<u16>().ok()).filter(|p| *p > 0)
+    std::env::var("OPENCODE_BROWSEVIL_PORT").ok().and_then(|raw| raw.trim().parse::<u16>().ok()).filter(|p| *p > 0)
 }
 
 pub fn configured_port() -> u16 {
@@ -126,7 +126,7 @@ pub async fn choose_port(paths: &Paths, configured: u16, pinned: bool, host: IpA
         }
     }
     anyhow::bail!(
-        "browse relay ports {} are all in use. Set OPENCODE_BROWSER_PORT to a free port, or stop the program holding them.",
+        "browse relay ports {} are all in use. Set OPENCODE_BROWSEVIL_PORT to a free port, or stop the program holding them.",
         ports.iter().map(u16::to_string).collect::<Vec<_>>().join(", ")
     )
 }

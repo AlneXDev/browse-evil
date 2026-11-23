@@ -9,9 +9,9 @@ pub fn paths() -> Paths {
     Paths::from_env()
 }
 
-/// Where `install` puts the executable: $OPENCODE_BROWSER_HOME/bin, else $XDG_BIN_HOME, else ~/.local/bin.
+/// Where `install` puts the executable: $OPENCODE_BROWSEVIL_HOME/bin, else $XDG_BIN_HOME, else ~/.local/bin.
 pub fn bin_root() -> PathBuf {
-    if let Some(home) = std::env::var_os("OPENCODE_BROWSER_HOME").filter(|h| !h.is_empty()) {
+    if let Some(home) = std::env::var_os("OPENCODE_BROWSEVIL_HOME").filter(|h| !h.is_empty()) {
         return PathBuf::from(home).join("bin");
     }
     std::env::var_os("XDG_BIN_HOME")

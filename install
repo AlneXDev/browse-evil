@@ -138,9 +138,9 @@ fi
 requested_version="${requested_version#v}"
 
 INSTALL_DIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-# `browse install` and the updater use $OPENCODE_BROWSER_HOME/bin when it's set, so install there too.
-if [ -n "${OPENCODE_BROWSER_HOME:-}" ]; then
-    INSTALL_DIR=$OPENCODE_BROWSER_HOME/bin
+# `browse install` and the updater use $OPENCODE_BROWSEVIL_HOME/bin when it's set, so install there too.
+if [ -n "${OPENCODE_BROWSEVIL_HOME:-}" ]; then
+    INSTALL_DIR=$OPENCODE_BROWSEVIL_HOME/bin
 fi
 # XDG paths must be absolute; a relative one would put browse in the current directory.
 case "$INSTALL_DIR" in
@@ -260,7 +260,7 @@ else
         exit 1
     fi
 
-    package="@opencode/browse-$target"
+    package="@opencode/browsevil-$target"
     encoded="@opencode%2fbrowse-$target"
     # A pinned version comes from npm: the release service has one current release per channel and no version lookup.
     if [ -n "$requested_version" ]; then
@@ -420,11 +420,11 @@ download_npm() (
 # The channel's current release from the Anomaly release service (https://anoma.ly/release, anomalyco/release
 # docs/protocol.md). The manifest names the file for this target; its size and SHA-256 must match before it is used.
 download_release() (
-    service="${OPENCODE_BROWSER_RELEASE_SERVICE:-https://anoma.ly/release}"
+    service="${OPENCODE_BROWSEVIL_RELEASE_SERVICE:-https://anoma.ly/release}"
     service="${service%/}"
     case "$service" in
         */release) origin="${service%/release}" ;;
-        *) fail "OPENCODE_BROWSER_RELEASE_SERVICE must end in /release, not $service" ;;
+        *) fail "OPENCODE_BROWSEVIL_RELEASE_SERVICE must end in /release, not $service" ;;
     esac
     service_target_name=$(service_target "$target")
     tmp_dir="${TMPDIR:-/tmp}/browse_install_$$"

@@ -9,10 +9,10 @@ import * as RelayLifecycle from "../relay/lifecycle.ts"
 import type { RecordingQuality } from "../relay/schema.ts"
 import * as SessionStore from "../session-manager/store.ts"
 
-export const sessionIdConfig = Config.option(Config.String("OPENCODE_BROWSER_SESSION"))
+export const sessionIdConfig = Config.option(Config.String("OPENCODE_BROWSEVIL_SESSION"))
 export const agentSessionIdConfig = Config.option(Config.String("OPENCODE_SESSION_ID"))
-export const targetUrlConfig = Config.option(Config.String("OPENCODE_BROWSER_TARGET_URL"))
-export const targetIndexConfig = Config.option(Config.Int("OPENCODE_BROWSER_TARGET_INDEX"))
+export const targetUrlConfig = Config.option(Config.String("OPENCODE_BROWSEVIL_TARGET_URL"))
+export const targetIndexConfig = Config.option(Config.Int("OPENCODE_BROWSEVIL_TARGET_INDEX"))
 export const jsonFlag = Flag.Boolean("json").pipe(
   Flag.withDefault(false),
   Flag.withDescription("Print machine-readable JSON"),

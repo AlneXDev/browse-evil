@@ -8,10 +8,10 @@ use serde_json::Value;
 
 use crate::setup::home;
 
-pub const STORE_ID: &str = "mfnicocicmmlkpjnaffgihfjhdgjkdjg";
+pub const STORE_ID: &str = "lfmeghngagemglmdnplimokblljgmnoj";
 
 pub fn store_id() -> String {
-    std::env::var("OPENCODE_BROWSER_STORE_ID")
+    std::env::var("OPENCODE_BROWSEVIL_STORE_ID")
         .ok()
         .filter(|id| id.len() == 32 && id.bytes().all(|b| (b'a'..=b'p').contains(&b)))
         .unwrap_or_else(|| STORE_ID.into())

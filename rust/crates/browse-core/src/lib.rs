@@ -166,7 +166,7 @@ pub trait Browser: Send + Sync {
     async fn state(&self, tab: TabId) -> anyhow::Result<Arc<TabState>>;
     async fn handoff(&self, tab: TabId, message: &str) -> anyhow::Result<HandoffResult>;
     /// The extension's "Human-like input" setting for the tab's browser (curved mouse paths, paced keys). On by
-    /// default; OPENCODE_BROWSER_HUMAN_INPUT overrides it in the page tools.
+    /// default; OPENCODE_BROWSEVIL_HUMAN_INPUT overrides it in the page tools.
     async fn human_input(&self, _tab: TabId) -> bool {
         true
     }

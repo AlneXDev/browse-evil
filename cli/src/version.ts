@@ -5,19 +5,19 @@ import { fileURLToPath } from "node:url"
 
 declare global {
   // Injected by scripts/build-cli.ts at build time.
-  var __OPENCODE_BROWSER_VERSION__: string | undefined
-  var __OPENCODE_BROWSER_BUILD_ID__: string | undefined
+  var __OPENCODE_BROWSEVIL_VERSION__: string | undefined
+  var __OPENCODE_BROWSEVIL_BUILD_ID__: string | undefined
   // True in a standalone `bun build --compile` executable (script/compile.ts).
-  var __OPENCODE_BROWSER_COMPILED__: boolean | undefined
-  // The executable's platform, as in its npm package @opencode/browse-<target>: linux-x64, darwin-arm64, linux-x64-musl…
-  var __OPENCODE_BROWSER_TARGET__: string | undefined
+  var __OPENCODE_BROWSEVIL_COMPILED__: boolean | undefined
+  // The executable's platform, as in its npm package @opencode/browsevil-<target>: linux-x64, darwin-arm64, linux-x64-musl…
+  var __OPENCODE_BROWSEVIL_TARGET__: string | undefined
   // The install script (install, or install.ps1 on Windows) this release shipped with, baked in by script/compile.ts:
   // a binary install's updater reruns it instead of downloading the one served at update time. npm bundles leave it unset.
-  var __OPENCODE_BROWSER_INSTALLER__: string | undefined
+  var __OPENCODE_BROWSEVIL_INSTALLER__: string | undefined
 }
 
-export const opencodeBrowserVersion: string = globalThis.__OPENCODE_BROWSER_VERSION__ ?? "0.0.0-dev"
-export const opencodeBrowserBuildId: string = globalThis.__OPENCODE_BROWSER_BUILD_ID__ ?? sourceBuildId()
+export const opencodeBrowserVersion: string = globalThis.__OPENCODE_BROWSEVIL_VERSION__ ?? "0.0.0-dev"
+export const opencodeBrowserBuildId: string = globalThis.__OPENCODE_BROWSEVIL_BUILD_ID__ ?? sourceBuildId()
 
 export function sourceBuildIdForFiles(files: readonly { readonly name: string; readonly content: string | Buffer }[]): string {
   const hash = crypto.createHash("sha256")

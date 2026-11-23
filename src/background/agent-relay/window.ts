@@ -8,7 +8,7 @@ import { TIMED_OUT, withTimeout } from "./wire"
 // collapsed at the start of the tab strip (agent-groups.ts). Some Chromium browsers keep windows the user never sees,
 // so a minimized or agents-only window is passed over for the normal window with the user's most recently used tab.
 // The status page offers "separate" instead: one window of the agents' own, created unfocused and placed beside the
-// user's window. The relay can override the setting per tab (OPENCODE_BROWSER_AGENT_WINDOW). Changing it affects new
+// user's window. The relay can override the setting per tab (OPENCODE_BROWSEVIL_AGENT_WINDOW). Changing it affects new
 // tabs only. Tabs the user lends agents stay where they are.
 //
 // Nothing here focuses a window: chrome.windows.create with `focused: false` shows the window inactive, and new tabs

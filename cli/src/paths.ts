@@ -4,7 +4,7 @@
 //   state   $XDG_STATE_HOME/browse       logs, journals, current session, pairing codes, update state
 //   cache   $XDG_CACHE_HOME/browse       update checks and the dev extension (re-creatable)
 //   bin     $XDG_BIN_HOME              the installer's executable (XDG_BIN_HOME, else ~/.local/bin)// Unset variables fall back to ~/.config, ~/.local/share, ~/.local/state, ~/.cache and ~/.local/bin;
-// Windows uses the same paths under %USERPROFILE%. OPENCODE_BROWSER_HOME overrides all of them for isolated
+// Windows uses the same paths under %USERPROFILE%. OPENCODE_BROWSEVIL_HOME overrides all of them for isolated
 // test relays (the executable then lives in <root>/bin).
 import fs from "node:fs"
 import os from "node:os"
@@ -12,19 +12,19 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 
 const override = (home: string) =>
-  home === os.homedir() && process.env.OPENCODE_BROWSER_HOME ? process.env.OPENCODE_BROWSER_HOME : undefined
+  home === os.homedir() && process.env.OPENCODE_BROWSEVIL_HOME ? process.env.OPENCODE_BROWSEVIL_HOME : undefined
 
 const xdgRoot = (variable: string, fallback: string, home: string) => {
   const configured = home === os.homedir() ? process.env[variable] : undefined
-  return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, fallback), "browse")
+  return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, fallback), "browsevil")
 }
 
-/** The config folder without the OPENCODE_BROWSER_HOME override: where an everyday install keeps its settings. */
+/** The config folder without the OPENCODE_BROWSEVIL_HOME override: where an everyday install keeps its settings. */
 function defaultConfigRoot(home = os.homedir()): string {
   return xdgRoot("XDG_CONFIG_HOME", ".config", home)
 }
 
-/** Browse's XDG folders without the OPENCODE_BROWSER_HOME override: an everyday install still writes them. */
+/** Browse's XDG folders without the OPENCODE_BROWSEVIL_HOME override: an everyday install still writes them. */
 export function defaultRoots(home = os.homedir()): {
   readonly config: string
   readonly data: string
@@ -61,19 +61,19 @@ function installerBinRoot(home = os.homedir()): string {
   return configured && path.isAbsolute(configured) ? configured : path.join(home, ".local", "bin")
 }
 
-/** The executable's folder: $OPENCODE_BROWSER_HOME/bin when that override is set, else the installers' folder. */
+/** The executable's folder: $OPENCODE_BROWSEVIL_HOME/bin when that override is set, else the installers' folder. */
 export function binRoot(home = os.homedir()): string {
   if (override(home)) return path.join(override(home)!, "bin")
   return installerBinRoot(home)
 }
 
-/** The executable agents run: $OPENCODE_BROWSER_HOME/bin when set, else the installers' folder. */
+/** The executable agents run: $OPENCODE_BROWSEVIL_HOME/bin when set, else the installers' folder. */
 export const installedBinaryPath = (home = os.homedir()) => path.join(binRoot(home), binaryName())
 
-/** The executable the installers wrote, independent of where OPENCODE_BROWSER_HOME points the CLI. */
+/** The executable the installers wrote, independent of where OPENCODE_BROWSEVIL_HOME points the CLI. */
 export const installerBinaryPath = (home = os.homedir()) => path.join(installerBinRoot(home), binaryName())
 
-/** An everyday install's settings, independent of where OPENCODE_BROWSER_HOME points the CLI. */
+/** An everyday install's settings, independent of where OPENCODE_BROWSEVIL_HOME points the CLI. */
 export const defaultSettingsPath = (home = os.homedir()) => path.join(defaultConfigRoot(home), "settings.json")
 
 /** This package's root: cli/ in a checkout (src/paths.ts, or the dist/cli.mjs bundle), else the installed package. */
@@ -89,14 +89,14 @@ export function fromCheckout(): boolean {
 }
 
 /** A standalone executable (script/compile.ts), which the install script puts in ~/.local/bin; not Node and npm. */
-export const compiledBinary = (): boolean => globalThis.__OPENCODE_BROWSER_COMPILED__ === true
+export const compiledBinary = (): boolean => globalThis.__OPENCODE_BROWSEVIL_COMPILED__ === true
 
-/** The npm package that carries this executable's platform build, e.g. @opencode/browse-darwin-arm64. */
+/** The npm package that carries this executable's platform build, e.g. @opencode/browsevil-darwin-arm64. */
 export const binaryPackage = (): string | undefined =>
-  globalThis.__OPENCODE_BROWSER_TARGET__ ? `@opencode/browse-${globalThis.__OPENCODE_BROWSER_TARGET__}` : undefined
+  globalThis.__OPENCODE_BROWSEVIL_TARGET__ ? `@opencode/browsevil-${globalThis.__OPENCODE_BROWSEVIL_TARGET__}` : undefined
 
 /** The executable's file name in its package (package/bin/) and in an installed version's directory. */
-export const binaryName = (platform: NodeJS.Platform = process.platform) => (platform === "win32" ? "browse.exe" : "browse")
+export const binaryName = (platform: NodeJS.Platform = process.platform) => (platform === "win32" ? "browsevil.exe" : "browsevil")
 
 /** A CLI entry Node runs (a bundle or source file), as opposed to an executable that runs by itself. */
 export const scriptEntry = (entry: string) => /\.[cm]?[jt]s$/.test(entry)
@@ -208,12 +208,12 @@ export type CliInstall =
 export function cliInstall(): CliInstall {
   if (compiledBinary()) return { kind: "binary", binary: installedBinary() ?? process.execPath, pathEnv: process.env.PATH }
   if (fromCheckout()) return { kind: "checkout", bundle: path.join(packageRoot(), "dist", "cli.mjs") }
-  return { kind: "npm", version: globalThis.__OPENCODE_BROWSER_VERSION__, npx: /[/\\]_npx[/\\]/.test(process.argv[1] ?? "") }
+  return { kind: "npm", version: globalThis.__OPENCODE_BROWSEVIL_VERSION__, npx: /[/\\]_npx[/\\]/.test(process.argv[1] ?? "") }
 }
 
 /**
  * The command that runs browse in a terminal: `browse` for a binary or global npm install on PATH (install adds the
- * binary's folder), the executable's full path when it isn't on PATH, `npx @opencode/browse` (`@dev` on the dev
+ * binary's folder), the executable's full path when it isn't on PATH, `npx @opencode/browsevil` (`@dev` on the dev
  * channel) for an npx run, and this checkout's bundle from a checkout, where the package may not be published.
  */
 export function cliPrefix(install: CliInstall = cliInstall()): string {
@@ -223,7 +223,7 @@ export function cliPrefix(install: CliInstall = cliInstall()): string {
     return onPath ? "browse" : quoted(install.binary)
   }
   if (install.kind === "checkout") return `node ${quoted(install.bundle)}`
-  if (install.npx) return install.version?.includes("-dev.") ? "npx @opencode/browse@dev" : "npx @opencode/browse"
+  if (install.npx) return install.version?.includes("-dev.") ? "npx @opencode/browsevil@dev" : "npx @opencode/browsevil"
   return "browse"
 }
 
@@ -233,8 +233,8 @@ export const cliCommand = (args: string, install: CliInstall = cliInstall()): st
 declare global {
   // Injected by build.ts: the store item from the release workflow's repository variables (RELEASING.md), and for a
   // dev build the unpacked extension zip it was built with, published to the release service.
-  var __OPENCODE_BROWSER_STORE__: { readonly id?: string } | undefined
-  var __OPENCODE_BROWSER_EXTENSION__: DevExtension | undefined
+  var __OPENCODE_BROWSEVIL_STORE__: { readonly id?: string } | undefined
+  var __OPENCODE_BROWSEVIL_EXTENSION__: DevExtension | undefined
 }
 
 /** A Chrome Web Store extension ID: 32 letters a to p. */
@@ -244,7 +244,7 @@ const STORE_ITEM_ID = /^[a-p]{32}$/
  * browse's public Chrome Web Store item (the CWS_ITEM_ID repository variable, RELEASING.md). A checkout, or a package
  * built without one, still points users at this item: every channel installs browse from the store.
  */
-export const PUBLIC_STORE_ID = "mfnicocicmmlkpjnaffgihfjhdgjkdjg"
+export const PUBLIC_STORE_ID = "lfmeghngagemglmdnplimokblljgmnoj"
 
 export type StoreConfig = {
   /** The public store item, when the release that built this package was configured with one. */
@@ -253,13 +253,13 @@ export type StoreConfig = {
 
 /**
  * The Chrome Web Store item this install knows. The published package carries the ID the release workflow baked in
- * (OPENCODE_BROWSER_STORE_ID at build time); the same variable at run time overrides it (testing a store build from a
+ * (OPENCODE_BROWSEVIL_STORE_ID at build time); the same variable at run time overrides it (testing a store build from a
  * checkout). Nothing else is trusted as a store ID: install sends the pairing code to the extension with this ID.
  * A stable npm install gets the extension from this item, a dev install from the release service (devExtension), and a
  * checkout loads dist/ unpacked.
  */
-export function storeConfig(env: NodeJS.ProcessEnv = process.env, baked = globalThis.__OPENCODE_BROWSER_STORE__): StoreConfig {
-  const id = [env.OPENCODE_BROWSER_STORE_ID, baked?.id].find((value) => value && STORE_ITEM_ID.test(value))
+export function storeConfig(env: NodeJS.ProcessEnv = process.env, baked = globalThis.__OPENCODE_BROWSEVIL_STORE__): StoreConfig {
+  const id = [env.OPENCODE_BROWSEVIL_STORE_ID, baked?.id].find((value) => value && STORE_ITEM_ID.test(value))
   return id ? { id } : {}
 }
 
@@ -270,13 +270,13 @@ export type DevExtension = { readonly file: string; readonly sha256: string; rea
 export const RELEASE_SERVICE = "https://anoma.ly/release"
 
 /** The dev extension this package was built with; undefined for stable releases and checkouts. */
-export function devExtension(baked = globalThis.__OPENCODE_BROWSER_EXTENSION__): DevExtension | undefined {
+export function devExtension(baked = globalThis.__OPENCODE_BROWSEVIL_EXTENSION__): DevExtension | undefined {
   return baked && /^[0-9a-f]{64}$/.test(baked.sha256) && /^[\w.-]+\.zip$/.test(baked.file) ? baked : undefined
 }
 
-/** Where the release service serves a file; OPENCODE_BROWSER_RELEASE_SERVICE points it elsewhere (tests; the sha256 is still checked). */
+/** Where the release service serves a file; OPENCODE_BROWSEVIL_RELEASE_SERVICE points it elsewhere (tests; the sha256 is still checked). */
 export const devExtensionUrl = (extension: DevExtension, env: NodeJS.ProcessEnv = process.env) =>
-  `${(env.OPENCODE_BROWSER_RELEASE_SERVICE || RELEASE_SERVICE).replace(/\/+$/, "")}/browse/files/${extension.sha256}/${extension.file}`
+  `${(env.OPENCODE_BROWSEVIL_RELEASE_SERVICE || RELEASE_SERVICE).replace(/\/+$/, "")}/browse/files/${extension.sha256}/${extension.file}`
 
 /** The folder a dev install's unpacked extension lives in (loaded once with Load unpacked; updates replace its files). */
 export const devExtensionFolder = (root = cacheRoot()) => path.join(root, "extension")

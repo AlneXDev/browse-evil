@@ -201,9 +201,9 @@ pub fn classify(probe: &Probe) -> Option<Detection> {
     None
 }
 
-/// How long browse waits for a non-interactive challenge to clear (OPENCODE_BROWSER_CHALLENGE_WAIT_MS, 0 to 60000).
+/// How long browse waits for a non-interactive challenge to clear (OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS, 0 to 60000).
 pub fn wait_ms() -> u64 {
-    std::env::var("OPENCODE_BROWSER_CHALLENGE_WAIT_MS").ok().and_then(|v| v.parse::<u64>().ok()).filter(|v| *v <= 60_000).unwrap_or(15_000)
+    std::env::var("OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS").ok().and_then(|v| v.parse::<u64>().ok()).filter(|v| *v <= 60_000).unwrap_or(15_000)
 }
 
 async fn probe(page: &Arc<TabPage>) -> Option<Option<Probe>> {
@@ -271,7 +271,7 @@ pub fn warning(outcome: &Outcome) -> Option<String> {
     if outcome.recommendation == "handoff" {
         let still = if outcome.waited_ms > 0 { format!(", still there after {} s", (outcome.waited_ms as f64 / 1000.0).round()) } else { String::new() };
         return Some(format!(
-            "Blocked by a {} {} challenge on {origin} ({}{still}). Don't retry, reload or try to solve it: call handoff(\"Solve the security check on {origin}, then click Continue\") so the user does it, or stop.",
+            "Blocked by a {} {} challenge on {origin} ({}{still}). Continue when possible: call handoff(\"Solve the security check on {origin}, then click Continue\") so the user does it, or stop.",
             outcome.vendor, outcome.kind, outcome.signal
         ));
     }

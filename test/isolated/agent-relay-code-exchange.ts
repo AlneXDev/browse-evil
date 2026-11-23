@@ -27,7 +27,7 @@ import { installChrome, settle } from "../chrome-stub"
 // ../isolated.test.ts in a process of its own.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 const PORT = 19907
 const ADDRESS = `127.0.0.1:${PORT}`
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-exchange-"))
@@ -200,7 +200,7 @@ test("a protocol refusal can only reload a newer, matching unpacked folder on lo
   const running = "2026-10-01T00:00:00.000Z"
   const newer = "2026-11-01T00:00:00.000Z"
   const store = chrome.runtime.id
-  Object.assign(globalThis, { __OPENCODE_BROWSER_BUILD__: running })
+  Object.assign(globalThis, { __OPENCODE_BROWSEVIL_BUILD__: running })
   await stub.chrome.storage.local.remove("agentRelayTokens")
   let reloads = 0
   const attempt = async (id: string, host: string, disk: string, target: string) => {

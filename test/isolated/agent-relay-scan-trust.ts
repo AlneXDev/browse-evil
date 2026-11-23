@@ -6,7 +6,7 @@ import { installChrome, settle } from "../chrome-stub"
 // listener can't keep the extension on itself. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
-;(globalThis as { __OPENCODE_BROWSER_BUILD__?: string }).__OPENCODE_BROWSER_BUILD__ = "test"
+;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 
 const SCANNED_PORT = 19990
 const DEFAULT_PORT = 19988
