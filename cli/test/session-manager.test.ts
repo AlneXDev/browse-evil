@@ -547,7 +547,7 @@ describe("execute timeouts, disconnects, one-shot cleanup, and idle reaping", ()
     tabId: id.length,
     sessionId: `cdp-${id}`,
     owner,
-    ...(sessionId ? { opencodeBrowserSessionId: sessionId } : {}),
+    ...(sessionId ? { opencodevilBrowserSessionId: sessionId } : {}),
     targetInfo: { targetId: id, type: "page", title: id, url: "about:blank", attached: true, canAccessOpener: false },
   })
 

@@ -11,7 +11,7 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 // disallowed load is sent back to about:blank (the tab is not a popup); the URL actually committed is also checked
 // and only published when it passes the guard.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-allowlist-create-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-allowlist-create-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -83,7 +83,7 @@ async function createScene(id: string, tabId: number, targetId: string) {
     })
   expect(await extension.pair()).toBe(true)
   const sessionId = await allowlistedSession(id)
-  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${sessionId}`, { authorization: `Bearer ${token}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${sessionId}`, { authorization: `Bearer ${token}` })
   if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
   return {
     extension,

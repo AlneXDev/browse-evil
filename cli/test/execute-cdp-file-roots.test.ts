@@ -5,7 +5,7 @@ import path from "node:path"
 import { checkHostCall, createExecuteFiles, ExecuteRealm, sandboxModules } from "../src/execute-realm.ts"
 import { prepareExecuteFileOutputs } from "../src/execute-realm/file-roots.ts"
 
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cdp-roots-"))
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-cdp-roots-"))
 let previousHome: string | undefined
 
 beforeAll(() => {

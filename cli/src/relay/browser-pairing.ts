@@ -28,8 +28,8 @@ import path from "node:path"
 import { writePrivateJsonFileSync } from "../fs-durability.ts"
 import { dataRoot, stateRoot } from "../paths.ts"
 
-const legacyContext = "opencode-browser-pairing-v2"
-const context = "opencode-browsevil-pairing-v3"
+const legacyContext = "opencodevil-browser-pairing-v2"
+const context = "opencodevil-browsevil-pairing-v3"
 export { context as pairingScheme }
 const crockford = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 const pairingCodeLength = 8

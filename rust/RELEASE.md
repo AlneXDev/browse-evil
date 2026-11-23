@@ -1,7 +1,7 @@
-# Releasing the Rust browse
+# Releasing the Rust browsevil
 
 Releases run in GitHub Actions ([../RELEASING.md](../RELEASING.md), [../.github/workflows/release.yml](../.github/workflows/release.yml)).
-One binary, `browse`, built from `crates/browse` with the workspace's release profile (`opt-level = "z"`, LTO, one
+One binary, `browsevil`, built from `crates/browsevil` with the workspace's release profile (`opt-level = "z"`, LTO, one
 codegen unit, stripped, `panic = "abort"`).
 
 The version is the repository's one release version (`bun scripts/version.ts set <version>` writes it into
@@ -32,31 +32,31 @@ bun ../scripts/npm-package.ts platforms --binaries dist --out dist/npm   # the p
 The TS build's `-baseline` (no AVX2) variants aren't needed: Rust's default x86-64 target doesn't require AVX2. The
 release publishes the same binary under the baseline names, which the install script still asks for.
 
-Each target ships as `opencode-browse-<target>-<version>.tgz` holding `package/bin/browse[.exe]`, `package.json` and
+Each target ships as `opencodevil-browsevil-<target>-<version>.tgz` holding `package/bin/browsevil[.exe]`, `package.json` and
 `LICENSE`: the npm package `@opencode/browsevil-<target>` and the release service file are the same tarball. Its size and
 SHA-256 go into the channel manifest's `release.targets` at `https://anoma.ly/release/browse/cli/<channel>.json`.
 Every relay polls it at launch and hourly, in every mode (`off` checks and installs nothing). Versions are only tested
-for equality (the release protocol's client rules, `crates/browse/src/protocol.rs`, checked against the release repo's test vectors
-in `crates/browse/tests/fixtures/release`): when the channel's release isn't the running one, installed binaries
+for equality (the release protocol's client rules, `crates/browsevil/src/protocol.rs`, checked against the release repo's test vectors
+in `crates/browsevil/tests/fixtures/release`): when the channel's release isn't the running one, installed binaries
 download their target's tarball in-process (ureq, rustls), check size and SHA-256, unpack it with tar and replace
-`~/.local/bin/browse` in place. A relay browse started restarts on the new file once no agent is using the browser (a
-foreground `browse serve` doesn't); `browse mcp` proxies reconnect to it on their own.
+`~/.local/bin/browsevil` in place. A relay browsevil started restarts on the new file once no agent is using the browser (a
+foreground `browsevil serve` doesn't); `browsevil mcp` proxies reconnect to it on their own.
 
-`@opencode/browsevil` (npm) is `npm/browse.mjs`, shipped as `dist/cli.mjs`: it runs the binary of whichever
+`@opencode/browsevil` (npm) is `npm/browsevil.mjs`, shipped as `dist/cli.mjs`: it runs the binary of whichever
 `@opencode/browsevil-<target>` npm installed, passing its own path and node's (`OPENCODE_BROWSEVIL_NPM_LAUNCHER`,
 `OPENCODE_BROWSEVIL_NPM_NODE`). A global install reads the channel's manifest from the release service at launch and
 hourly, like a binary install, and once no agent is using the browser runs
 `npm install -g --prefix <its prefix> @opencode/browsevil@<the manifest's version>` with the npm beside that node, then
 restarts on the platform package's new binary. npm's registry can lag the service by a few minutes; a version it doesn't
 have is retried on the same backoff without landing in `lastError`. Real failures do land in `auto-update.json`
-(`lastError`) for the options page. npx runs only check the manifest, and checkout builds don't update; `browse install`
+(`lastError`) for the options page. npx runs only check the manifest, and checkout builds don't update; `browsevil install`
 moves any install to the self-updating binary in `~/.local/bin`.
 
-Update settings: `browse update --mode on|notify|off`, overridden by `OPENCODE_BROWSEVIL_AUTO_UPDATE`
+Update settings: `browsevil update --mode on|notify|off`, overridden by `OPENCODE_BROWSEVIL_AUTO_UPDATE`
 (`OPENCODE_BROWSEVIL_UPDATE_CHECK=0` means off). `OPENCODE_BROWSEVIL_RELEASE_SERVICE` and `OPENCODE_BROWSEVIL_NPM_REGISTRY` point
 at another release service or npm registry for tests.
 
-MCP servers of the TypeScript browse that OpenCode started before the update keep running until OpenCode restarts
+MCP servers of the TypeScript browsevil that OpenCode started before the update keep running until OpenCode restarts
 them. The relay answers their API (`/v1/…`, `/cli/…`, `/json/…`, `/network/…`, `/recording/…`, `/tabs/cleanup`,
 `/settings`, the CDP WebSocket, and `/extension/status` for a client sending Effect's `b3` trace header) with 410 and
-an error telling the agent to restart OpenCode or reconnect browse with /mcps.
+an error telling the agent to restart OpenCode or reconnect browsevil with /mcps.

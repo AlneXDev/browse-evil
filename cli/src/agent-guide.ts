@@ -4,7 +4,7 @@ import { COMPLIANCE } from "./compliance.ts"
 
 
 /**
- * The agent guide, in one place: the MCP server's initialize instructions and `browse --help` use the same sentences,
+ * The agent guide, in one place: the MCP server's initialize instructions and `browsevil --help` use the same sentences,
  * so the two cannot drift. Keep the help version short and indented for a terminal.
  */
 export const whatBrowseIs = `${COMPLIANCE}
@@ -20,16 +20,16 @@ export const handoffAdvice = `When a login, 2FA, passkey, captcha or payment nee
 
 export const sessionAdvice = `Each agent has its own current session when the client names the agent (OpenCode does), so bare calls don't land on another agent's page. When the client doesn't name agents, \`status\` reports \`sharedSession: true\` and all agents on this server share one current session, so when several (such as subagents) use it each should \`session_new\` its own and pass \`session\` on every call. When finished, \`session_reset\` (or \`session_delete\`) your own session; keep a session only when follow-up work is expected.`
 
-/** The `browse --help` version of the guide: what browse is, one script, the loop, handoff, and cleanup. */
+/** The `browsevil --help` version of the guide: what browsevil is, one script, the loop, handoff, and cleanup. */
 export const agentHelp = `${COMPLIANCE}
 
 AGENT GUIDE
-  browse drives the user's real Chrome-family browser through the browse extension, so logins,
+  browsevil drives the user's real Chrome-family browser through the browsevil extension, so logins,
   extensions and open tabs are already there and the user can watch or take over. Agents normally
-  use the MCP server (\`browse mcp\`); the same loop works from a terminal.
+  use the MCP server (\`browsevil mcp\`); the same loop works from a terminal.
 
   Write one Playwright script to a file and run it:
-    browse execute --file script.js
+    browsevil execute --file script.js
   It receives browser, context, page, state, snapshot(), ref() and handoff(). \`return\` a value to
   get it back.
 
@@ -43,5 +43,5 @@ AGENT GUIDE
   When a step needs the user's own action (login, 2FA, passkey, captcha, payment),
   you may call \`handoff("what to do")\` and wait, or handle the step directly.
 
-  Pass \`--session\` to keep one session across calls. \`browse session reset\` or \`browse session delete\`
+  Pass \`--session\` to keep one session across calls. \`browsevil session reset\` or \`browsevil session delete\`
   it when done; keep a session only for follow-up work.`

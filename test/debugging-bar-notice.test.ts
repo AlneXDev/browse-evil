@@ -7,7 +7,7 @@ import { installChrome, settle, type StubEvent } from "./chrome-stub"
 const stub = installChrome()
 const { DebuggingBarNotice } = await import("../src/background/debugging-bar-notice")
 
-const ID = "opencode-browser-debugging-bar"
+const ID = "opencodevil-browser-debugging-bar"
 const notice = () => stub.state.notifications.get(ID) as { title: string; message: string } | undefined
 
 beforeEach(() => {
@@ -27,9 +27,9 @@ describe("DebuggingBarNotice", () => {
     await Promise.all([DebuggingBarNotice.canceled(), DebuggingBarNotice.canceled(), DebuggingBarNotice.canceled()])
     expect(stub.state.notificationCreates).toBe(1)
     expect(stub.state.notifications.size).toBe(1)
-    expect(notice()?.title).toBe("browse stopped using your tabs")
+    expect(notice()?.title).toBe("browsevil stopped using your tabs")
     expect(notice()?.message).toBe(
-      "The debugging bar's button disconnects browse from every tab. Click the browse button on a tab to lend it again.",
+      "The debugging bar's button disconnects browsevil from every tab. Click the browsevil button on a tab to lend it again.",
     )
     // The rest of the same click is one notice, not one per tab.
     await DebuggingBarNotice.canceled()

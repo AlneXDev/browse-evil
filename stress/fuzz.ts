@@ -175,7 +175,7 @@ function openWs(url: string, headers: Record<string, string> = {}): Promise<WebS
 async function fuzzCdp(token: string) {
   stats.cdp++
   const unauth = rand() < 0.2
-  const url = `ws://127.0.0.1:${relayPort}/devtools/browser/fuzz${unauth ? "" : `?opencodeBrowserToken=${token}`}${rand() < 0.3 ? `&opencodeBrowserSessionId=fuzz-${int(3)}` : ""}`
+  const url = `ws://127.0.0.1:${relayPort}/devtools/browser/fuzz${unauth ? "" : `?opencodevilBrowserToken=${token}`}${rand() < 0.3 ? `&opencodevilBrowserSessionId=fuzz-${int(3)}` : ""}`
   const ws = await openWs(url, rand() < 0.1 ? { origin: "https://evil.example" } : {})
   if (typeof ws === "string") {
     if (!unauth && !/403|503/.test(ws)) anomaly("cdp-connect-failed", { result: ws })

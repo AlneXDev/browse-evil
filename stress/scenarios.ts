@@ -1,4 +1,4 @@
-// The scenario set. Each scenario gets a fresh session and throws when browse misbehaves. Add scenarios by appending to
+// The scenario set. Each scenario gets a fresh session and throws when browsevil misbehaves. Add scenarios by appending to
 // `scenarios`; `soak` tags mark the ones the soak runner loops (safe to run concurrently with other sessions).
 import fs from "node:fs"
 import path from "node:path"
@@ -27,7 +27,7 @@ function assert(condition: unknown, message: string): asserts condition {
 /** The session's targets as the relay lists them (the relay's target id is Chrome's target id). */
 export async function sessionTargets(session: string): Promise<any[]> {
   const targets = await relayJson<any[]>("/json/list")
-  return targets.filter((t) => t.opencodeBrowserSessionId === session)
+  return targets.filter((t) => t.opencodevilBrowserSessionId === session)
 }
 
 export const scenarios: Scenario[] = [
@@ -121,7 +121,7 @@ export const scenarios: Scenario[] = [
     assert(out === "stress-upload.txt:12", `upload ${out}`)
   } },
   { name: "file-download", tags: ["files"], run: async ({ client, session, exec, fx }) => {
-    // Chromium blocks download behaviour through chrome.debugger, so browse refuses download.saveAs() with a message
+    // Chromium blocks download behaviour through chrome.debugger, so browsevil refuses download.saveAs() with a message
     // pointing at the workaround (fetch the file in the page and save it with files.write).
     await exec(`await page.goto(${j(fx.url("/download"))})`)
     const refused = await client.call("execute", { session, code: `const [d] = await Promise.all([page.waitForEvent('download', {timeout: 15000}), page.click('#dl')]); await d.saveAs(files.path('x.txt'))` }, 60_000)

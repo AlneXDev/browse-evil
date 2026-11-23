@@ -6,7 +6,7 @@ import path from "node:path"
 import { cachedUpdateCheck, checkForUpdate, createUpdateWatcher, gitIn, runUpdate, updateNotice, type UpdateNotice } from "../src/update.ts"
 
 // Each scenario is a bare repository standing in for GitHub and a clone of it, so nothing here needs the network.
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-update-"))
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-update-"))
 afterAll(() => fs.rmSync(root, { recursive: true, force: true }))
 
 const gitEnv = {
@@ -186,19 +186,19 @@ describe("update check", () => {
 })
 
 describe("update command", () => {
-  test("behind: fast-forwards, lists the new commits, reruns setup and says to restart opencode", async () => {
+  test("behind: fast-forwards, lists the new commits, reruns setup and says to restart opencodevil", async () => {
     const { clone, push } = scenario()
     const before = git(clone, "rev-parse", "HEAD")
     const latest = push("cli/bun.lock", "src/feature.ts")
-    const { code, output, setups } = update(clone, ["--opencode", "/tmp/opencode.json", "--no-open"])
+    const { code, output, setups } = update(clone, ["--opencodevil", "/tmp/opencodevil.json", "--no-open"])
     expect(code).toBe(0)
     expect(git(clone, "rev-parse", "HEAD")).toBe(latest)
-    expect(output).toContain(`Updating browse ${before.slice(0, 7)} → ${latest.slice(0, 7)} (2 new commits on origin/main):`)
+    expect(output).toContain(`Updating browsevil ${before.slice(0, 7)} → ${latest.slice(0, 7)} (2 new commits on origin/main):`)
     expect(output).toContain("change cli/bun.lock")
     expect(output).toContain("change src/feature.ts")
-    expect(output).toContain("Restart opencode")
+    expect(output).toContain("Restart opencodevil")
     // Only the CLI's lockfile changed; install's flags pass through and it never waits for the extension.
-    expect(setups).toEqual([{ root: false, cli: true, args: ["--opencode", "/tmp/opencode.json", "--no-open", "--no-wait"] }])
+    expect(setups).toEqual([{ root: false, cli: true, args: ["--opencodevil", "/tmp/opencodevil.json", "--no-open", "--no-wait"] }])
     // The update check sees it's current now.
     expect(await checkForUpdate(clone)).toMatchObject({ available: false })
   })
@@ -216,7 +216,7 @@ describe("update command", () => {
     const { code, output } = update(clone)
     expect(code).toBe(0)
     expect(output).toContain("origin/main is gone from the remote; following origin/dev")
-    expect(output).toContain(`Updating browse ${before.slice(0, 7)} → ${latest.slice(0, 7)} (1 new commit on origin/dev):`)
+    expect(output).toContain(`Updating browsevil ${before.slice(0, 7)} → ${latest.slice(0, 7)} (1 new commit on origin/dev):`)
     expect(git(clone, "rev-parse", "HEAD")).toBe(latest)
     expect(git(clone, "config", "branch.main.merge")).toBe("refs/heads/dev")
     expect(await checkForUpdate(clone)).toMatchObject({ upstream: "origin/dev", available: false })
@@ -303,6 +303,6 @@ describe("update command", () => {
   test("installed from npm: prints the npx update instead", () => {
     const { code, output } = update(undefined)
     expect(code).toBe(0)
-    expect(output).toContain("npx @opencode/browse@latest install")
+    expect(output).toContain("npx @opencode/browsevil@latest install")
   })
 })

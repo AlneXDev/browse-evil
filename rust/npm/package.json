@@ -1,12 +1,12 @@
 {
   "name": "@opencode/browsevil",
-  "description": "browse: let your AI agents use your real browser. The MCP server and relay for the browse Chrome extension.",
+  "description": "browsevil: let your AI agents use your real browser. The MCP server and relay for the browsevil Chrome extension.",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "browse": "dist/cli.mjs",
-    "opencode-browser": "dist/cli.mjs",
-    "opencode-browser-cli": "dist/cli.mjs"
+    "browsevil": "dist/cli.mjs",
+    "opencodevil-browser": "dist/cli.mjs",
+    "opencodevil-browser-cli": "dist/cli.mjs"
   },
   "files": [
     "dist"

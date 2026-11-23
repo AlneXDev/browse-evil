@@ -15,7 +15,7 @@ import { HANDOFF_NOTIFICATIONS_KEY, handoffNotifications } from "../shared/proto
 // The status page's "Handoff notifications" setting can ask for a notification on every handoff instead. A tab that
 // isn't recorded still shows its card then; the notification is extra, and clicking it shows the tab the same way.
 
-const PREFIX = "opencode-browser-handoff:"
+const PREFIX = "opencodevil-browser-handoff:"
 /** The handoff each notification is for, by tab, so a repeated status (or one the user dismissed) doesn't notify twice. */
 const shown = new Map<number, string>()
 /** Tabs whose handoff couldn't be announced by a notification: their page shows the card even while recorded. */
@@ -58,7 +58,7 @@ export async function sync(tabId: number, page: PageStatus | undefined, sessionN
     .create(PREFIX + tabId, {
       type: "basic",
       iconUrl: chrome.runtime.getURL("icons/icon-128.png"),
-      title: "browse",
+      title: "browsevil",
       message: `${sessionName(page?.sessionId)} needs you on ${origin}`,
       ...(page?.message ? { contextMessage: page.message } : {}),
       requireInteraction: true,

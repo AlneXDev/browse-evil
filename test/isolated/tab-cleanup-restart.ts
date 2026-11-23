@@ -2,13 +2,13 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // An extension reload keeps tab ids but clears session storage, so a missing marker keeps only entries whose tab is
-// still in a browse-owned group. Run by ../isolated.test.ts in a process of its own, so the module's listener and first
+// still in a browsevil-owned group. Run by ../isolated.test.ts in a process of its own, so the module's listener and first
 // restore start from this test's storage.
 
 const stub = installChrome()
 const MARKER = "\u2063"
 
-test("an extension reload keeps stored ids only while their tab is still in a browse group", async () => {
+test("an extension reload keeps stored ids only while their tab is still in a browsevil group", async () => {
   const window = await stub.chrome.windows.create({ url: "https://user.example/", focused: true })
   const userTab = window.tabs[0]!.id
   const create = (url: string) => stub.chrome.tabs.create({ windowId: window.id, url, active: false })
@@ -17,7 +17,7 @@ test("an extension reload keeps stored ids only while their tab is still in a br
   const ownedGroup = await stub.chrome.tabs.group({ tabIds: [owned.id!] })
   await stub.chrome.tabGroups.update(ownedGroup, { title: `Agent${MARKER}` })
 
-  // In a browse group but never tracked: recovery must not adopt it.
+  // In a browsevil group but never tracked: recovery must not adopt it.
   const unstored = await create("https://unstored.example/")
   await stub.chrome.tabs.group({ tabIds: [unstored.id!], groupId: ownedGroup })
 
@@ -57,7 +57,7 @@ test("an extension reload keeps stored ids only while their tab is still in a br
   expect(Object.keys(filtered)).toEqual([String(owned.id!)])
   expect((await stub.chrome.storage.local.get("tabCleanupCreating")).tabCleanupCreating).toBeUndefined()
 
-  // A stored tab it drops but leaves open comes back with its sound; the one it keeps stays as browse left it.
+  // A stored tab it drops but leaves open comes back with its sound; the one it keeps stays as browsevil left it.
   for (let i = 0; i < 20; i++) await settle()
   for (const tab of [ungrouped, userGrouped, pinned]) expect(stub.state.tabs.get(tab.id!)!.muted).toBe(false)
   expect(stub.state.tabs.get(owned.id!)!.muted).toBe(true)

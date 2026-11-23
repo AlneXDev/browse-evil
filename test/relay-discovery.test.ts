@@ -12,13 +12,13 @@ afterEach(() => {
 })
 
 describe("pairing link fragment", () => {
-  test("takes the code and the relay port when it is one browse uses", () => {
+  test("takes the code and the relay port when it is one browsevil uses", () => {
     expect(pairingLink("#code=ABCD1234&port=29699")).toEqual({ code: "ABCD1234", port: 29699 })
     expect(pairingLink("#code=ABCD1234&port=29698")).toEqual({ code: "ABCD1234", port: 29698 })
     expect(pairingLink("#code=ABCD1234")).toEqual({ code: "ABCD1234" })
   })
 
-  test("ignores a port that isn't a browse relay's", () => {
+  test("ignores a port that isn't a browsevil relay's", () => {
     expect(pairingLink("#code=ABCD1234&port=19989")).toEqual({ code: "ABCD1234" })
     expect(pairingLink("#code=ABCD1234&port=19987")).toEqual({ code: "ABCD1234" })
     expect(pairingLink("#code=ABCD1234&port=19999")).toEqual({ code: "ABCD1234" })
@@ -48,7 +48,7 @@ describe("relay target", () => {
 
   test("an automatic connection dials the discovered port", () => {
     expect(relayTarget({ agentRelayDiscoveredPort: 29702 })).toEqual({ host: "127.0.0.1", port: 29702, automatic: true })
-    // A discovered value that isn't a browse port is ignored, like an unknown setting.
+    // A discovered value that isn't a browsevil port is ignored, like an unknown setting.
     expect(relayTarget({ agentRelayDiscoveredPort: 19989 })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
     expect(relayTarget({ agentRelayDiscoveredPort: "29702" })).toEqual({ host: "127.0.0.1", port: 29698, automatic: true })
   })
@@ -76,7 +76,7 @@ describe("relay target", () => {
 })
 
 describe("relay scan", () => {
-  test("asks every candidate at once and keeps the browse answers in dial order", async () => {
+  test("asks every candidate at once and keeps the browsevil answers in dial order", async () => {
     const asked: string[] = []
     globalThis.fetch = (async (input: string | URL) => {
       asked.push(String(input))
@@ -89,7 +89,7 @@ describe("relay scan", () => {
     expect(asked).toHaveLength(relayPorts.length)
   })
 
-  test("nothing answering as browse is an empty scan, not an error", async () => {
+  test("nothing answering as browsevil is an empty scan, not an error", async () => {
     globalThis.fetch = (async () => new Response("nope", { status: 404 })) as unknown as typeof fetch
     expect(await scanRelayPorts()).toEqual([])
     globalThis.fetch = (async () => {

@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// An unlocked (and unpaired) extension with no pairing hint: 29698 is held by something that isn't browse (Playwriter
-// does the same), so the connection fails before any browse protocol. The worker scans the candidate ports' /version,
+// An unlocked (and unpaired) extension with no pairing hint: 29698 is held by something that isn't browsevil (Playwriter
+// does the same), so the connection fails before any browsevil protocol. The worker scans the candidate ports' /version,
 // finds the relay on a fallback port, stores it, and reconnects there. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()
@@ -67,7 +67,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("an automatic connection scans a failed port and moves to the browse relay it finds", async () => {
+test("an automatic connection scans a failed port and moves to the browsevil relay it finds", async () => {
   await until(() => relay.state().relay.address === "localhost:29698" && made().some((url) => url.includes(":29699/")))
   expect(made()).toEqual(["ws://127.0.0.1:29698/extension", "ws://127.0.0.1:29699/extension"])
   expect(await stored("agentRelayDiscoveredPort")).toBe(BROWSER_PORT)

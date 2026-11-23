@@ -13,7 +13,7 @@ export type McpToolSpec = {
   readonly readOnly: boolean
   readonly destructive: boolean
   readonly idempotent: boolean
-  /** Whether the tool reaches arbitrary web pages, as opposed to only browse's own state. */
+  /** Whether the tool reaches arbitrary web pages, as opposed to only browsevil's own state. */
   readonly openWorld: boolean
   readonly requiresRelayCompatibility?: boolean | ((input: unknown) => boolean)
   readonly handle: (input: unknown) => Effect.Effect<unknown, Error>
@@ -59,11 +59,11 @@ export function registerMcpTools(options: {
 }
 
 /** The `tools/call` `_meta` key OpenCode sets to the calling agent's session id. */
-export const opencodeSessionMetaKey = "ai.opencode/sessionID"
+export const opencodevilSessionMetaKey = "ai.opencodevil/sessionID"
 
-/** The implicit browse session of an OpenCode agent session: the same in every server, so it survives an update. */
-export function callerSessionId(opencodeSessionId: string): string {
-  return `mcp-${createHash("sha256").update(opencodeSessionId).digest("hex").slice(0, 8)}`
+/** The implicit browsevil session of an OpenCode agent session: the same in every server, so it survives an update. */
+export function callerSessionId(opencodevilSessionId: string): string {
+  return `mcp-${createHash("sha256").update(opencodevilSessionId).digest("hex").slice(0, 8)}`
 }
 
 export function createMcpToolContext(options: {
@@ -92,7 +92,7 @@ export function createMcpToolContext(options: {
   const callers = new Map<string, Caller>()
   const caller = Effect.serviceOption(McpSchema.McpRequestContext).pipe(Effect.map((context) => {
     const meta = Option.getOrUndefined(context)?.requestMetadata
-    const id = meta && opencodeSessionMetaKey in meta ? meta[opencodeSessionMetaKey] : undefined
+    const id = meta && opencodevilSessionMetaKey in meta ? meta[opencodevilSessionMetaKey] : undefined
     if (typeof id !== "string" || id === "") return shared
     const known = callers.get(id)
     if (known) {

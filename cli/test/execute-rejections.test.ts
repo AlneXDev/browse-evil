@@ -5,7 +5,7 @@ import os from "node:os"
 import path from "node:path"
 import { safeErrorMessage } from "../src/execute-realm/rejection-text.ts"
 
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browse-rejections-"))
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-rejections-"))
 const home = path.join(scratch, "home")
 fs.mkdirSync(home, { recursive: true })
 afterAll(() => fs.rmSync(scratch, { recursive: true, force: true }))

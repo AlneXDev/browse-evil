@@ -1,6 +1,6 @@
 // Finding this computer's relay when it isn't on the default port. An unpinned relay steps to a fallback port when
 // another program (Playwriter) holds 29698 (cli/src/relay/port.ts) and tells the extension where it went when it
-// pairs; without that hint, a failed connection scans the candidates' open /version for a browse relay.
+// pairs; without that hint, a failed connection scans the candidates' open /version for a browsevil relay.
 import { defaultRelayPort, isJsonObject, relayPortHint, relayPorts } from "../../agent-relay/protocol"
 import { probeRelayPort } from "../../agent-relay/probe"
 import { RELAY_ADDRESS_KEY, relayAddress } from "../../shared/protocol"
@@ -35,7 +35,7 @@ export const PROBE_TIMEOUT_MS = 800
 /** At most one scan per this long: a relay that isn't running must not be hunted for on every retry. */
 export const SCAN_INTERVAL_MS = 30_000
 
-/** The candidate ports whose /version answered as a browse relay, in dial order. */
+/** The candidate ports whose /version answered as a browsevil relay, in dial order. */
 export async function scanRelayPorts(timeoutMs = PROBE_TIMEOUT_MS): Promise<number[]> {
   const answers = await Promise.all(
     relayPorts.map(async (port) => ((await probeRelayPort(port, timeoutMs)) === "absent" ? undefined : port)),
@@ -75,14 +75,14 @@ export function createRelayDiscovery(deps: {
     const stored = await chrome.storage.local.get([TOKENS_KEY, DISCOVERED_PORT_KEY, DISCOVERED_KIND_KEY, PROVEN_PORT_KEY])
     let proven = relayPortHint(stored[PROVEN_PORT_KEY])
     // A port only a scan found and no connection ever proved is a hint at best: forget it before looking again, so a
-    // listener that mimics browse's /version can't keep the next attempt on itself. A proven port is just restarting.
+    // listener that mimics browsevil's /version can't keep the next attempt on itself. A proven port is just restarting.
     if (
       failed !== proven &&
       stored[DISCOVERED_KIND_KEY] !== "hint" &&
       relayPortHint(stored[DISCOVERED_PORT_KEY]) === failed
     ) await chrome.storage.local.remove([DISCOVERED_PORT_KEY, DISCOVERED_KIND_KEY])
     const found = await scanRelayPorts()
-    // Every candidate refused, or none is browse (the usual "no relay is running"): keep the normal backoff.
+    // Every candidate refused, or none is browsevil (the usual "no relay is running"): keep the normal backoff.
     if (found.length === 0) return missed()
     // The proven port just failed without its proof and something else answered: it is no longer the relay here. (When
     // it is the only candidate it is most likely restarting, so keep it.)

@@ -7,7 +7,7 @@
 
 tag="v$BROWSE_VERSION"
 assets=$(mktemp -d)
-zip="browse-extension-$BROWSE_VERSION.zip" tarball="opencode-browse-$BROWSE_VERSION.tgz"
+zip="browse-extension-$BROWSE_VERSION.zip" tarball="opencode-browsevil-$BROWSE_VERSION.tgz"
 for file in "$1/$zip" "$1/$tarball"; do
   test -s "$file" || die "Missing $file"
   verify_attestation "$file"
@@ -23,7 +23,7 @@ cp "$2/attestation.sigstore.json" "$assets/"
   echo
   echo "## Install"
   echo
-  echo '`npx @opencode/browse install`'
+  echo '`npx @opencode/browsevil install`'
   echo
   echo "## Verify"
   echo

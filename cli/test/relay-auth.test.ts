@@ -33,7 +33,7 @@ import {
 } from "../src/relay/browser-pairing.ts"
 import { relayToken, secretsEqual } from "../src/relay/secrets.ts"
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-auth-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-auth-"))
 afterAll(() => fs.rmSync(home, { recursive: true, force: true }))
 
 const request = (headers: http.IncomingHttpHeaders) => ({ headers }) as http.IncomingMessage

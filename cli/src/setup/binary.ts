@@ -4,7 +4,7 @@ import { spawnSync } from "node:child_process"
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { installedBinaryPath } from "../paths.ts"
-import { opencodeBrowserVersion } from "../version.ts"
+import { opencodevilBrowserVersion } from "../version.ts"
 import { configRoot, fail, home, log, readFileOr, tilde } from "./environment.ts"
 
 export const samePath = (left: string, right: string) => {
@@ -16,7 +16,7 @@ export const samePath = (left: string, right: string) => {
 }
 
 /**
- * Makes sure this executable is the install's stable one: the installer already put it at ~/.local/bin/browse; an
+ * Makes sure this executable is the install's stable one: the installer already put it at ~/.local/bin/browsevil; an
  * executable someone downloaded and ran is copied there by rename. Returns the path, which stays where it is; updates
  * replace the file in place, so every agent entry keeps working.
  */
@@ -38,10 +38,10 @@ export async function installBinaryRuntime(): Promise<{ entry: string; version: 
       }
       renameSync(staged, target)
     } catch (error) {
-      fail(`Could not install browse ${opencodeBrowserVersion} to ${target}: ${(error as Error).message}`)
+      fail(`Could not install browsevil ${opencodevilBrowserVersion} to ${target}: ${(error as Error).message}`)
     }
   }
-  return { entry: target, version: opencodeBrowserVersion }
+  return { entry: target, version: opencodevilBrowserVersion }
 }
 
 /** A regular file that is provably this install's executable: the running binary, or the same bytes as the managed copy. */
@@ -60,9 +60,9 @@ export function isInstallerBinary(candidate: string, managed: string): boolean {
 }
 
 /**
- * A browse binary (the curl or PowerShell installer) puts its folder on PATH, so `browse` works in a new terminal:
- * the user PATH on Windows, else the shell's startup file, as opencode's installer does. Returns where it was added;
- * nothing when PATH already has it or browse runs on Node.
+ * A browsevil binary (the curl or PowerShell installer) puts its folder on PATH, so `browsevil` works in a new terminal:
+ * the user PATH on Windows, else the shell's startup file, as opencodevil's installer does. Returns where it was added;
+ * nothing when PATH already has it or browsevil runs on Node.
  */
 export function addToPath(dir = path.dirname(process.execPath)): string | undefined {
   if (/(^|[\\/])(node|bun)(\.exe)?$/i.test(process.execPath)) return undefined
@@ -72,20 +72,20 @@ export function addToPath(dir = path.dirname(process.execPath)): string | undefi
     return editWindowsPath(dir, "add") ? "Windows user PATH" : undefined
   }
   const { candidates, line, legacyLine } = shellPath(dir)
-  // A new Mac has no ~/.zshrc: create the shell's main file rather than leave browse off PATH.
+  // A new Mac has no ~/.zshrc: create the shell's main file rather than leave browsevil off PATH.
   const file = candidates.find((candidate) => existsSync(candidate)) ?? candidates[0]!
   try {
     const text = existsSync(file) ? readFileSync(file, "utf8") : ""
     if (text.split("\n").includes(line)) return undefined
-    if (text.includes(`\n# browse\n${legacyLine}\n`)) {
-      writeFileSync(file, text.replace(`\n# browse\n${legacyLine}\n`, () => `\n# browse\n${line}\n`))
+    if (text.includes(`\n# browsevil\n${legacyLine}\n`)) {
+      writeFileSync(file, text.replace(`\n# browsevil\n${legacyLine}\n`, () => `\n# browsevil\n${line}\n`))
       return file
     }
     mkdirSync(path.dirname(file), { recursive: true })
-    writeFileSync(file, `${text && !text.endsWith("\n") ? "\n" : ""}\n# browse\n${line}\n`, { flag: "a" })
+    writeFileSync(file, `${text && !text.endsWith("\n") ? "\n" : ""}\n# browsevil\n${line}\n`, { flag: "a" })
     return file
   } catch {
-    log(`! Couldn't add browse to your PATH. Add this to ${tilde(file)}: ${line}`)
+    log(`! Couldn't add browsevil to your PATH. Add this to ${tilde(file)}: ${line}`)
     return undefined
   }
 }
@@ -110,7 +110,7 @@ function editWindowsPath(dir: string, action: "add" | "remove"): boolean {
   const done = spawnSync("powershell.exe", ["-NoProfile", "-NonInteractive", "-Command", script], {
     env: { ...process.env, BROWSE_PATH_ENTRY: dir }, windowsHide: true, encoding: "utf8",
   })
-  if (done.status !== 0) log(`! Couldn't ${action === "add" ? "add browse to" : "remove browse from"} your Windows user PATH: ${dir}`)
+  if (done.status !== 0) log(`! Couldn't ${action === "add" ? "add browsevil to" : "remove browsevil from"} your Windows user PATH: ${dir}`)
   return done.status === 0 && done.stdout.trim() === "changed"
 }
 
@@ -144,7 +144,7 @@ export function removeBinaryInstall(binary: string): string | undefined {
     for (const file of candidates) {
       const text = readFileOr(file, "")
       for (const entry of [line, legacyLine]) {
-        const block = `\n# browse\n${entry}\n`
+        const block = `\n# browsevil\n${entry}\n`
         if (text.includes(block)) { writeFileSync(file, text.replace(`\n${block}`, "\n").replace(block, "\n")); break }
       }
     }

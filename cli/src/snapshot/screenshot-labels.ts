@@ -58,7 +58,7 @@ export async function screenshotWithLabels(options: ScreenshotWithLabelsOptions 
 
 // Labels are drawn from Patchright's isolated (utility) world into a closed shadow root on a host without an
 // id: the page can't see the script's state, and the host exists only until the screenshot is taken.
-type ScreenshotLabelsWindow = Window & { __opencodeBrowserScreenshotLabels?: { readonly host: HTMLElement; readonly timer: number } }
+type ScreenshotLabelsWindow = Window & { __opencodevilBrowserScreenshotLabels?: { readonly host: HTMLElement; readonly timer: number } }
 
 async function showScreenshotLabels(page: Page, draw: boolean): Promise<{ readonly labels: readonly ScreenshotLabel[]; readonly viewportWidth: number }> {
   return await page.evaluate(({ draw }) => {
@@ -78,12 +78,12 @@ async function showScreenshotLabels(page: Page, draw: boolean): Promise<{ readon
     }
 
     const markerClass = "label"
-    const opencodeBrowserWindow = window as ScreenshotLabelsWindow
-    const previous = opencodeBrowserWindow.__opencodeBrowserScreenshotLabels
+    const opencodevilBrowserWindow = window as ScreenshotLabelsWindow
+    const previous = opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels
     if (previous) {
       window.clearTimeout(previous.timer)
       previous.host.remove()
-      delete opencodeBrowserWindow.__opencodeBrowserScreenshotLabels
+      delete opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels
     }
 
     const selectors = [
@@ -347,9 +347,9 @@ async function showScreenshotLabels(page: Page, draw: boolean): Promise<{ readon
     document.documentElement.appendChild(host)
     const timer = window.setTimeout(() => {
       host.remove()
-      delete opencodeBrowserWindow.__opencodeBrowserScreenshotLabels
+      delete opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels
     }, 30_000)
-    opencodeBrowserWindow.__opencodeBrowserScreenshotLabels = { host, timer }
+    opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels = { host, timer }
     return { labels, viewportWidth: window.innerWidth }
   }, { draw }, undefined, true)
 }
@@ -410,11 +410,11 @@ function drawScreenshotLabels(image: Buffer, labels: readonly ScreenshotLabel[],
 
 async function hideScreenshotLabels(page: Page): Promise<void> {
   await page.evaluate(() => {
-    const opencodeBrowserWindow = window as ScreenshotLabelsWindow
-    const labels = opencodeBrowserWindow.__opencodeBrowserScreenshotLabels
+    const opencodevilBrowserWindow = window as ScreenshotLabelsWindow
+    const labels = opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels
     if (!labels) return
     window.clearTimeout(labels.timer)
     labels.host.remove()
-    delete opencodeBrowserWindow.__opencodeBrowserScreenshotLabels
+    delete opencodevilBrowserWindow.__opencodevilBrowserScreenshotLabels
   }, undefined, undefined, true)
 }

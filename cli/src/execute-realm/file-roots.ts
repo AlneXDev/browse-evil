@@ -44,11 +44,11 @@ export const bringToFrontBlockedMessage = "page.bringToFront() is blocked: it ra
 /** Harmless compute modules available as `modules.*` and top-level aliases in sandboxed execute code. */
 export const sandboxModules = { path, url, util, crypto, buffer, zlib, events, stream }
 
-// Each process gets one private directory in TMPDIR, named with its pid: opencode-browser-files-<pid>-XXXXXX. Files
+// Each process gets one private directory in TMPDIR, named with its pid: opencodevil-browser-files-<pid>-XXXXXX. Files
 // stay readable after execute returns (agents read screenshots they saved), so the directory goes when the process
 // exits, and a relay starting up removes the ones whose process is gone (killed, or crashed before its exit hook).
-const filesDirectoryPrefix = "opencode-browser-files-"
-const filesDirectoryPattern = /^opencode-browser-files-(\d+)-[A-Za-z0-9]{6}$/
+const filesDirectoryPrefix = "opencodevil-browser-files-"
+const filesDirectoryPattern = /^opencodevil-browser-files-(\d+)-[A-Za-z0-9]{6}$/
 
 /** Directory `files.write(name, ...)` uses for relative names. */
 let filesDirectory: string | undefined
@@ -179,7 +179,7 @@ function realTarget(target: string): string {
  * The default roots cover an everyday install while OPENCODE_BROWSEVIL_HOME points this relay elsewhere, and the legacy
  * roots count too: migration copies them into the live roots on the next run.
  */
-function browseDirectories(): readonly string[] {
+function browsevilDirectories(): readonly string[] {
   return [...new Set([
     configRoot(), dataRoot(), stateRoot(), cacheRoot(),
     ...Object.values(defaultRoots()),
@@ -188,8 +188,8 @@ function browseDirectories(): readonly string[] {
 }
 
 /**
- * Whether `target` is a staging name beside `binary`, or inside one: `browse.new` (install, install.ps1),
- * `browse.<pid>.new` (binary.ts), `browse.old-<suffix>` (binary.ts and install.ps1 backups) or `browse.migrate-<pid>`
+ * Whether `target` is a staging name beside `binary`, or inside one: `browsevil.new` (install, install.ps1),
+ * `browsevil.<pid>.new` (binary.ts), `browsevil.old-<suffix>` (binary.ts and install.ps1 backups) or `browsevil.migrate-<pid>`
  * (migrate.ts). Such a name must not be created as a directory, and nothing below it may be written either.
  */
 export function isInstallSibling(target: string, binary: string, platform: NodeJS.Platform = process.platform): boolean {
@@ -213,26 +213,26 @@ function isBinaryOrStaging(target: string, binary: string, platform: NodeJS.Plat
     isInstallSibling(target, resolved, platform) || isInstallSibling(target, stagedAt, platform)
 }
 
-/** The real locations of browse's own folders. */
-function browseOwnedDirectories(): readonly string[] {
-  return browseDirectories().map((root) => realTarget(root))
+/** The real locations of browsevil's own folders. */
+function browsevilOwnedDirectories(): readonly string[] {
+  return browsevilDirectories().map((root) => realTarget(root))
 }
 
-/** True for browse's folders, its binaries and the files installs stage beside them. */
-function isBrowseOwned(target: string, platform: NodeJS.Platform = process.platform, browse = browseOwnedDirectories()): boolean {
-  if (browse.some((root) => isInside(target, root, platform))) return true
+/** True for browsevil's folders, its binaries and the files installs stage beside them. */
+function isBrowseOwned(target: string, platform: NodeJS.Platform = process.platform, browsevil = browsevilOwnedDirectories()): boolean {
+  if (browsevil.some((root) => isInside(target, root, platform))) return true
   // The installer and updater write the installer binary even when OPENCODE_BROWSEVIL_HOME points the CLI elsewhere.
   return [installedBinaryPath(), installerBinaryPath()].some((binary) => isBinaryOrStaging(target, binary, platform))
 }
 
 /**
- * Throw unless `target` is an absolute path inside the execute file roots and outside browse's own files.
+ * Throw unless `target` is an absolute path inside the execute file roots and outside browsevil's own files.
  * `directory` exempts only the execute files directory from the private-parent rule.
  */
 export function assertExecuteFilePath(
   target: unknown,
   operation: string,
-  options: { readonly directory?: boolean; readonly roots?: readonly string[]; readonly browseOwned?: readonly string[] } = {},
+  options: { readonly directory?: boolean; readonly roots?: readonly string[]; readonly browsevilOwned?: readonly string[] } = {},
 ): string {
   if (typeof target !== "string" || target.length === 0) {
     throw new ExecuteFileAccessError(`${operation}: file paths must be non-empty strings`)
@@ -243,8 +243,8 @@ export function assertExecuteFilePath(
     throw new ExecuteFileAccessError(`${operation}: use an absolute path inside ${describeRoots()}, for example files.path("name.png")`)
   }
   const resolved = realTarget(target)
-  if (isBrowseOwned(resolved, process.platform, options.browseOwned)) {
-    throw new ExecuteFileAccessError(`${operation}: ${target} is inside browse's own files, which execute code cannot access`)
+  if (isBrowseOwned(resolved, process.platform, options.browsevilOwned)) {
+    throw new ExecuteFileAccessError(`${operation}: ${target} is inside browsevil's own files, which execute code cannot access`)
   }
   if (!roots.some((root) => isInside(resolved, root))) {
     throw new ExecuteFileAccessError(`${operation}: ${target} is outside the execute file roots ${describeRoots()}. Set ${allowNodeEnvironmentVariable}=1 for unrestricted file access.`)
@@ -310,7 +310,7 @@ function executeFileRootOf(resolved: string, roots: readonly string[] = executeF
 function assertExecuteFilePathNotRoot(
   target: string,
   operation: string,
-  options: { readonly roots?: readonly string[]; readonly browseOwned?: readonly string[] } = {},
+  options: { readonly roots?: readonly string[]; readonly browsevilOwned?: readonly string[] } = {},
 ): string {
   const resolved = assertExecuteFilePath(target, operation, options)
   if (executeFileRootOf(resolved, options.roots) !== undefined) {
@@ -321,7 +321,7 @@ function assertExecuteFilePathNotRoot(
 
 /** Check a setInputFiles/setFiles payload, sharing root lookup and the folder-upload budget. */
 function checkUploadValue(value: unknown, method: string): unknown {
-  const options = { roots: executeFileRoots(), browseOwned: browseOwnedDirectories() }
+  const options = { roots: executeFileRoots(), browsevilOwned: browsevilOwnedDirectories() }
   const assertPath = (target: string, operation: string) => assertExecuteFilePathNotRoot(target, operation, options)
   const checkEntry = (target: string, operation: string) => assertExecuteFilePath(target, operation, options)
   return checkFileInputValue(value, method, assertPath, checkEntry)

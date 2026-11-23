@@ -2,7 +2,7 @@ import { expect, test } from "bun:test"
 import { pairingProof, randomNonce } from "../../src/background/pairing"
 import { installChrome, settle } from "../chrome-stub"
 
-// Two listeners answer /version like browse: the spoofer cannot complete the HMAC proof, the real relay can. The scan
+// Two listeners answer /version like browsevil: the spoofer cannot complete the HMAC proof, the real relay can. The scan
 // must skip the port that just failed its proof and move to the real one. Run by ../isolated.test.ts.
 
 const stub = installChrome()

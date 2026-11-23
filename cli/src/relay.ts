@@ -62,7 +62,7 @@ import { defaultShutdownTimeoutMs, OpenCodeBrowserSessions } from "./session-man
 import { SessionNavigationGuard } from "./session-manager/navigation-guard.ts"
 import { TabActivity } from "./cdp/tab-activity.ts"
 import { TargetRegistry, type RootTargetChange, type TargetOwnershipChange } from "./cdp/target-registry.ts"
-import { opencodeBrowserBuildId, opencodeBrowserVersion } from "./version.ts"
+import { opencodevilBrowserBuildId, opencodevilBrowserVersion } from "./version.ts"
 
 export {
   handleRelayProcessFault,
@@ -249,7 +249,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       ownersAcrossReconnect.set(target.targetInfo.targetId, {
         browser: key,
         owner: target.owner,
-        ...(target.opencodeBrowserSessionId ? { sessionId: target.opencodeBrowserSessionId } : {}),
+        ...(target.opencodevilBrowserSessionId ? { sessionId: target.opencodevilBrowserSessionId } : {}),
       })
     }
     for (const target of [...registry.listRootTargets(), ...registry.listStagedRootTargets()]) {
@@ -320,7 +320,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       // Only tabs the session owns: a tab it merely drove through target selection may be another session's or the user's.
       onStoppingExecute: (session) => {
         if (session.readOnly) return Effect.void
-        const tabs = registry.listRootTargets().filter((target) => target.opencodeBrowserSessionId === session.id)
+        const tabs = registry.listRootTargets().filter((target) => target.opencodevilBrowserSessionId === session.id)
         if (tabs.length === 0) return Effect.void
         return Effect.forEach(tabs, (target) =>
           sendDebuggerCommand({ tabId: target.tabId, method: "Page.stopLoading", params: {} }).pipe(
@@ -388,7 +388,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       getTargets: () => registry.listRootTargets(),
       relayTargetIdsForSession: (sessionId) => [
         ...registry.listRootTargets()
-          .filter((target) => target.owner === "relay" && target.opencodeBrowserSessionId === sessionId)
+          .filter((target) => target.owner === "relay" && target.opencodevilBrowserSessionId === sessionId)
           .map((target) => target.targetInfo.targetId),
         ...Array.from(ownersAcrossReconnect)
           .filter(([targetId, known]) => known.deleted !== true && known.owner === "relay" && known.sessionId === sessionId && !registry.targetsByTargetId.has(targetId))
@@ -458,7 +458,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       // Like a popup or a created tab: the session's allowlist decides before the page is published for it.
       const allowed = navigationGuard.createdTabNavigated({
         tabId,
-        opencodeBrowserSessionId: sessionId,
+        opencodevilBrowserSessionId: sessionId,
         owner,
         targetInfo: { targetId, url },
       })
@@ -583,19 +583,19 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       return "error" in link ? Effect.fail(new Error(link.error)) : Effect.succeed(link)
     }
     const existing = sessionId
-      ? registry.listRootTargets().find((target) => target.opencodeBrowserSessionId === sessionId && target.owner === "relay")
+      ? registry.listRootTargets().find((target) => target.opencodevilBrowserSessionId === sessionId && target.owner === "relay")
       : undefined
     const link = (existing && browsers.browserTab(existing.tabId)?.link) ?? browsers.defaultLink()
-    return link ? Effect.succeed(link) : Effect.fail(new Error("browse extension is not connected"))
+    return link ? Effect.succeed(link) : Effect.fail(new Error("browsevil extension is not connected"))
   })
 
   const createAndAttachTab = Effect.fnUntraced(function* (createOptions: {
     readonly url: string
     readonly active: boolean
-    readonly opencodeBrowserSessionId?: string
+    readonly opencodevilBrowserSessionId?: string
     readonly autoAttachParams?: JsonObject
   }) {
-    const link = yield* sessionBrowser(createOptions.opencodeBrowserSessionId)
+    const link = yield* sessionBrowser(createOptions.opencodevilBrowserSessionId)
     // Create the tab blank and navigate only after attaching: the navigation guard then sees the real load (a tab
     // created at the URL would load it before any debugger was attached), and Vivaldi never has to answer commands
     // on a tab that is still loading.
@@ -606,7 +606,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     const target = yield* rootLifecycle.attach({
       tabId,
       owner: "relay",
-      ...(createOptions.opencodeBrowserSessionId ? { opencodeBrowserSessionId: createOptions.opencodeBrowserSessionId } : {}),
+      ...(createOptions.opencodevilBrowserSessionId ? { opencodevilBrowserSessionId: createOptions.opencodevilBrowserSessionId } : {}),
       ...(createOptions.autoAttachParams ? { autoAttachParams: createOptions.autoAttachParams } : {}),
       // The created tab's allowlist check runs below; record it only once that check has passed.
       deferHeldTarget: true,
@@ -621,7 +621,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     const requested = createTargetUrl({ url: createOptions.url })
     let heldAllowed = true
     const finishCreatedTarget = (created: ConnectedTarget) => {
-      if (heldAllowed && createOptions.opencodeBrowserSessionId) sessions.noteTargetHeld(created.targetInfo.targetId, createOptions.opencodeBrowserSessionId)
+      if (heldAllowed && createOptions.opencodevilBrowserSessionId) sessions.noteTargetHeld(created.targetInfo.targetId, createOptions.opencodevilBrowserSessionId)
       return created
     }
     if (requested !== "about:blank") {
@@ -731,9 +731,9 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     cdpClients.sendToViewers(rootSessionId, event, (client, tabId) => cdpRouter.canSeeTab(client, tabId))
   }
 
-  function pruneInvisibleAnnouncementsForSession(opencodeBrowserSessionId: string): void {
+  function pruneInvisibleAnnouncementsForSession(opencodevilBrowserSessionId: string): void {
     for (const client of cdpClients) {
-      if (cdpClients.sessionId(client) === opencodeBrowserSessionId) cdpRouter.reconcileClient(client)
+      if (cdpClients.sessionId(client) === opencodevilBrowserSessionId) cdpRouter.reconcileClient(client)
     }
   }
 
@@ -893,7 +893,7 @@ const makeRelay = Effect.fnUntraced(function* (options: {
     yield* closeWebSocketServer(websocketServer).pipe(logCloseError("Failed to close websocket server"))
     // Removed only once this relay stops answering (until closeHttpServer completes, relay.json must keep clients on
     // this instance instead of sending them to whatever holds the configured port, relay/port.ts) and after its last
-    // line, so uninstall and a restart that wait for the file know it is done with browse's files. ensuring covers a
+    // line, so uninstall and a restart that wait for the file know it is done with browsevil's files. ensuring covers a
     // close that fails, where the listener may still be gone.
     yield* closeHttpServer(httpServer).pipe(
       logCloseError("Failed to close http server"),
@@ -948,17 +948,17 @@ const makeRelay = Effect.fnUntraced(function* (options: {
           if (restored.some((entry, i) => entry !== entries[i])) await sessionCatalog.save(restored)
           return restored
         },
-        catch: (cause) => cause instanceof Error ? cause : new Error("Load browse session catalog", { cause }),
+        catch: (cause) => cause instanceof Error ? cause : new Error("Load browsevil session catalog", { cause }),
       })
       yield* Effect.try({
         try: () => sessions.restore(restoredSessions),
-        catch: (cause) => cause instanceof Error ? cause : new Error("Restore browse sessions", { cause }),
+        catch: (cause) => cause instanceof Error ? cause : new Error("Restore browsevil sessions", { cause }),
       })
       catalogWritesEnabled = true
       if (managed) {
         yield* audit(yield* RelayLifecycleEvent.cases.Ready.makeEffect({
           instanceId: browserId,
-          buildId: opencodeBrowserBuildId,
+          buildId: opencodevilBrowserBuildId,
           ...(Option.isSome(restartRequestId) ? { restartRequestId: restartRequestId.value } : {}),
         }))
       }
@@ -987,8 +987,8 @@ const makeRelay = Effect.fnUntraced(function* (options: {
       }
       relayLog("relay.ready", {
         url: endpointUrl,
-        version: opencodeBrowserVersion,
-        build: opencodeBrowserBuildId,
+        version: opencodevilBrowserVersion,
+        build: opencodevilBrowserBuildId,
         pid: process.pid,
         managed,
         extensionTimeoutMs: extensionCommandTimeoutMs,

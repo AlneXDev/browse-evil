@@ -83,7 +83,7 @@ function lenient<T extends object>(target: T, namespaces = false): T {
   })
 }
 
-/** The extension's id, as chrome.runtime.id answers: a mute browse set is recorded against it. */
+/** The extension's id, as chrome.runtime.id answers: a mute browsevil set is recorded against it. */
 const RUNTIME_ID = "stubextensionid"
 
 export function createChrome() {
@@ -340,11 +340,11 @@ export type Stub = ReturnType<typeof createChrome>
  * instead of replacing the stub.
  */
 export function installChrome(): Stub {
-  const global = globalThis as { chrome?: unknown; __chromeStub?: Stub; __browseFetchStubbed?: boolean }
+  const global = globalThis as { chrome?: unknown; __chromeStub?: Stub; __browsevilFetchStubbed?: boolean }
   // Isolated tests must never reach a real local relay: anything aimed at this computer gets a 404 unless the test
   // installs its own fetch stub first. Other hosts pass through.
-  if (!global.__browseFetchStubbed) {
-    global.__browseFetchStubbed = true
+  if (!global.__browsevilFetchStubbed) {
+    global.__browsevilFetchStubbed = true
     const realFetch = globalThis.fetch
     globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
       const host = new URL(typeof input === "string" || input instanceof URL ? String(input) : input.url).hostname

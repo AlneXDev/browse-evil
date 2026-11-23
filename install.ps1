@@ -1,5 +1,5 @@
-# Installs browse on Windows: downloads the browse binary for this computer from Anomaly's release service into
-# %USERPROFILE%\.local\bin (or %XDG_BIN_HOME%), then hands over to `browse install`, which does the rest (PATH, your
+# Installs browsevil on Windows: downloads the browsevil binary for this computer from Anomaly's release service into
+# %USERPROFILE%\.local\bin (or %XDG_BIN_HOME%), then hands over to `browsevil install`, which does the rest (PATH, your
 # agents, pairing with your browser). Served at https://opencode.ai/browse/install.ps1; the PowerShell twin of ./install.
 #
 #   irm https://opencode.ai/browse/install.ps1 | iex
@@ -16,9 +16,9 @@
 #   -v, --version <version> Install a specific version from npm (or $env:VERSION)
 #       --channel <channel> Install the latest version on a release channel: stable (default), beta or dev.
 #                           `latest` means stable (or $env:BROWSE_CHANNEL)
-#   -b, --binary <path>     Install from a local browse.exe instead of downloading
-#       --no-setup          Only install the binary; don't run `browse install`
-# Anything else goes to `browse install`, e.g. --remote, --agent claude or --no-modify-path.
+#   -b, --binary <path>     Install from a local browsevil.exe instead of downloading
+#       --no-setup          Only install the binary; don't run `browsevil install`
+# Anything else goes to `browsevil install`, e.g. --remote, --agent claude or --no-modify-path.
 
 # Windows PowerShell 5.1 can fail to autoload Get-FileHash when a PowerShell 7 module directory earlier in PSModulePath
 # shadows Microsoft.PowerShell.Utility, so hash a file with .NET directly: the same lowercase hex on 5.1 and 7+.
@@ -40,7 +40,7 @@ function Get-FileDigest {
     }
 }
 
-function Install-browse {
+function Install-browsevil {
     param([string[]]$Arguments)
     # Function scope: this doesn't leak to the caller's session. It covers the property probing below and the
     # dot-sourced download blocks, which run in this same scope, under a caller's `Set-StrictMode -Version Latest`.
@@ -61,21 +61,21 @@ function Install-browse {
         switch -Regex ($arg) {
             "^(-h|--help|-Help)$" {
                 Write-Host @"
-browse installer
+browsevil installer
 
 Usage:
   irm https://opencode.ai/browse/install.ps1 | iex
-  & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) [options] [browse install options]
+  & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) [options] [browsevil install options]
 
 Options:
   -h, --help              Show this help
   -v, --version <version> Install a specific version from npm (e.g., 0.0.7), or set `$env:VERSION
       --channel <channel> Install the latest version on a release channel: stable (default), beta or dev.
                           `latest` means stable, or set `$env:BROWSE_CHANNEL
-  -b, --binary <path>     Install from a local browse.exe instead of downloading
-      --no-setup          Only install the binary; don't run ``browse install``
+  -b, --binary <path>     Install from a local browsevil.exe instead of downloading
+      --no-setup          Only install the binary; don't run ``browsevil install``
 
-Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-modify-path.
+Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --no-modify-path.
 "@
                 return
             }
@@ -111,16 +111,16 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
     try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
 
     $installDir = if ($env:XDG_BIN_HOME -and [IO.Path]::IsPathRooted($env:XDG_BIN_HOME)) { $env:XDG_BIN_HOME } else { Join-Path $env:USERPROFILE ".local\bin" }
-    $exe = Join-Path $installDir "browse.exe"
+    $exe = Join-Path $installDir "browsevil.exe"
     New-Item -ItemType Directory -Force -Path $installDir | Out-Null
 
-    $tmp = Join-Path ([IO.Path]::GetTempPath()) "browse_install_$([Guid]::NewGuid().ToString('N'))"
+    $tmp = Join-Path ([IO.Path]::GetTempPath()) "browsevil_install_$([Guid]::NewGuid().ToString('N'))"
     New-Item -ItemType Directory -Force -Path $tmp | Out-Null
     try {
         if ($binary) {
             if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) { throw "Binary not found at $binary" }
             Write-Host ""
-            Write-Host "Installing browse from: $binary"
+            Write-Host "Installing browsevil from: $binary"
             $source = (Resolve-Path -LiteralPath $binary).Path
         } else {
             $arch = $null
@@ -130,7 +130,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
                 "^(X64|AMD64)$" { "x64" }
                 # Windows on ARM runs the x64 build under emulation; the baseline build doesn't need AVX2.
                 "^(Arm64|ARM64)$" { "x64-baseline" }
-                default { throw "Unsupported architecture: $arch. browse runs on 64-bit Windows." }
+                default { throw "Unsupported architecture: $arch. browsevil runs on 64-bit Windows." }
             }
             if ($target -eq "x64") {
                 $avx2 = $false
@@ -141,7 +141,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
             }
 
             $package = "@opencode/browsevil-windows-$target"
-            $encoded = "@opencode%2fbrowse-windows-$target"
+            $encoded = "@opencodevil%2fbrowsevil-windows-$target"
             if ($pinned) {
                 $version = $requested -replace "^v", ""
                 if (-not $version) { throw "--version needs a version, e.g. 0.0.14" }
@@ -150,7 +150,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
                 catch {
                     $status = $null
                     try { $status = [int]$_.Exception.Response.StatusCode } catch {}
-                    if ($status -eq 404) { throw "browse $version is not available for windows-$target. Available versions: https://www.npmjs.com/package/${package}?activeTab=versions" }
+                    if ($status -eq 404) { throw "browsevil $version is not available for windows-$target. Available versions: https://www.npmjs.com/package/${package}?activeTab=versions" }
                     throw "Failed to fetch package information: $($_.Exception.Message)"
                 }
                 $integrity = [string]$metadata.dist.integrity
@@ -173,18 +173,18 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
                 $service = if ($env:OPENCODE_BROWSEVIL_RELEASE_SERVICE) { $env:OPENCODE_BROWSEVIL_RELEASE_SERVICE } else { "https://anoma.ly/release" }
                 $service = $service.TrimEnd("/")
                 if (-not $service.EndsWith("/release")) { throw "OPENCODE_BROWSEVIL_RELEASE_SERVICE must end in /release, not $service" }
-                $manifestUrl = "$service/browse/cli/$channel.json"
+                $manifestUrl = "$service/browsevil/cli/$channel.json"
                 # PowerShell 7 validates the User-Agent as RFC 7231 product tokens, so the channel and action live in
                 # one product and a comment instead of extra `/`-separated segments.
-                try { $manifest = Invoke-RestMethod -UseBasicParsing -UserAgent "browse/$channel (install)" $manifestUrl }
+                try { $manifest = Invoke-RestMethod -UseBasicParsing -UserAgent "browsevil/$channel (install)" $manifestUrl }
                 catch {
                     $status = $null
                     try { $status = [int]$_.Exception.Response.StatusCode } catch {}
                     if ($status -eq 404) { throw "no $channel release at ${manifestUrl}: $($_.Exception.Message)" }
                     throw "could not read the $channel release manifest at ${manifestUrl}: $($_.Exception.Message)"
                 }
-                if ($manifest.app -ne "browse" -or $manifest.artifact -ne "cli" -or $manifest.channel -ne $channel) {
-                    throw "$manifestUrl is not browse's $channel CLI manifest"
+                if ($manifest.app -ne "browsevil" -or $manifest.artifact -ne "cli" -or $manifest.channel -ne $channel) {
+                    throw "$manifestUrl is not browsevil's $channel CLI manifest"
                 }
                 $version = [string]$manifest.release.version
                 if (-not $version) { throw "the $channel release has no version" }
@@ -201,10 +201,10 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
         }
 
         $download = {
-            $filename = "browse-windows-$target-$version.tgz"
+            $filename = "browsevil-windows-$target-$version.tgz"
             $archive = Join-Path $tmp $filename
             Write-Host ""
-            Write-Host "Installing browse version: $version"
+            Write-Host "Installing browsevil version: $version"
             Invoke-WebRequest -UseBasicParsing -Uri "https://registry.npmjs.org/$package/-/$filename" -OutFile $archive
             $actualSha = Get-FileDigest -Path $archive -Algorithm SHA512
             if ($actualSha -ne $expectedSha512) {
@@ -216,14 +216,14 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
             if (-not (Test-Path -LiteralPath $tar)) { $tar = "tar.exe" }
             & $tar -xzf $archive -C $tmp
             if ($LASTEXITCODE -ne 0) { throw "Could not extract $filename" }
-            $source = Join-Path $tmp "package\bin\browse.exe"
-            if (-not (Test-Path -LiteralPath $source)) { throw "$filename has no package\bin\browse.exe" }
+            $source = Join-Path $tmp "package\bin\browsevil.exe"
+            if (-not (Test-Path -LiteralPath $source)) { throw "$filename has no package\bin\browsevil.exe" }
         }
         $downloadService = {
             $archive = Join-Path $tmp $filename
             Write-Host ""
-            Write-Host "Installing browse version: $version ($channel)"
-            Invoke-WebRequest -UseBasicParsing -UserAgent "browse/$version ($channel; cli)" -Uri $url -OutFile $archive
+            Write-Host "Installing browsevil version: $version ($channel)"
+            Invoke-WebRequest -UseBasicParsing -UserAgent "browsevil/$version ($channel; cli)" -Uri $url -OutFile $archive
             $actualSha = Get-FileDigest -Path $archive -Algorithm SHA256
             if (-not $expectedSha -or $actualSha -ne $expectedSha.ToLowerInvariant()) {
                 throw "checksum mismatch for $filename (expected $(if ($expectedSha) { $expectedSha } else { 'none' }), got $actualSha)"
@@ -236,8 +236,8 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
             if (-not (Test-Path -LiteralPath $tar)) { $tar = "tar.exe" }
             & $tar -xzf $archive -C $tmp
             if ($LASTEXITCODE -ne 0) { throw "Could not extract $filename" }
-            $source = Join-Path $tmp "package\bin\browse.exe"
-            if (-not (Test-Path -LiteralPath $source)) { throw "$filename has no package\bin\browse.exe" }
+            $source = Join-Path $tmp "package\bin\browsevil.exe"
+            if (-not (Test-Path -LiteralPath $source)) { throw "$filename has no package\bin\browsevil.exe" }
         }
         if (-not $binary) {
             if (-not $pinned) {
@@ -261,7 +261,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
                         $index = [array]::IndexOf($ordered, $version)
                         if ($index -lt 0 -or $index + 1 -ge $ordered.Count) { throw }
                         $previous = $ordered[$index + 1]
-                        Write-Warning "browse $version is still unavailable; falling back to $previous ($channel)."
+                        Write-Warning "browsevil $version is still unavailable; falling back to $previous ($channel)."
                         $version = $previous
                         . $download
                     }
@@ -269,9 +269,9 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
             }
         }
 
-        # A running browse.exe (the relay) can't be overwritten, but it can be renamed: move it aside, then put the new
+        # A running browsevil.exe (the relay) can't be overwritten, but it can be renamed: move it aside, then put the new
         # one in its place. Copies moved aside earlier are deleted once nothing runs them.
-        Get-ChildItem -LiteralPath $installDir -Filter "browse.exe.old-*" -ErrorAction SilentlyContinue | ForEach-Object {
+        Get-ChildItem -LiteralPath $installDir -Filter "browsevil.exe.old-*" -ErrorAction SilentlyContinue | ForEach-Object {
             Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue
         }
         $staged = "$exe.new"
@@ -286,7 +286,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
 
     if ($noSetup) {
         Write-Host ""
-        Write-Host "Run $exe install to add browse to your agents and pair it with your browser."
+        Write-Host "Run $exe install to add browsevil to your agents and pair it with your browser."
         return
     }
     Write-Host ""
@@ -294,7 +294,7 @@ Anything else goes to ``browse install``, e.g. --remote, --agent claude or --no-
 }
 
 try {
-    Install-browse -Arguments $args
+    Install-browsevil -Arguments $args
 } catch {
     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
     $global:LASTEXITCODE = 1

@@ -1,12 +1,12 @@
-// Asking a port whether a browse relay answers there. The relay's open /version identifies it (cli/src/relay.ts); the
+// Asking a port whether a browsevil relay answers there. The relay's open /version identifies it (cli/src/relay.ts); the
 // status page uses this to tell "no relay yet" from "a relay that hasn't paired with this browser", and the worker
 // uses it to find a relay that moved to a fallback port.
 
-/** Whether a browse relay answers on this computer's relay port; "unknown" until the first probe ends. */
+/** Whether a browsevil relay answers on this computer's relay port; "unknown" until the first probe ends. */
 export type RelayProbe = "unknown" | "absent" | "found" | "install-waiting"
 
 /**
- * What a GET of the relay's /version answered: found for browse's own reply (`{ version, instanceId }`), or for the
+ * What a GET of the relay's /version answered: found for browsevil's own reply (`{ version, instanceId }`), or for the
  * relay's refusal of a cross-site browser request; absent for anything else, or no answer.
  */
 export function relayProbeResult(status: number | undefined, body: unknown): Exclude<RelayProbe, "unknown"> {
@@ -19,13 +19,13 @@ export function relayProbeResult(status: number | undefined, body: unknown): Exc
 }
 
 /**
- * GETs the relay's open /version on `port` and says what answered. Anything that isn't browse's own reply, or no
+ * GETs the relay's open /version on `port` and says what answered. Anything that isn't browsevil's own reply, or no
  * answer within `timeoutMs`, reads as absent. Sent without credentials: whoever holds the port can't learn anything.
  */
 export async function probeRelayPort(port: number, timeoutMs = 2_000): Promise<Exclude<RelayProbe, "unknown">> {
   try {
     const response = await fetch(`http://127.0.0.1:${port}/version`, {
-      headers: { "x-browse-install": "probe" },
+      headers: { "x-browsevil-install": "probe" },
       cache: "no-store",
       credentials: "omit",
       redirect: "error",

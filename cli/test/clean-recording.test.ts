@@ -34,7 +34,7 @@ describe("clean recordings", () => {
   })
 
   test.skipIf(process.platform === "win32")("a broken ffmpeg input rejects the write without crashing the relay process", async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "browse-ffmpeg-"))
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), "browsevil-ffmpeg-"))
     try {
       // Read the Matroska header and part of a frame, then close while the rest of the frame is still buffered.
       await fs.writeFile(path.join(dir, "ffmpeg"), '#!/bin/sh\n[ "$1" = -version ] && exit 0\ndd bs=1 count=1024 of=/dev/null 2>/dev/null\nexit 42\n', { mode: 0o755 })

@@ -3,7 +3,7 @@ import { Predicate } from "effect"
 /** What a scrubbed credential is replaced with, in artifacts and execute output. */
 export const redactedPlaceholder = "[redacted]"
 /** A URL-safe stand-in while a captured value is being rebuilt, so URL encoding leaves it intact. */
-const redactionSentinel = "__browse_redacted__"
+const redactionSentinel = "__browsevil_redacted__"
 
 const secretNamePattern = /auth(?:orization)?|cookie|credential|csrf|xsrf|token|secret|session|password|passwd|pwd|passcode|otp|(?:^|[-_.])code(?:$|[-_.])|(?:api|access|refresh)[-_.]?key|signature|(?:^|[-_.])sig(?:$|[-_.])/i
 // Values typed into these fields (passwords, one-time codes) are redacted at any length.

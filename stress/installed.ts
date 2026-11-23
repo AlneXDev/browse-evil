@@ -1,7 +1,7 @@
 // What users hit, with installed artifacts: the binary the curl installer (or npm) put in a throwaway $HOME, Chrome for
 // Testing with the release zip as the store extension, paired through install's link. Each scenario injects one
 // fault a user meets (relay crash, browser restart, extension reload or update, the machine sleeping, the network
-// dropping, a second browser or relay, an upgrade, many agents, a long idle) and measures how long browse takes to
+// dropping, a second browser or relay, an upgrade, many agents, a long idle) and measures how long browsevil takes to
 // work again and whether the user had to do anything.
 //   node stress/installed.ts [--only a,b] [--user curl] [--extension ~/u/ext-0.0.8-store] [--sleep-minutes 3]
 //                            [--idle-minutes 20] [--agents 16] [--keep]
@@ -59,7 +59,7 @@ type Ctx = {
 type Outcome = { recoverMs?: number; manual?: string; note?: string }
 type Scenario = { name: string; run: (ctx: Ctx) => Promise<Outcome | void> }
 
-/** Keeps calling `fn` until it succeeds: how long after a fault browse works again, from the user's point of view. */
+/** Keeps calling `fn` until it succeeds: how long after a fault browsevil works again, from the user's point of view. */
 async function recovery(fn: () => Promise<unknown>, timeoutMs = 180_000, everyMs = 500): Promise<{ ms: number; attempts: number; lastError?: string }> {
   const started = Date.now()
   let attempts = 0
@@ -152,7 +152,7 @@ const scenarios: Scenario[] = [
         const agent = await freshAgent(ctx, "repair")
         await agent.client.call("session_delete", { id: agent.session })
         await agent.client.close()
-        return { recoverMs: paired.ms, manual: "yes: run `browse pair`, type the code (by design after a revoke)" }
+        return { recoverMs: paired.ms, manual: "yes: run `browsevil pair`, type the code (by design after a revoke)" }
       } finally {
         cdp.close()
       }
@@ -186,7 +186,7 @@ const scenarios: Scenario[] = [
     },
   },
   {
-    // `browse relay restart` (what install/update run) while an agent has a page open.
+    // `browsevil relay restart` (what install/update run) while an agent has a page open.
     name: "relay-restart",
     async run(ctx) {
       const agent = await ctx.agent()
@@ -433,7 +433,7 @@ const scenarios: Scenario[] = [
     },
   },
   {
-    // `browse install --remote`: the relay opens to other computers; a browser elsewhere pairs with its address and
+    // `browsevil install --remote`: the relay opens to other computers; a browser elsewhere pairs with its address and
     // the code. Here the "other computer" is a second profile talking to the box's network address, not loopback.
     name: "remote-pairing",
     async run(ctx) {
@@ -501,7 +501,7 @@ const scenarios: Scenario[] = [
       if (install.status !== 0) throw new Error(`curl installer exited ${install.status}: ${(install.stdout + install.stderr).slice(-400)}`)
       const installMs = Date.now() - t
       const settings = JSON.parse(fs.readFileSync(path.join(ctx.u.configDir, "settings.json"), "utf8")) as { entry: string; version: string }
-      const opencode = fs.readFileSync(path.join(ctx.u.home, ".config/opencode/opencode.json"), "utf8")
+      const opencodevil = fs.readFileSync(path.join(ctx.u.home, ".config/opencodevil/opencodevil.json"), "utf8")
       const after = status(ctx.u)
       const connected = await waitFor(() => extensionConnected(ctx.u), { timeoutMs: 60_000, label: "extension connected after the migration" })
       const oldStill = await recovery(() => exec(oldAgent, oldSession, "return await page.title()", 30_000), 60_000).catch((error) => ({ ms: -1, attempts: 0, lastError: oneLine(error) }))
@@ -511,12 +511,12 @@ const scenarios: Scenario[] = [
       return {
         recoverMs: connected.ms,
         manual: "no",
-        note: `installer ${installMs} ms; entry ${settings.entry.endsWith("/browse") ? "binary" : settings.entry}; opencode.json ${opencode.includes(".local/bin/browse") ? "points at the binary" : "UNCHANGED"}; relay ${before.relay.buildId} -> ${after.relay.buildId} (${after.relay.running ? "running" : "down"}); old npm agent ${oldStill.ms >= 0 ? `still works (${oldStill.ms} ms)` : `broken: ${oldStill.lastError}`}; new binary agent ${fresh.ms} ms`,
+        note: `installer ${installMs} ms; entry ${settings.entry.endsWith("/browsevil") ? "binary" : settings.entry}; opencodevil.json ${opencodevil.includes(".local/bin/browsevil") ? "points at the binary" : "UNCHANGED"}; relay ${before.relay.buildId} -> ${after.relay.buildId} (${after.relay.running ? "running" : "down"}); old npm agent ${oldStill.ms >= 0 ? `still works (${oldStill.ms} ms)` : `broken: ${oldStill.lastError}`}; new binary agent ${fresh.ms} ms`,
       }
     },
   },
   {
-    // Many agents at once (an opencode with many sessions, or several agents): 16 MCP servers, one session each.
+    // Many agents at once (an opencodevil with many sessions, or several agents): 16 MCP servers, one session each.
     name: "many-agents",
     async run(ctx) {
       const n = Number(values.agents)

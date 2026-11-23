@@ -84,7 +84,7 @@ function kernel32Library(): Kernel32 {
  * Resolves the executable CreateProcessW will start. A fully qualified path is used as is; a bare name is looked up
  * only in the absolute directories of `env`'s PATH, trying .exe and .com when it has no extension. CreateProcessW
  * resolves a non-NULL lpApplicationName against the current directory and does not search PATH, so a bare name from
- * opencode-browser-client.ts must arrive here as a full path. `exists` is injectable for tests.
+ * opencodevil-browser-client.ts must arrive here as a full path. `exists` is injectable for tests.
  */
 export function resolveWindowsExecutable(
   executable: string,

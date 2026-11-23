@@ -1,4 +1,4 @@
-// Soak + chaos: N agents (MCP stdio servers, like N opencode sessions) loop random tasks from the scenario set and a
+// Soak + chaos: N agents (MCP stdio servers, like N opencodevil sessions) loop random tasks from the scenario set and a
 // few real sites while chaos events hit the relay, the extension, Chrome and the network.
 //   node stress/soak.ts [--workers 8] [--minutes 60] [--chaos-every 120] [--chaos relay-kill9,sw-stop,...]
 //                       [--no-sites] [--sample-every 30] [--recovery-bound 120] [--only scenario,scenario]
@@ -188,7 +188,7 @@ const chaosActions: Record<string, () => Promise<Record<string, unknown>>> = {
   },
   "chrome-restart": async () => {
     launchTab = undefined
-    sudo(["systemctl", "restart", canary ? "browse-canary-browser@chrome.service" : "browse-chrome"])
+    sudo(["systemctl", "restart", canary ? "browsevil-canary-browser@chrome.service" : "browsevil-chrome"])
     cdpConnection?.close()
     cdpConnection = undefined
     launchTab = await findLaunchTab()
@@ -196,7 +196,7 @@ const chaosActions: Record<string, () => Promise<Record<string, unknown>>> = {
   },
   "network-drop": async () => {
     // A root-owned, time-bounded unit affects only the canary UID, even if this soak dies.
-    if (canary) { sudo(["systemctl", "start", "browse-canary-drop.service"]); return { scope: "canary" } }
+    if (canary) { sudo(["systemctl", "start", "browsevil-canary-drop.service"]); return { scope: "canary" } }
     const ms = 10_000 + Math.floor(Math.random() * 15_000)
     netDown()
     try { await sleep(ms) } finally { netUp() }
@@ -251,20 +251,20 @@ const chaosActions: Record<string, () => Promise<Record<string, unknown>>> = {
   // The user clicks the toolbar button on an agent's tab: the kill switch, which stops the agent there.
   "toolbar-stop": async () => {
     const c = await cdp()
-    const held = (await relayJson<any[]>("/json/list")).filter((t) => t.opencodeBrowserSessionId?.startsWith("soak-w"))
+    const held = (await relayJson<any[]>("/json/list")).filter((t) => t.opencodevilBrowserSessionId?.startsWith("soak-w"))
     const victim = held[Math.floor(Math.random() * held.length)]
     if (!victim) return { skipped: "no agent tab" }
     if (canary) {
       await c.evalInExtension(`chrome.tabs.update(${Number(victim.tabId)}, {active:true}).then(t => chrome.windows.update(t.windowId,{focused:true}))`)
       execFileSync("xdotool", ["key", "--clearmodifiers", "ctrl+shift+y"], { timeout: 3000 })
       await sleep(500)
-      if ((await relayJson<any[]>("/json/list")).some(t => t.tabId === victim.tabId && t.opencodeBrowserSessionId === victim.opencodeBrowserSessionId)) throw new Error("toolbar shortcut did not release the tab")
+      if ((await relayJson<any[]>("/json/list")).some(t => t.tabId === victim.tabId && t.opencodevilBrowserSessionId === victim.opencodevilBrowserSessionId)) throw new Error("toolbar shortcut did not release the tab")
       return { tabId: victim.tabId }
     }
-    const hooked = await c.evalInExtension<boolean>(`typeof globalThis.__opencodeBrowserTest?.toolbarClick === "function"`)
+    const hooked = await c.evalInExtension<boolean>(`typeof globalThis.__opencodevilBrowserTest?.toolbarClick === "function"`)
     if (!hooked) throw new Error("the extension has no test hooks; build it with OPENCODE_BROWSEVIL_TEST_HOOKS=1 (stress/exe/deploy.sh does)")
-    await c.evalInExtension(`globalThis.__opencodeBrowserTest.toolbarClick(${Number(victim.tabId)})`)
-    return { tabId: victim.tabId, session: victim.opencodeBrowserSessionId }
+    await c.evalInExtension(`globalThis.__opencodevilBrowserTest.toolbarClick(${Number(victim.tabId)})`)
+    return { tabId: victim.tabId, session: victim.opencodevilBrowserSessionId }
   },
 }
 

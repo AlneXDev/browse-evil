@@ -29,7 +29,7 @@ export function clearDeviceMetricsOverride<Error>(
 }
 
 type OverrideEntry = {
-  /** The browse session whose client set it, or undefined for a raw client. */
+  /** The browsevil session whose client set it, or undefined for a raw client. */
   sessionId: string | undefined
   generation: number
 }

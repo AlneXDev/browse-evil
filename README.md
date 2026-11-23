@@ -1,6 +1,10 @@
+# OpenCode Eʌil Browse — Made by ✧Alne
+
+Evil side-by-side fork of `anomalyco/browsevil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">
-  <img src="assets/banner-light.png" alt="browse: let your AI agents use your real browser. An isometric desk computer whose screen shows a web browser with an agent's tab group, cabled to a small relay box.">
+  <img src="assets/banner-light.png" alt="browsevil: let your AI agents use your real browser. An isometric desk computer whose screen shows a web browser with an agent's tab group, cabled to a small relay box.">
 </picture>
 
 Let your AI agents use your real browser: your tabs, your logins, your extensions. A small native MCP server and a
@@ -8,35 +12,46 @@ Chromium extension, for [OpenCode](https://opencode.ai), Claude Code, Codex, Cur
 
 ---
 
-Agents get a `browse` MCP server. They open tabs in the background, read pages, click, type, take screenshots,
+Agents get a `browsevil` MCP server. They open tabs in the background, read pages, click, type, take screenshots,
 capture network traffic and record the screen, in tabs grouped out of your way. When it's your turn (a login, a 2FA
 prompt, a payment), they hand the tab back to you and continue once you click **Continue**.
 
 It works in Chrome, Edge, Brave, Arc, Helium, Vivaldi, Opera and Chromium.
 
-## Install
+## Install (Windows)
 
-```sh
-curl -fsSL https://opencode.ai/browse/install | bash
+Download the evil CLI from the GitHub release and let it set up the `browsevil` MCP server for your agents:
+
+```powershell
+iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe
+.\browsevil.exe install
 ```
 
-Or paste this into your agent: *"Set up browse so you can use my Chrome: run
-`curl -fsSL https://opencode.ai/browse/install | bash`"*. It sets browse up for the agent that ran it.
+Then load the evil extension unpacked: download
+`opencode-evil-browse-extension-0.1.5.zip` from the same release, extract it, open `chrome://extensions`, turn on
+Developer mode and click **Load unpacked** on the extracted folder. Run `.\browsevil.exe install` again to pair it.
 
-Other ways to install, all of which end in the same `browse install`:
+> The `https://opencode.ai/browse/install` installers install **normal** OpenCode Browse. Don't use them for the evil
+> build — this fork is not published to the Chrome Web Store, so the extension must be loaded unpacked.
 
-| How | Command | Where `browse` lives, and what updates it |
+The evil build lives under `~/.config/browsevil`, `~/.local/share/browsevil`, `~/.local/state/browsevil` and
+`~/.cache/browsevil`, registers the MCP server as `browsevil`, and its relay listens on port `29698`, so it runs
+side-by-side with normal Browse without touching it.
+
+Other ways to install, all of which end in the same `browsevil install`:
+
+| How | Command | Where `browsevil` lives, and what updates it |
 | --- | --- | --- |
-| Install script (macOS, Linux) | `curl -fsSL https://opencode.ai/browse/install \| bash` | `~/.local/bin/browse` (`$XDG_BIN_HOME` when set); updates itself |
-| Install script (Windows) | `irm https://opencode.ai/browse/install.ps1 \| iex` in PowerShell | `%USERPROFILE%\.local\bin\browse.exe`; updates itself |
-| npx, bunx | `npx @opencode/browsevil install` | copied to `~/.local/bin/browse` once; updates itself from then on |
-| npm | `npm i -g @opencode/browsevil`, then `browse install` | npm's global `browse`; browse runs `npm install -g` to update |
-| bun | `bun add -g @opencode/browsevil`, then `browse install` | `~/.bun/bin/browse`; browse runs `bun add -g` to update |
-| pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browsevil`, then `browse install` | that manager's `browse`; updated with the same manager |
+| Install script (macOS, Linux) | `curl -fsSL https://opencode.ai/browse/install \| bash` | `~/.local/bin/browsevil` (`$XDG_BIN_HOME` when set); updates itself |
+| Evil release (Windows) | `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe` then `.\browsevil.exe install` | `%USERPROFILE%\.local\bin\browsevil.exe`; updates itself |
+| npx, bunx | `npx @opencode/browsevil install` | copied to `~/.local/bin/browsevil` once; updates itself from then on |
+| npm | `npm i -g @opencode/browsevil`, then `browsevil install` | npm's global `browsevil`; browsevil runs `npm install -g` to update |
+| bun | `bun add -g @opencode/browsevil`, then `browsevil install` | `~/.bun/bin/browsevil`; browsevil runs `bun add -g` to update |
+| pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browsevil`, then `browsevil install` | that manager's `browsevil`; updated with the same manager |
 
-There's always exactly one `browse`: a global package install is left to its package manager (nothing is copied next
-to it, and a leftover `~/.local/bin/browse` from an earlier install is removed), and agents run the same `browse` your
-terminal does. If `browse install` finds another `browse` on your PATH it tells you which one and how to remove it.
+There's always exactly one `browsevil`: a global package install is left to its package manager (nothing is copied next
+to it, and a leftover `~/.local/bin/browsevil` from an earlier install is removed), and agents run the same `browsevil` your
+terminal does. If `browsevil install` finds another `browsevil` on your PATH it tells you which one and how to remove it.
 
 The install script reads the channel's manifest from [Anomaly's release service](https://anoma.ly/release), downloads
 the binary for this computer and checks its size and SHA-256 before installing it. `--channel stable|beta|dev` picks
@@ -44,27 +59,27 @@ the channel (`stable` by default); `--version <version>` installs a specific ver
 published SHA-512 integrity. With npm, `@opencode/browsevil@dev` is the dev channel. The npm package is a small Node
 launcher (Node 22+) that runs the native binary npm installed for your platform.
 
-### What `browse install` does
+### What `browsevil install` does
 
-1. **Puts browse in place** (see above) and adds `~/.local/bin` to your PATH when it copied browse there
+1. **Puts browsevil in place** (see above) and adds `~/.local/bin` to your PATH when it copied browsevil there
    (`--no-modify-path` skips that).
-2. **Adds the browse MCP server to your agents.** In a terminal you get a picker: OpenCode and the agents found on this
+2. **Adds the browsevil MCP server to your agents.** In a terminal you get a picker: OpenCode and the agents found on this
    computer start checked (your last choice next time). Type to search all supported agents, ↑/↓ to move, Space or Tab
-   to toggle, Enter to confirm. An agent running `browse install` sets up itself. Without a terminal OpenCode is the
+   to toggle, Enter to confirm. An agent running `browsevil install` sets up itself. Without a terminal OpenCode is the
    default. Edits keep the comments and formatting of each agent's config, and a config that's a symlink (a
-   dotfiles repo, Nix Home Manager) stays one: browse writes the file it points at.
-3. **Connects the extension.** If no browser has browse yet, install opens it in the Chrome Web Store; add it, and
+   dotfiles repo, Nix Home Manager) stays one: browsevil writes the file it points at.
+3. **Connects the extension.** If no browser has browsevil yet, install opens it in the Chrome Web Store; add it, and
    install pairs it once it's there. If a browser already has it, install opens its setup page with a one-time pairing
    code in the link, so it pairs without copying anything. Over SSH or without a display it prints a code instead.
 
 Then ask your agent to *"open news.ycombinator.com and tell me the top story"*. An agent that was already running
-needs a restart (or an MCP reload) to load browse.
+needs a restart (or an MCP reload) to load browsevil.
 
 ```sh
-browse install -a claude codex   # these agents, without asking (--agent; names below)
-browse install -a '*'            # every supported agent, installed or not
-browse install -y                # every agent found on this computer
-browse install --agent none      # no agent: print the MCP entry to add by hand
+browsevil install -a claude codex   # these agents, without asking (--agent; names below)
+browsevil install -a '*'            # every supported agent, installed or not
+browsevil install -y                # every agent found on this computer
+browsevil install --agent none      # no agent: print the MCP entry to add by hand
 ```
 
 <details><summary>Supported agents and their user-level config files</summary>
@@ -74,7 +89,7 @@ Windows, or `CONFIG` on Linux. The paths below are defaults; a client's existing
 
 | Agent (flag) | User config | Format / server key |
 | --- | --- | --- |
-| [OpenCode](https://opencode.ai/v2/docs/mcp-servers) (`opencode`) | `CONFIG/opencode/opencode.json` or `.jsonc` | JSONC · `mcp.servers` |
+| [OpenCode](https://opencode.ai/v2/docs/mcp-servers) (`opencodevil`) | `CONFIG/opencodevil/opencodevil.json` or `.jsonc` | JSONC · `mcp.servers` |
 | [Claude Code](https://code.claude.com/docs/en/mcp-quickstart) (`claude`) | `~/.claude.json` | JSON · `mcpServers` |
 | [Claude Desktop](https://modelcontextprotocol.io/docs/develop/build-server) (`claude-desktop`) | `APP/Claude/claude_desktop_config.json` | JSON · `mcpServers` |
 | [Cursor](https://cursor.com/docs/context/mcp) (`cursor`) | `~/.cursor/mcp.json` | JSON · `mcpServers` |
@@ -111,39 +126,39 @@ Windows, or `CONFIG` on Linux. The paths below are defaults; a client's existing
 
 </details>
 
-For any other stdio MCP client, run `browse mcp`:
+For any other stdio MCP client, run `browsevil mcp`:
 
 ```json
-{ "mcpServers": { "browse": { "command": "/home/you/.local/bin/browse", "args": ["mcp"] } } }
+{ "mcpServers": { "browsevil": { "command": "/home/you/.local/bin/browsevil", "args": ["mcp"] } } }
 ```
 
-(`browse install --agent none` prints this with your path.) Re-running install updates the entries it wrote and
-leaves servers named browse that it didn't write alone. With `OPENCODE_BROWSEVIL_PORT` set, install writes the port into
-each entry's environment so agents start `browse mcp` on the relay the extension is paired with. dsh and Mistral Vibe
+(`browsevil install --agent none` prints this with your path.) Re-running install updates the entries it wrote and
+leaves servers named browsevil that it didn't write alone. With `OPENCODE_BROWSEVIL_PORT` set, install writes the port into
+each entry's environment so agents start `browsevil mcp` on the relay the extension is paired with. dsh and Mistral Vibe
 are the exception: add `OPENCODE_BROWSEVIL_PORT` to their env by hand (an entry you write yourself needs it too). Install
 never removes a port it wrote, so if you stop pinning, delete it from those entries or re-run install with the new port.
 
 ### Pairing
 
-There's nothing to sign in to. Each browser pairs with browse once and gets a key of its own (see
-[Security](#security)). If pairing didn't happen by itself, run `browse install` again, or run `browse pair`: it
-prints a one-time code (`XXXX-XXXX`, good for 10 minutes) and waits. Open **Extensions → browse → Options**, expand
-**advanced** (or click **Pair with a code**), enter the code under **Pairing code** and click **Connect**. `browse pair
---list` shows paired browsers; `browse pair --revoke <browser>` unpairs one.
+There's nothing to sign in to. Each browser pairs with browsevil once and gets a key of its own (see
+[Security](#security)). If pairing didn't happen by itself, run `browsevil install` again, or run `browsevil pair`: it
+prints a one-time code (`XXXX-XXXX`, good for 10 minutes) and waits. Open **Extensions → browsevil → Options**, expand
+**advanced** (or click **Pair with a code**), enter the code under **Pairing code** and click **Connect**. `browsevil pair
+--list` shows paired browsers; `browsevil pair --revoke <browser>` unpairs one.
 
 ### Browser on another computer
 
-When your agent runs on one machine and your browser on another (over Tailscale, say), browse runs next to the agent
+When your agent runs on one machine and your browser on another (over Tailscale, say), browsevil runs next to the agent
 and the extension connects to it across the network:
 
-1. On the agent's machine run `browse install --remote` (or `browse set hostname 0.0.0.0` after installing). browse
+1. On the agent's machine run `browsevil install --remote` (or `browsevil set hostname 0.0.0.0` after installing). browsevil
    then listens on every network, restarting the relay if it runs, and prints this machine's address and a pairing
    code. Other computers reach only the extension link; the HTTP API answers on `127.0.0.1` only.
-2. In the browser, open browse's setup page, choose **Connect an agent on another computer** and enter the address and
+2. In the browser, open browsevil's setup page, choose **Connect an agent on another computer** and enter the address and
    code (or use **Relay address** and **Pairing code** under **advanced** on the options page).
 
-The connection isn't encrypted by browse; use a network that is (Tailscale or WireGuard), not the open internet.
-`browse set hostname 127.0.0.1` goes back to this computer only.
+The connection isn't encrypted by browsevil; use a network that is (Tailscale or WireGuard), not the open internet.
+`browsevil set hostname 127.0.0.1` goes back to this computer only.
 
 ### Updates
 
@@ -151,8 +166,8 @@ The connection isn't encrypted by browse; use a network that is (Tailscale or Wi
 channel's release when it isn't the one running (a rollback reaches everyone too):
 
 - every install reads its channel's manifest from the release service (`stable`, or `dev`/`beta` for those builds),
-  with `browse/<channel>/<version>/cli/<install kind>` as the User-Agent;
-- the install script's binary replaces `~/.local/bin/browse` with the manifest's tarball after checking its size and
+  with `browsevil/<channel>/<version>/cli/<install kind>` as the User-Agent;
+- the install script's binary replaces `~/.local/bin/browsevil` with the manifest's tarball after checking its size and
   SHA-256;
 - global installs run the package manager that installed them (`npm install -g`, `bun add -g`, `pnpm add -g`,
   `yarn global add`, `volta install`) to install `@opencode/browsevil@<the manifest's version>` into the same place. A
@@ -161,10 +176,10 @@ channel's release when it isn't the one running (a rollback reaches everyone too
 - `npx`, `bunx`, `pnpm dlx` and `yarn dlx` runs resolve the package themselves: they only tell you another release is
   out.
 
-A relay browse started restarts on the new version when it's idle (one you run with `browse serve` in a terminal keeps
+A relay browsevil started restarts on the new version when it's idle (one you run with `browsevil serve` in a terminal keeps
 running until you restart it); agent tabs stay open and come back. A running MCP server keeps
-working with the newer relay until the agent restarts it. `browse update` updates now and `browse update --check` only
-looks. Choose **Tell me** or **Off** under **updates** on the extension's options page, or run `browse update --mode
+working with the newer relay until the agent restarts it. `browsevil update` updates now and `browsevil update --check` only
+looks. Choose **Tell me** or **Off** under **updates** on the extension's options page, or run `browsevil update --mode
 notify|off` (`OPENCODE_BROWSEVIL_AUTO_UPDATE=off` in the environment overrides both). Off still checks hourly, and
 installs nothing. To go back, rerun the install
 script with `--channel <channel>` or `--version <version>`, or install `@opencode/browsevil@<version>` with your package
@@ -173,17 +188,17 @@ manager. The Chrome Web Store updates the extension.
 **Dev builds**: every push to `dev` publishes one: `curl -fsSL https://opencode.ai/browse/install | bash -s --
 --channel dev`, or `npx @opencode/browsevil@dev install`. The store extension works with dev builds. To try the dev
 extension too, download https://anoma.ly/release/browse/extension/dev/chromium, unzip it, turn on **Developer mode** on
-your browser's extensions page, click **Load unpacked**, pick the folder and run `browse pair` (`browse extension`
-prints these steps on the dev channel). Remove the store extension first so only one browse runs in that profile.
+your browser's extensions page, click **Load unpacked**, pick the folder and run `browsevil pair` (`browsevil extension`
+prints these steps on the dev channel). Remove the store extension first so only one browsevil runs in that profile.
 
 ### Uninstall
 
 ```sh
-browse uninstall
+browsevil uninstall
 ```
 
-It removes browse from every agent config it was added to, stops the relay, deletes `~/.local/bin/browse` (for the
-install script and npx installs), the PATH line it added and browse's files. A global package stays with its package
+It removes browsevil from every agent config it was added to, stops the relay, deletes `~/.local/bin/browsevil` (for the
+install script and npx installs), the PATH line it added and browsevil's files. A global package stays with its package
 manager: uninstall prints the command (`npm rm -g @opencode/browsevil`, `bun remove -g @opencode/browsevil`, ...). Remove the
 extension from your browser to finish.
 
@@ -203,27 +218,27 @@ extension from your browser to finish.
 - **Agents open their own tabs** in the background of the window you last used, grouped together and collapsed unless
   you're looking at one (you can turn that off). Agents can't switch you to their tabs or bring a window to the front.
   Tabs nobody touches for 10 minutes close by themselves (never while something runs on them). Closing agent tabs never
-  quits the browser or leaves it without a window: browse leaves a new tab (or window) behind when it would close the
+  quits the browser or leaves it without a window: browsevil leaves a new tab (or window) behind when it would close the
   last one.
 - **Relay restarts keep agent tabs.** The relay saves the tabs agents opened and their options, and takes them back
   when it starts again (after an update, say).
 - **Hand an agent one of your tabs** by clicking the toolbar button on it. The badge shows **ON**; click again to take
   it back. While an agent works the badge reads **RUN**, and **WAIT** when it needs you. The button always works: a
   click while an agent runs takes the tab back. The browser's debugging bar (**Cancel**, or **OK** in some browsers)
-  disconnects browse from every tab; browse shows a notification when that happens, and clicking the browse button on a
+  disconnects browsevil from every tab; browsevil shows a notification when that happens, and clicking the browsevil button on a
   tab lends it again. Chrome's own pages, the Web Store included, can't be lent.
 - **Handoffs:** the page shows a small card with the site's origin. Do the human part, then click **Continue** on the
   card or the toolbar button. While a tab is recorded you get a system notification instead of the card.
 - **Uploads.** Large files, or sites that reject copied files, work when the browser is on the same computer and the
-  extension has "Allow access to file URLs" turned on in the browser's extensions page (browse → Details): that lets
-  the extension read files on this computer, and browse only hands it files from its file roots. Otherwise browse
+  extension has "Allow access to file URLs" turned on in the browser's extensions page (browsevil → Details): that lets
+  the extension read files on this computer, and browsevil only hands it files from its file roots. Otherwise browsevil
   copies the files in, up to 50 MB per call. Files that aren't on the relay's machine can be passed inline as base64
   (`{ name, data }`): those always copy in and fit about 10 MB per call (the 50 MB limit is for paths copied in), and
   mixing them with paths copies the paths in too.
 - **Several browsers at once.** Each connected browser has an id (like `chrome-macbook`); `status` lists them, and new
   tabs open in the default browser unless `browser` names another.
 - **Settings** (the extension's options page, applied right away): where agent tabs open (your window or their own),
-  grouping (one shared group, one per task, or none), whether browse collapses agent groups by itself or leaves them
+  grouping (one shared group, one per task, or none), whether browsevil collapses agent groups by itself or leaves them
   as you set them (a handoff still opens its group so you can find the tab), when idle tabs close (10, 30, 60 minutes
   or never), whether agent tabs open muted, human-like input, and handoff notifications. Agents can read and change
   these with the `settings` tool when you ask them to.
@@ -247,29 +262,29 @@ OpenCode, which composes tools in code mode, gets the plain tools. Every other M
 | `tabs` | List, open or close tabs (`group` closes a whole group; an `id` names a tab for good, and opens it if it's missing) |
 | `handoff`, `demonstrate` | Ask you to do something only a person can do; ask you to show a flow while it records your steps |
 | `settings`, `status` | Read or change your settings when you ask; the relay, browsers, pairing state and what to do next |
-| `execute` | For other clients: JavaScript with a Playwright-style `page`, `snapshot()`, `ref()`, `handoff()`, `state` and `browse.<tool>()`. Each result starts with the tab it ended in, to pass back as `tab` |
+| `execute` | For other clients: JavaScript with a Playwright-style `page`, `snapshot()`, `ref()`, `handoff()`, `state` and `browsevil.<tool>()`. Each result starts with the tab it ended in, to pass back as `tab` |
 
-Everything is a CLI too: `browse navigate https://example.com` prints the new tab's id, then `browse snapshot --tab
-<id>`, `browse click e12 --tab <id>`, `browse execute --file script.js`. `browse tools` lists them and `browse <tool>
+Everything is a CLI too: `browsevil navigate https://example.com` prints the new tab's id, then `browsevil snapshot --tab
+<id>`, `browsevil click e12 --tab <id>`, `browsevil execute --file script.js`. `browsevil tools` lists them and `browsevil <tool>
 --help` shows a tool's options.
 
 ## How it works
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/how-dark.png">
-  <img src="assets/how-light.png" alt="Three machines on one bench, cabled in a line: the agent's terminal calling browse, the relay box in the middle, and the computer whose browser the agent drives.">
+  <img src="assets/how-light.png" alt="Three machines on one bench, cabled in a line: the agent's terminal calling browsevil, the relay box in the middle, and the computer whose browser the agent drives.">
 </picture>
 
-The agent starts `browse mcp`, a small stdio proxy, which starts the relay on demand and forwards each call to it on
+The agent starts `browsevil mcp`, a small stdio proxy, which starts the relay on demand and forwards each call to it on
 `127.0.0.1:29698` (or the next free port from 29699–29706 when another program holds it). The extension connects to
 the relay over a WebSocket and runs its commands in your browser through `chrome.debugger`.
 
-- **The relay** (`browse serve`, in `rust/`) keeps agent tabs, handoffs, recordings and network captures, talks the
+- **The relay** (`browsevil serve`, in `rust/`) keeps agent tabs, handoffs, recordings and network captures, talks the
   Chrome DevTools Protocol to each tab, and runs `execute` scripts in an embedded JavaScript engine (QuickJS). It
-  runs until it's stopped (`browse restart`, `browse uninstall`, a signal) or restarts onto an update.
+  runs until it's stopped (`browsevil restart`, `browsevil uninstall`, a signal) or restarts onto an update.
 - **The extension** (`src/`) runs the relay's commands through `chrome.debugger`, keeps agent tabs in collapsed groups
   by default (or their own window), closes idle ones, and shows the toolbar badge and the handoff card.
-- **Quiet in the page.** browse doesn't enable the CDP domains pages can detect, runs its own code in isolated worlds
+- **Quiet in the page.** browsevil doesn't enable the CDP domains pages can detect, runs its own code in isolated worlds
   and leaves no globals behind. Input moves like a person: curved mouse paths, paced typing, gliding scroll (turn
   *Human-like input* off for full speed). This makes an agent hard to spot, not impossible: the browser shows its
   "started debugging" bar while the debugger is attached.
@@ -281,10 +296,10 @@ computer except what your agent sends to its model provider; see the [privacy po
 
 ## Security
 
-browse drives the browser you're signed in to, so it assumes that what an agent reads (a web page, an email) may try
+browsevil drives the browser you're signed in to, so it assumes that what an agent reads (a web page, an email) may try
 to steer it, and that other programs on your computer may try to use the relay.
 
-- **Relay token.** Every request to the relay needs the token in `~/.local/share/browse/relay-token` (readable only by
+- **Relay token.** Every request to the relay needs the token in `~/.local/share/browsevil/relay-token` (readable only by
   you). The MCP server and CLI read it for you. The relay listens on `127.0.0.1` only (unless you open it with `set
   hostname`, and then only the extension link) and refuses cross-site browser requests and foreign `Host` headers.
 - **Pairing.** A pairing code works once, within 10 minutes; five wrong codes in a row void every pending one. A
@@ -306,21 +321,21 @@ to steer it, and that other programs on your computer may try to use the relay.
   opens. Scrolling to an element or to the page's edges still works. `eval` and `webmcp` still run JavaScript in the
   page: they can read everything the page can, make requests as the page, and change it (click, submit, navigate).
   Snapshots, screenshots and the cookies the page itself can see stay readable. These keep an agent from wandering: for
-  pages you don't want an agent to read, don't open them in browse.
+  pages you don't want an agent to read, don't open them in browsevil.
 - **What output is masked.** `fill` hides values only for password and one-time-code fields. Snapshots leave out what's
   typed in editable fields, but not other page text. Network capture redacts credentials by name and shape (auth and
   API-key headers, cookie values, secret-named fields, token-like path segments), so a value under an ordinary name can
   still come through. `eval` results, console messages, page text and screenshots are returned as they are.
 - **WebMCP tools come from the page.** Their names, titles, descriptions, schemas, annotations, `origin` and results are
-  whatever a page supplies; browse doesn't verify them, and an annotation like `readOnly` is only the page's word. Treat
+  whatever a page supplies; browsevil doesn't verify them, and an annotation like `readOnly` is only the page's word. Treat
   them like any other page text, not as instructions from the user.
-- **Bot challenges.** After a navigation browse reports Cloudflare, captcha walls and "access denied" pages and tells
+- **Bot challenges.** After a navigation browsevil reports Cloudflare, captcha walls and "access denied" pages and tells
   the agent to hand interactive ones to you. It can handle them or hand them off.
 - **Your tabs stay yours.** Agents use only tabs they opened or you lent them. Only a real click on the card or the
   toolbar button finishes a handoff, so a page can't fake it.
 
 Escape hatches, set in the environment you start your agent from. The relay inherits `OPENCODE_BROWSEVIL_*` variables
-when it starts: it stops after 30 minutes without use, or run `browse restart` from a shell with the same variables:
+when it starts: it stops after 30 minutes without use, or run `browsevil restart` from a shell with the same variables:
 
 | Variable | Effect |
 | --- | --- |
@@ -335,25 +350,25 @@ when it starts: it stops after 30 minutes without use, or run `browse restart` f
 | `OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS=15000` | How long to wait for a bot check the browser clears by itself |
 | `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS=30000` | How long the relay waits for the extension to answer a command |
 | `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS=10000` | How long a ping may go unanswered before the browser counts as asleep |
-| `OPENCODE_BROWSEVIL_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browse's own ports (29698, 29699–29706) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browse install` with it set writes it into each agent's MCP entry, so agents start `browse mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
+| `OPENCODE_BROWSEVIL_PORT=20000` | Pin the relay's port, with no fallback. The extension finds only browsevil's own ports (29698, 29699–29706) by itself, so enter `localhost:<port>` as its relay address when you pair. Running `browsevil install` with it set writes it into each agent's MCP entry, so agents start `browsevil mcp` on it (dsh and Mistral Vibe need it added by hand); install never removes a port it wrote, so stop pinning by deleting it or re-running install with the new port |
 | `OPENCODE_BROWSEVIL_TOOLS=plain\|execute\|all` | Which tools every client gets |
 
 ## Troubleshooting
 
-- `browse status` shows the install, the agents browse is set up in, updates, the relay, the extension and agent tabs,
+- `browsevil status` shows the install, the agents browsevil is set up in, updates, the relay, the extension and agent tabs,
   and says what to do when the extension is missing, unpaired, closed or out of date. Agents get the same from the
   `status` tool.
 - After the relay restarts, the extension reconnects by itself within about half a minute; calls made in the meantime
   wait for it.
-- An agent says browse's tools are missing: restart the agent (or reload its MCP servers) after `browse install`.
+- An agent says browsevil's tools are missing: restart the agent (or reload its MCP servers) after `browsevil install`.
 - "The browser isn't answering" while the computer is very busy: raise `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS` and
   `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS`.
-- Logs: `~/.local/state/browse/logs/relay.log`.
-- Another program's server on port 29698: browse takes the next free port from 29699–29706 and the extension finds it
+- Logs: `~/.local/state/browsevil/logs/relay.log`.
+- Another program's server on port 29698: browsevil takes the next free port from 29699–29706 and the extension finds it
   there. A port held by something that doesn't answer HTTP stops it; stop that program or set `OPENCODE_BROWSEVIL_PORT`.
-- The extension says it's not paired, or the relay refused it: run `browse install` again, or `browse pair` and enter
+- The extension says it's not paired, or the relay refused it: run `browsevil install` again, or `browsevil pair` and enter
   the code in the extension's options.
-- An agent says browse was updated and its MCP server must restart: an MCP server started before an update to this
+- An agent says browsevil was updated and its MCP server must restart: an MCP server started before an update to this
   version can't talk to the new relay. Restart the agent.
 
 ## Development
@@ -361,11 +376,11 @@ when it starts: it stops after 30 minutes without use, or run `browse restart` f
 ```sh
 bun install && bun run dev       # rebuilds the extension into dist/ on change; load it unpacked, reload to pick it up
 bun run typecheck && bun test ./test
-cd rust && cargo test --workspace && cargo run -p browse -- status
+cd rust && cargo test --workspace && cargo run -p browsevil -- status
 ```
 
-A build from a checkout (`cargo run -p browse -- install`) is used in place and never updates itself. The extension in
-`dist/` keeps the manifest key, so it loads with the unpacked ID the relay trusts; run `browse pair` to pair it.
+A build from a checkout (`cargo run -p browsevil -- install`) is used in place and never updates itself. The extension in
+`dist/` keeps the manifest key, so it loads with the unpacked ID the relay trusts; run `browsevil pair` to pair it.
 [RELEASING.md](RELEASING.md) has the release flow (dev builds from every push to `dev`; stable releases only from the
 Release workflow in GitHub Actions), and [rust/PLAN.md](rust/PLAN.md) the layout of the Rust crates. `cli/` is the
 earlier TypeScript implementation, kept as a reference.

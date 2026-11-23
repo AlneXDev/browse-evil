@@ -155,7 +155,7 @@ export interface Interface {
   readonly settingsSet: (changes: Record<string, unknown>) => Effect.Effect<SettingsSetResponse, RelayClientError>
 }
 
-export class Service extends Context.Service<Service, Interface>()("opencode-browser-cli/RelayClient") {}
+export class Service extends Context.Service<Service, Interface>()("opencodevil-browser-cli/RelayClient") {}
 
 const decodeErrorEnvelope = Schema.decodeUnknownOption(ErrorEnvelope)
 const decodeErrorMessage = Schema.decodeUnknownOption(Schema.Struct({ error: Schema.String }))
@@ -225,7 +225,7 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
   const transportError = (path: string, at?: string) => (cause: unknown) => {
     const endpoint = at ?? currentEndpoint()
     return new RelayUnreachable({
-      message: `browse relay is not reachable at ${endpoint}. Relay-backed CLI commands start it automatically; use \`${cliCommand("serve")}\` only for foreground debugging.`,
+      message: `browsevil relay is not reachable at ${endpoint}. Relay-backed CLI commands start it automatically; use \`${cliCommand("serve")}\` only for foreground debugging.`,
       endpoint,
       path,
       cause,
@@ -249,7 +249,7 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
       return request
     }
     const authorized = HttpClientRequest.setHeader(request, "authorization", authorization)
-    return options?.clientPid === undefined ? authorized : HttpClientRequest.setHeader(authorized, "opencode-browser-client-pid", String(options.clientPid))
+    return options?.clientPid === undefined ? authorized : HttpClientRequest.setHeader(authorized, "opencodevil-browser-client-pid", String(options.clientPid))
   }
 
   // Every session's execute code shares the relay's event loop, so under load even /version can wait several seconds
@@ -274,7 +274,7 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
 
   const notBrowse = (endpoint: string, cause: unknown) =>
     new RelayDecodeFailed({
-      message: `Relay port ${new URL(endpoint).port} is in use by another program (not a browse /version response).`,
+      message: `Relay port ${new URL(endpoint).port} is in use by another program (not a browsevil /version response).`,
       path: "/version",
       cause,
     })
@@ -294,7 +294,7 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
   const sameLiveState = (left: ReturnType<typeof liveRelayState>, right: ReturnType<typeof liveRelayState>) =>
     left === undefined ? right === undefined : right !== undefined && left.port === right.port && left.instanceId === right.instanceId
 
-  // Bearer tokens only go to a port whose open /version proved it is this install's browse relay. Verified once per
+  // Bearer tokens only go to a port whose open /version proved it is this install's browsevil relay. Verified once per
   // resolved endpoint (and instance), never for an endpoint that changed underneath this client.
   const verifyEndpoint = (
     endpoint: string,
@@ -464,8 +464,8 @@ export const make = Effect.fn("RelayClient.make")(function* (options?: {
         }),
       )
       return probe.pipe(
-        // Another product on the port (Playwriter answers `{ version }` alone): without browse's instanceId this is not
-        // a browse relay, and must never be mistaken for one. Same path as any other foreign listener.
+        // Another product on the port (Playwriter answers `{ version }` alone): without browsevil's instanceId this is not
+        // a browsevil relay, and must never be mistaken for one. Same path as any other foreign listener.
         Effect.flatMap(({ value: version, endpoint }): Effect.Effect<RelayVersion, RelayClientError> => {
           const instanceId = version.instanceId
           if (typeof instanceId !== "string") return Effect.fail(notBrowse(endpoint, version))

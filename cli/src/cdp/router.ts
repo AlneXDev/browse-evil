@@ -38,13 +38,13 @@ export class CdpRouter<Client extends object> {
     if (clientSessionId && !this.inSessionBrowser(clientSessionId, target.tabId)) return false
     return canClientSeeTarget({
       clientSessionId,
-      targetOwnerSessionId: target.opencodeBrowserSessionId,
+      targetOwnerSessionId: target.opencodevilBrowserSessionId,
       targetOwner: target.owner,
       clientHasOwnedTarget:
         clientSessionId !== undefined &&
-        target.opencodeBrowserSessionId === undefined &&
+        target.opencodevilBrowserSessionId === undefined &&
         target.owner !== "user" &&
-        this.registry.listRootTargets().some((candidate) => candidate.opencodeBrowserSessionId === clientSessionId),
+        this.registry.listRootTargets().some((candidate) => candidate.opencodevilBrowserSessionId === clientSessionId),
     })
   }
 
@@ -59,7 +59,7 @@ export class CdpRouter<Client extends object> {
       if (target.crashed) return false
       if (browserContextId !== undefined && target.targetInfo.browserContextId !== browserContextId) return false
       return clientSessionId !== undefined
-        ? target.opencodeBrowserSessionId === clientSessionId && this.inSessionBrowser(clientSessionId, target.tabId)
+        ? target.opencodevilBrowserSessionId === clientSessionId && this.inSessionBrowser(clientSessionId, target.tabId)
         : this.canSeeTarget(client, target)
     })
     if (candidates.length === 0) return undefined

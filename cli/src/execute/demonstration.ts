@@ -156,7 +156,7 @@ function appendStep(steps: DemonstrationStep[], next: DemonstrationStep): void {
 const isDemonstrationStep = Schema.is(DemonstrationStep)
 
 type DemonstrationWorld = {
-  __opencodeBrowserDemonstration?: {
+  __opencodevilBrowserDemonstration?: {
     readonly id: string
     readonly steps: DemonstrationStep[]
     wake?: (() => void) | undefined
@@ -166,12 +166,12 @@ type DemonstrationWorld = {
 
 function installDemonstrationListeners(options: { readonly recorderId: string }): void {
   const world = globalThis as DemonstrationWorld
-  if (world.__opencodeBrowserDemonstration?.id === options.recorderId) return
-  world.__opencodeBrowserDemonstration?.cleanup()
+  if (world.__opencodevilBrowserDemonstration?.id === options.recorderId) return
+  world.__opencodevilBrowserDemonstration?.cleanup()
   const steps: DemonstrationStep[] = []
   const send = (step: DemonstrationStep) => {
     steps.push(step)
-    world.__opencodeBrowserDemonstration?.wake?.()
+    world.__opencodevilBrowserDemonstration?.wake?.()
   }
   const cssPath = (element: Element): string => {
     const id = element.getAttribute("id")
@@ -249,18 +249,18 @@ function installDemonstrationListeners(options: { readonly recorderId: string })
     document.removeEventListener("click", onClick, true)
     document.removeEventListener("input", onInput, true)
     document.removeEventListener("change", onChange, true)
-    const current = world.__opencodeBrowserDemonstration
+    const current = world.__opencodevilBrowserDemonstration
     if (current?.id === options.recorderId) {
-      delete world.__opencodeBrowserDemonstration
+      delete world.__opencodevilBrowserDemonstration
       current.wake?.()
     }
   }
-  world.__opencodeBrowserDemonstration = { id: options.recorderId, steps, cleanup }
+  world.__opencodevilBrowserDemonstration = { id: options.recorderId, steps, cleanup }
 }
 
 /** Resolves with the frame's recorded steps once there are any (or after `waitMs`); null when nothing listens. */
 function takeDemonstrationSteps(options: { readonly recorderId: string; readonly waitMs: number }): Promise<DemonstrationStep[] | null> {
-  const state = (globalThis as DemonstrationWorld).__opencodeBrowserDemonstration
+  const state = (globalThis as DemonstrationWorld).__opencodevilBrowserDemonstration
   if (!state || state.id !== options.recorderId) return Promise.resolve(null)
   if (state.steps.length > 0) return Promise.resolve(state.steps.splice(0))
   return new Promise((resolve) => {
@@ -277,6 +277,6 @@ function takeDemonstrationSteps(options: { readonly recorderId: string; readonly
 }
 
 function removeDemonstrationListeners(options: { readonly recorderId: string }): void {
-  const state = (globalThis as DemonstrationWorld).__opencodeBrowserDemonstration
+  const state = (globalThis as DemonstrationWorld).__opencodevilBrowserDemonstration
   if (state?.id === options.recorderId) state.cleanup()
 }

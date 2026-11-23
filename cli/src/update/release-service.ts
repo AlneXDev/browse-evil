@@ -216,16 +216,16 @@ export async function fetchManifest(options: {
   readonly fetch?: typeof fetch
 }): Promise<ManifestResponse> {
   const service = (options.service ?? releaseService()).replace(/\/+$/, "")
-  const response = await (options.fetch ?? fetch)(`${service}/browse/cli/${options.channel}.json`, {
+  const response = await (options.fetch ?? fetch)(`${service}/browsevil/cli/${options.channel}.json`, {
     headers: {
-      "user-agent": `browse/${options.channel}/${options.version}/cli`,
+      "user-agent": `browsevil/${options.channel}/${options.version}/cli`,
       ...(options.etag ? { "if-none-match": options.etag } : {}),
     },
     signal: AbortSignal.timeout(30_000),
   })
   if (response.status === 304) return { status: "unchanged" }
   if (response.status === 404) return { status: "missing" }
-  if (!response.ok) throw new Error(`the release service answered ${response.status} for browse/cli/${options.channel}`)
+  if (!response.ok) throw new Error(`the release service answered ${response.status} for browsevil/cli/${options.channel}`)
   const etag = response.headers.get("etag")
   return { status: "manifest", text: await response.text(), ...(etag ? { etag } : {}) }
 }
@@ -254,7 +254,7 @@ export async function checkRelease(options: {
   })
   if (manifest.status !== "manifest") return manifest
   const decision = decide({
-    app: "browse",
+    app: "browsevil",
     artifact: "cli",
     channel: options.channel,
     manifest: manifest.text,

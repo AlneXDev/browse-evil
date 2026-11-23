@@ -1,7 +1,7 @@
-// Smoke test over MCP stdio, the way an agent uses browse: initialize, tools/list, status, then one session through
+// Smoke test over MCP stdio, the way an agent uses browsevil: initialize, tools/list, status, then one session through
 // navigate, snapshot, fill, click, screenshot, network capture, a recording and session_delete.
 //   node stress/smoke.ts                                   # on the box (spawns `node cli/dist/cli.mjs mcp`)
-//   node stress/smoke.ts --remote browse-stress.exe.xyz    # from a Mac: the MCP server runs on the box over wssh
+//   node stress/smoke.ts --remote browsevil-stress.exe.xyz    # from a Mac: the MCP server runs on the box over wssh
 // --remote only lists tools and calls status (the fixture site lives on the box).
 import fs from "node:fs"
 import os from "node:os"
@@ -13,7 +13,7 @@ import { exec, McpClient } from "./lib/mcp.ts"
 
 type StatusToolResult = { status?: { connected?: boolean } }
 
-const { values } = parseArgs({ options: { remote: { type: "string" }, ssh: { type: "string", default: "wssh" }, "remote-cli": { type: "string", default: "/home/exedev/browse/cli/dist/cli.mjs" } } })
+const { values } = parseArgs({ options: { remote: { type: "string" }, ssh: { type: "string", default: "wssh" }, "remote-cli": { type: "string", default: "/home/exedev/browsevil/cli/dist/cli.mjs" } } })
 const steps: { step: string; ok: boolean; ms: number; detail?: string }[] = []
 async function step<T>(name: string, run: () => Promise<T>): Promise<T | undefined> {
   const t = Date.now()
@@ -51,7 +51,7 @@ await step("status", async () => {
 if (!values.remote) {
   const fx = await startFixtures(fixturePort)
   const session = `smoke-${Date.now().toString(36)}`
-  const out = fs.mkdtempSync(path.join(os.tmpdir(), "browse-smoke-"))
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-smoke-"))
   const run = (code: string) => exec(client, session, code)
   await step("session_new", async () => { const r = await client.call("session_new", { id: session }); check(!r.isError, r.text); return r.data?.session?.id ?? session })
   await step("execute: navigate + snapshot", async () => { const s = await run(`await page.goto(${JSON.stringify(fx.url("/form"))}); return await snapshot()`); check(String(s).includes("Save"), s); return s })

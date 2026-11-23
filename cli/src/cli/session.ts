@@ -47,7 +47,7 @@ const sessionNew = Command.make(
     browser: Flag.String("browser").pipe(
       Flag.optional,
       Flag.withDescription(
-        "Open this session's tabs in the connected browser with this id or name (browse status --json lists them); omit for the default browser",
+        "Open this session's tabs in the connected browser with this id or name (browsevil status --json lists them); omit for the default browser",
       ),
     ),
     keepVisible: Flag.Boolean("keep-visible").pipe(
@@ -71,7 +71,7 @@ const sessionNew = Command.make(
     yield* store.write(result.id)
     yield* Console.log(result.id)
   }),
-).pipe(Command.withDescription("Create a browse session and make it current"))
+).pipe(Command.withDescription("Create a browsevil session and make it current"))
 
 const sessionList = Command.make(
   "list",
@@ -102,7 +102,7 @@ const sessionList = Command.make(
       return Console.log(`${marker} ${item.id} ${page}${keys}${readOnly}${allowed}${handoff}`)
     })
   }),
-).pipe(Command.withDescription("List browse sessions"))
+).pipe(Command.withDescription("List browsevil sessions"))
 
 const sessionCurrent = Command.make(
   "current",
@@ -131,7 +131,7 @@ const sessionReset = Command.make(
   "reset",
   {
     id: Argument.String("id").pipe(Argument.optional),
-    session: sessionFlag("Reset this browse session id"),
+    session: sessionFlag("Reset this browsevil session id"),
   },
   Effect.fn("Cli.sessionReset")(function* ({ id, session }) {
     const relay = yield* RelayClient.Service
@@ -141,13 +141,13 @@ const sessionReset = Command.make(
     if (reset.stopped) yield* Console.error(`Stopped first: ${describeStop(reset.stopped)}`)
     yield* Console.log(reset.session.id)
   }),
-).pipe(Command.withDescription("Reset a browse session state and page"))
+).pipe(Command.withDescription("Reset a browsevil session state and page"))
 
 const sessionAdopt = Command.make(
   "adopt",
   {
     session: sessionFlag(
-      "Adopt into this browse session, creating it when it does not exist yet; omit to create a fresh readable id",
+      "Adopt into this browsevil session, creating it when it does not exist yet; omit to create a fresh readable id",
     ),
     targetUrl: Flag.String("target-url").pipe(
       Flag.optional,
@@ -198,7 +198,7 @@ const sessionDelete = Command.make(
   "delete",
   {
     id: Argument.String("id").pipe(Argument.optional),
-    session: sessionFlag("Delete this browse session id"),
+    session: sessionFlag("Delete this browsevil session id"),
   },
   Effect.fn("Cli.sessionDelete")(function* ({ id, session }) {
     const relay = yield* RelayClient.Service
@@ -213,7 +213,7 @@ const sessionDelete = Command.make(
     }
     yield* Console.log(sessionId)
   }),
-).pipe(Command.withDescription("Delete a browse session"))
+).pipe(Command.withDescription("Delete a browsevil session"))
 
 const sessionAllow = Command.make(
   "allow",
@@ -252,7 +252,7 @@ const sessionAllow = Command.make(
 ).pipe(Command.withDescription("Set the domain allowlist of a session (the current one by default)"))
 
 const session = Command.make("session").pipe(
-  Command.withDescription("Manage browse sessions"),
+  Command.withDescription("Manage browsevil sessions"),
   Command.withSubcommands([
     sessionNew,
     sessionList,
@@ -268,7 +268,7 @@ const session = Command.make("session").pipe(
 const journal = Command.make(
   "journal",
   {
-    session: sessionFlag("Show the journal for this browse session id"),
+    session: sessionFlag("Show the journal for this browsevil session id"),
     limit: Flag.Int("limit").pipe(
       Flag.optional,
       Flag.withDescription("Number of most recent entries to show, defaults to 20"),
@@ -299,7 +299,7 @@ const journal = Command.make(
       return Console.log(formatJournalEntry(entry))
     })
   }),
-).pipe(Command.withDescription("Show what agents did in a browse session"))
+).pipe(Command.withDescription("Show what agents did in a browsevil session"))
 
 registerCliCommand(300, () => session)
 registerCliCommand(800, () => journal)

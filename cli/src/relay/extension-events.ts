@@ -166,7 +166,7 @@ export function createExtensionEventHandler(options: {
 
   function adoptOpenedTab(tabId: number, openerTabId: number): void {
     const opener = registry.tabTargets.get(openerTabId)
-    const sessionId = opener?.opencodeBrowserSessionId
+    const sessionId = opener?.opencodevilBrowserSessionId
     if (!opener || !sessionId || registry.routingRootTarget(tabId)) return
     if (opener.owner === "user" && !sessions.isExecuting(sessionId)) return
     const autoAttachParams = Array.from(cdpClients)
@@ -178,7 +178,7 @@ export function createExtensionEventHandler(options: {
     const attach = () => Effect.runPromise(rootLifecycle.attach({
       tabId,
       owner: "relay",
-      opencodeBrowserSessionId: sessionId,
+      opencodevilBrowserSessionId: sessionId,
       openerTargetId: opener.targetInfo.targetId,
       ...(autoAttachParams ? { autoAttachParams } : {}),
       deferHeldTarget: true,
@@ -201,7 +201,7 @@ export function createExtensionEventHandler(options: {
       const popup = registry.tabTargets.get(tabId)
       if (!popup) return
       const allowed = navigationGuard.popupAttached(popup)
-      if (allowed && popup.opencodeBrowserSessionId) sessions.noteTargetHeld(popup.targetInfo.targetId, popup.opencodeBrowserSessionId)
+      if (allowed && popup.opencodevilBrowserSessionId) sessions.noteTargetHeld(popup.targetInfo.targetId, popup.opencodevilBrowserSessionId)
     }).catch((error: unknown) => {
       relayLog("tab.opened.error", { tabId, error: error instanceof Error ? error.message : String(error) })
     })
@@ -231,7 +231,7 @@ export function createExtensionEventHandler(options: {
       const text = getString(message.params, "message")
       if (!text) return
       const level = message.params?.level === "error" || message.params?.level === "warn" ? message.params.level : "log"
-      console[level](`[browse extension] ${text}`)
+      console[level](`[browsevil extension] ${text}`)
       return
     }
     if (extensionMethod === "ready") {
@@ -255,7 +255,7 @@ export function createExtensionEventHandler(options: {
             // A tombstone is always closed, even when a new session reused the deleted session's id.
             if (known.deleted !== true && sessions.sessions.has(known.sessionId)) continue
             const target = registry.targetsByTargetId.get(targetId)
-            if (!target || (known.deleted !== true && target.opencodeBrowserSessionId !== undefined)) continue
+            if (!target || (known.deleted !== true && target.opencodevilBrowserSessionId !== undefined)) continue
             relayLog("extension.inventory.orphan", { tabId: target.tabId, session: known.sessionId, reason: "session deleted" })
             sendExtensionBestEffort({ method: "tabs.remove", params: { tabId: target.tabId } })
             detachTargetState(target.tabId, { updateExtension: false, reason: "session-deleted" })
@@ -268,7 +268,7 @@ export function createExtensionEventHandler(options: {
             }
           }
           for (const target of registry.listRootTargets()) {
-            if (!announcedAgentTabIds.has(target.tabId) || target.owner !== "user" || target.opencodeBrowserSessionId !== undefined) continue
+            if (!announcedAgentTabIds.has(target.tabId) || target.owner !== "user" || target.opencodevilBrowserSessionId !== undefined) continue
             const known = ownersAcrossReconnect.get(target.targetInfo.targetId)
             if (known?.owner === "user") continue
             // Every other announced agent tab is one this relay did not keep: an unknown tab, a refused reclaim, or a

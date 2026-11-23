@@ -4,7 +4,7 @@ import { Context, Effect, FileSystem, Layer, Option, Path, Predicate, Schema } f
 import { endpointForPort, portConfig } from "../relay/client.ts"
 
 /**
- * SessionStore persists the CLI's current browse session id, scoped
+ * SessionStore persists the CLI's current browsevil session id, scoped
  * by relay endpoint so switching `OPENCODE_BROWSEVIL_PORT` cannot silently reuse
  * a session id created against a different relay.
  *
@@ -37,7 +37,7 @@ export interface Interface {
   readonly clear: Effect.Effect<void, SessionStoreError>
 }
 
-export class Service extends Context.Service<Service, Interface>()("opencode-browser-cli/SessionStore") {}
+export class Service extends Context.Service<Service, Interface>()("opencodevil-browser-cli/SessionStore") {}
 
 const defaultFilePath = (): string => {
   return `${stateRoot()}/session.json`

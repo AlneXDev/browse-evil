@@ -1,5 +1,5 @@
 // Gets the Chrome Web Store API refresh token the release workflow uses, once, on your own computer:
-//   bun scripts/cws-auth.ts    prints the refresh token once, for `bun set browse release CWS_REFRESH_TOKEN` in
+//   bun scripts/cws-auth.ts    prints the refresh token once, for `bun set browsevil release CWS_REFRESH_TOKEN` in
 //                              anomalyco/secrets, which stores it in AWS Secrets Manager (RELEASING.md)
 // It asks for the OAuth client's ID and secret (or reads CWS_CLIENT_ID / CWS_CLIENT_SECRET), opens Google's consent page
 // in your browser with PKCE, receives the code on a one-time 127.0.0.1 redirect, and exchanges it. Nothing is written to
@@ -124,7 +124,7 @@ async function main() {
     throw new Error(`Token exchange failed: ${response.status} ${body.error ?? ""} ${body.error_description ?? ""}${response.ok ? " (no refresh token; revoke the app's access at https://myaccount.google.com/permissions and run this again)" : ""}`)
   if (body.scope && !body.scope.split(" ").includes(SCOPE)) throw new Error(`The token doesn't carry the ${SCOPE} scope.`)
 
-  console.error("Refresh token (shown once; store it as browse/release/CWS_REFRESH_TOKEN with `bun set browse release CWS_REFRESH_TOKEN` in anomalyco/secrets, then clear your terminal):")
+  console.error("Refresh token (shown once; store it as browsevil/release/CWS_REFRESH_TOKEN with `bun set browsevil release CWS_REFRESH_TOKEN` in anomalyco/secrets, then clear your terminal):")
   process.stdout.write(`${body.refresh_token}\n`)
 }
 

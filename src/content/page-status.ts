@@ -1,4 +1,4 @@
-// In-page status for tabs agents use through the browse relay: a "your turn" card when an agent hands
+// In-page status for tabs agents use through the browsevil relay: a "your turn" card when an agent hands
 // the page to the user (logins, 2FA, passkeys, payments). While an agent is running it also removes other
 // extensions' injected frames, which make Chrome drop the debugger. The background injects it (a classic
 // script: content scripts cannot import modules) only into the top frame of tabs agents use, again after
@@ -15,7 +15,7 @@
 // The toolbar badge shows the other states (ON, RUN).
 import { pageStatusFromJson, type PageStatus } from "../agent-relay/protocol"
 
-type Loaded = { __opencodeBrowserPageStatus?: true }
+type Loaded = { __opencodevilBrowserPageStatus?: true }
 
 let current: PageStatus | undefined
 let completing: string | undefined
@@ -26,8 +26,8 @@ let edge: HTMLElement | undefined
 let observer: MutationObserver | undefined
 
 // The background injects again after navigations; a document that already has the script keeps the first copy.
-if (!(globalThis as Loaded).__opencodeBrowserPageStatus) {
-  ;(globalThis as Loaded).__opencodeBrowserPageStatus = true
+if (!(globalThis as Loaded).__opencodevilBrowserPageStatus) {
+  ;(globalThis as Loaded).__opencodevilBrowserPageStatus = true
   chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
     if (typeof message !== "object" || message === null || !("action" in message)) return
     if (message.action === "evict-extension-frames") {
@@ -238,7 +238,7 @@ function create() {
   root = host.attachShadow({ mode: "closed" })
   root.innerHTML = `<style>${STYLE}</style>
     <div id="card" role="dialog" aria-labelledby="title" aria-describedby="message">
-      <div id="head"><span id="dot"></span><span id="title">Your turn</span><span id="source">${MARK}browse</span></div>
+      <div id="head"><span id="dot"></span><span id="title">Your turn</span><span id="source">${MARK}browsevil</span></div>
       <p id="origin"></p>
       <p id="message"></p>
       <div id="actions"><button id="continue" type="button">Continue</button></div>

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "browse",
+      "name": "browsevil",
       "dependencies": {
         "@kobalte/core": "0.13.13",
         "@opencode/ui": "2.2.5",

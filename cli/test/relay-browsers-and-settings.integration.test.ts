@@ -16,7 +16,7 @@ import {
   until,
 } from "./relay-harness.ts"
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-settings-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-settings-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -47,7 +47,7 @@ async function settingsScene(options: { readonly relayPort: number; readonly rel
     .on("Target.getTargetInfo", () => ({ targetInfo }))
     .on("Page.createIsolatedWorld", () => ({ executionContextId: 7 }))
   expect(await extension.pair(options.settings ? { settings: options.settings } : {})).toBe(true)
-  const socket = await connectCdp(`ws://127.0.0.1:${options.relayPort}/devtools/browser/test?opencodeBrowserSessionId=settings-${options.tabId}`, { authorization: `Bearer ${options.relayToken}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${options.relayPort}/devtools/browser/test?opencodevilBrowserSessionId=settings-${options.tabId}`, { authorization: `Bearer ${options.relayToken}` })
   if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
   await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/" })
   const sessionId = String((await cdpCall(socket, 2, "Target.attachToTarget", { targetId: targetInfo.targetId, flatten: true })).result?.sessionId)
@@ -75,7 +75,7 @@ async function settingsScene(options: { readonly relayPort: number; readonly rel
 }
 
 describe("several browsers", () => {
-  const multiHome = fs.mkdtempSync(path.join(os.tmpdir(), "browse-multi-"))
+  const multiHome = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-multi-"))
   let multi: Awaited<ReturnType<typeof startRelay>> | undefined
   beforeAll(async () => {
     multi = await startRelay(multiHome)
@@ -98,7 +98,7 @@ describe("several browsers", () => {
   })
   /** A session's new tab, opened over CDP, and the answer to an evaluate in it. */
   const openTab = async (session: string) => {
-    const socket = await connectCdp(`ws://127.0.0.1:${multi!.port}/devtools/browser/test?opencodeBrowserSessionId=${session}`, { authorization: `Bearer ${multi!.token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${multi!.port}/devtools/browser/test?opencodevilBrowserSessionId=${session}`, { authorization: `Bearer ${multi!.token}` })
     if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
     const created = await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/" })
     const attached = await cdpCall(socket, 2, "Target.attachToTarget", { targetId: String(created.result?.targetId), flatten: true })
@@ -182,7 +182,7 @@ describe("several browsers", () => {
       const targets = await (await api("/json/list")).json() as Array<{ id: string; tabId: number }>
       const shared = targets.find(t => t.id === "SHARED-B")
       expect(shared).toBeDefined()
-      const socket = await connectCdp(`ws://127.0.0.1:${multi!.port}/devtools/browser/test?opencodeBrowserSessionId=${id}`, { authorization: `Bearer ${multi!.token}` })
+      const socket = await connectCdp(`ws://127.0.0.1:${multi!.port}/devtools/browser/test?opencodevilBrowserSessionId=${id}`, { authorization: `Bearer ${multi!.token}` })
       if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
       client = socket
       expect((await cdpCall(client, 1, "Target.getTargets")).result?.targetInfos).toEqual([])
@@ -270,7 +270,7 @@ describe("several browsers", () => {
 // so the relay treats it as another computer.
 const lanAddress = Object.values(os.networkInterfaces()).flat().find((address) => address?.family === "IPv4" && !address.internal)?.address
 describe.skipIf(lanAddress === undefined)("a browser on another computer (hostname 0.0.0.0)", () => {
-  const remoteHome = fs.mkdtempSync(path.join(os.tmpdir(), "browse-remote-"))
+  const remoteHome = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-remote-"))
   let remote: Awaited<ReturnType<typeof startRelay>> | undefined
   beforeAll(async () => {
     fs.writeFileSync(path.join(remoteHome, "config.json"), JSON.stringify({ hostname: "0.0.0.0" }))
@@ -320,14 +320,14 @@ describe.skipIf(lanAddress === undefined)("a browser on another computer (hostna
 
 describe("sessions of MCP servers that went away", () => {
   test("an implicit session is deleted once its MCP server has been gone for the grace period; a named one stays", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-orphans-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-orphans-"))
     const started = await startRelay(root, { OPENCODE_BROWSEVIL_CLIENT_GONE_GRACE_MS: "1000" })
     try {
       expect(await new FakeExtension(root, started.port).pair()).toBe(true)
       const client = spawn(process.execPath, ["-e", "setTimeout(() => {}, 60_000)"], { stdio: "ignore" })
       const ensure = (id: string) => fetch(`http://127.0.0.1:${started.port}/v1/sessions/ensure`, {
         method: "POST",
-        headers: { authorization: `Bearer ${started.token}`, "content-type": "application/json", "opencode-browser-client-pid": String(client.pid) },
+        headers: { authorization: `Bearer ${started.token}`, "content-type": "application/json", "opencodevil-browser-client-pid": String(client.pid) },
         body: JSON.stringify({ id }),
       })
       expect((await ensure("mcp-0123abcd")).ok).toBe(true)
@@ -377,7 +377,7 @@ describe("settings from the extension", () => {
   }, 20_000)
 
   test("environment variables override the settings, and the relay reports them", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-env-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-env-"))
     const started = await startRelay(root, { OPENCODE_BROWSEVIL_HUMAN_INPUT: "0", OPENCODE_BROWSEVIL_AGENT_WINDOW: "separate" })
     try {
       const scene = await settingsScene({ relayPort: started.port, relayToken: started.token, code: root, tabId: 91, settings: { humanInput: "on" } })
@@ -505,7 +505,7 @@ describe("the settings tool's relay API", () => {
   }, 20_000)
 
   test("a setting an environment variable fixes is reported, and not written", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-settings-env-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-settings-env-"))
     const started = await startRelay(root, { OPENCODE_BROWSEVIL_AGENT_WINDOW: "separate" })
     try {
       const { extension, sets } = settingsExtension(root, started.port)

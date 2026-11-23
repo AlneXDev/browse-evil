@@ -30,7 +30,7 @@ import { freePort } from "./support/ports.ts"
 import type { RelayVersion } from "../src/relay/schema.ts"
 
 // Port fallback and relay.json (relay/port.ts). Candidates are passed in so nothing here touches 29698–29706.
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-port-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-port-"))
 const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
 const previousPort = process.env.OPENCODE_BROWSEVIL_PORT
 process.env.OPENCODE_BROWSEVIL_HOME = home
@@ -45,7 +45,7 @@ afterAll(() => {
 
 const header = (request: Request, name: string) => request.headers.get(name) ?? undefined
 
-/** A free port outside browse's real range, so no test here can bind 29698–29706. */
+/** A free port outside browsevil's real range, so no test here can bind 29698–29706. */
 async function freePortOutsideBrowseRange(): Promise<number> {
   for (;;) {
     const port = await freePort()
@@ -64,7 +64,7 @@ describe("relay port fallback", () => {
       fetch: (request) => {
         probes.push({
           authorization: header(request, "authorization"),
-          pid: header(request, "opencode-browser-client-pid"),
+          pid: header(request, "opencodevil-browser-client-pid"),
         })
         return Response.json({ name: "playwriter" })
       },
@@ -110,7 +110,7 @@ describe("relay port fallback", () => {
         requests.push({
           path: pathname,
           authorization: header(request, "authorization"),
-          pid: header(request, "opencode-browser-client-pid"),
+          pid: header(request, "opencodevil-browser-client-pid"),
         })
         return pathname === "/version"
           ? Response.json({ version: "9.9.9", instanceId: "fake-relay" })
@@ -134,7 +134,7 @@ describe("relay port fallback", () => {
     const held = await freePortOutsideBrowseRange()
     const fallback = await freePortOutsideBrowseRange()
     let mine = false
-    const instanceId = "browse-after-start"
+    const instanceId = "browsevil-after-start"
     // Playwriter's relay answers GET /version with just `{ version }`.
     using other = Bun.serve({
       hostname: "127.0.0.1",
@@ -143,7 +143,7 @@ describe("relay port fallback", () => {
         ? Response.json(mine ? { version: "9.9.9", instanceId } : { version: "0.10.0" })
         : Response.json({ error: "unauthorized" }, { status: 401 }),
     })
-    // A definite non-browse reply is what lets the relay move to a fallback port.
+    // A definite non-browsevil reply is what lets the relay move to a fallback port.
     expect(await chooseRelayPort({ configuredPort: held, pinned: false, candidates: [held, fallback] })).toBe(fallback)
     await Effect.runPromise(Effect.gen(function* () {
       const client = yield* RelayClient.make({ endpoint: endpointForPort(held) })
@@ -171,7 +171,7 @@ describe("relay port fallback", () => {
     const configuredPort = await freePortOutsideBrowseRange()
     const actualPort = await freePortOutsideBrowseRange()
     const free = await freePortOutsideBrowseRange()
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-state-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-state-"))
     using live = Bun.serve({
       hostname: "127.0.0.1",
       port: actualPort,
@@ -200,7 +200,7 @@ describe("relay port fallback", () => {
     const silent = net.createServer((socket) => socket.on("data", () => undefined))
     await new Promise<void>((resolve) => silent.listen(held, "127.0.0.1", resolve))
     try {
-      const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-state-"))
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-state-"))
       try {
         await expect(chooseRelayPort({
           configuredPort: held,
@@ -254,7 +254,7 @@ describe("relay port fallback", () => {
         calls++
         // After the old relay's shutdown it removes relay.json; the endpoint falls back to a port Playwriter holds.
         if (calls === 3) return Effect.fail(new RelayClient.RelayDecodeFailed({
-          message: "in use by another program (not a browse /version response)",
+          message: "in use by another program (not a browsevil /version response)",
           path: "/version",
           cause: { version: "0.10.0" },
         }))
@@ -291,7 +291,7 @@ describe("relay port fallback", () => {
       version: Effect.suspend(() => {
         calls++
         if (calls === 1) return Effect.fail(new RelayClient.RelayDecodeFailed({
-          message: "in use by another program (not a browse /version response)",
+          message: "in use by another program (not a browsevil /version response)",
           path: "/version",
           cause: { version: "0.10.0" },
         }))
@@ -311,7 +311,7 @@ describe("relay port fallback", () => {
     expect(readiness.version.instanceId).toBe("new-relay")
   })
 
-  test("setup and RelayClient never send the token to a non-browse or mismatched listener", async () => {
+  test("setup and RelayClient never send the token to a non-browsevil or mismatched listener", async () => {
     const port = await freePortOutsideBrowseRange()
     const sent: Array<string | undefined> = []
     let versionReply: Record<string, unknown> = { version: "0.10.0" }
@@ -408,7 +408,7 @@ describe("relay port fallback", () => {
           return calls <= 2
             ? Effect.succeed(old)
             : Effect.fail(new RelayClient.RelayDecodeFailed({
-              message: "in use by another program (not a browse /version response)",
+              message: "in use by another program (not a browsevil /version response)",
               path: "/version",
               cause: { version: "0.10.0" },
             }))
@@ -456,7 +456,7 @@ describe("relay port fallback", () => {
           // probe finds the replacement on the pinned port.
           if (calls <= 2) return Effect.succeed(old)
           if (calls === 3) return Effect.fail(new RelayClient.RelayDecodeFailed({
-            message: "in use by another program (not a browse /version response)",
+            message: "in use by another program (not a browsevil /version response)",
             path: "/version",
             cause: { version: "0.10.0" },
           }))
@@ -502,7 +502,7 @@ describe("relay port fallback", () => {
         // The old relay and its record are gone together: a listener on the pinned port is not ours to wait for.
         fs.rmSync(relayStatePath(), { force: true })
         return Effect.fail(new RelayClient.RelayDecodeFailed({
-          message: "in use by another program (not a browse /version response)",
+          message: "in use by another program (not a browsevil /version response)",
           path: "/version",
           cause: { version: "0.10.0" },
         }))
@@ -549,7 +549,7 @@ describe("relay port fallback", () => {
         calls++
         if (calls === 1) return Effect.succeed(old)
         if (calls === 2) return Effect.fail(new RelayClient.RelayDecodeFailed({
-          message: "in use by another program (not a browse /version response)",
+          message: "in use by another program (not a browsevil /version response)",
           path: "/version",
           cause: { version: "0.10.0" },
         }))
@@ -595,7 +595,7 @@ describe("relay port fallback", () => {
       version: Effect.suspend((): Effect.Effect<RelayVersion, RelayClient.RelayClientError> => {
         calls++
         if (calls === 1) return Effect.fail(new RelayClient.RelayDecodeFailed({
-          message: "in use by another program (not a browse /version response)",
+          message: "in use by another program (not a browsevil /version response)",
           path: "/version",
           cause: { version: "0.10.0" },
         }))
@@ -648,7 +648,7 @@ describe("relay port fallback", () => {
     let calls = 0
     let starts = 0
     const decode = () => new RelayClient.RelayDecodeFailed({
-      message: "in use by another program (not a browse /version response)",
+      message: "in use by another program (not a browsevil /version response)",
       path: "/version",
       cause: { version: "0.10.0" },
     })
@@ -695,7 +695,7 @@ describe("relay port fallback", () => {
     let calls = 0
     let starts = 0
     const decode = () => new RelayClient.RelayDecodeFailed({
-      message: "in use by another program (not a browse /version response)",
+      message: "in use by another program (not a browsevil /version response)",
       path: "/version",
       cause: { version: "0.10.0" },
     })
@@ -742,7 +742,7 @@ describe("relay port fallback", () => {
     let calls = 0
     let starts = 0
     const decode = () => new RelayClient.RelayDecodeFailed({
-      message: "in use by another program (not a browse /version response)",
+      message: "in use by another program (not a browsevil /version response)",
       path: "/version",
       cause: { version: "0.10.0" },
     })
@@ -825,7 +825,7 @@ describe("relay port fallback", () => {
   })
 
   test("a pairing file names a port only from a live relay.json", async () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-live-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-live-"))
     const port = await freePortOutsideBrowseRange()
     using live = Bun.serve({
       hostname: "127.0.0.1",
@@ -851,7 +851,7 @@ describe("relay port fallback", () => {
     const configured = await freePortOutsideBrowseRange()
     const recordedPort = await freePortOutsideBrowseRange()
     const candidate = await freePortOutsideBrowseRange()
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-last-port-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-last-port-"))
     try {
       writeLastRelayPort(recordedPort, root, configured)
       expect(readLastRelayPort(root, configured)).toBe(recordedPort)
@@ -936,7 +936,7 @@ describe("relay port fallback", () => {
 
   test("relay.json with an empty instance or another configured port is not a relay", async () => {
     const configured = await freePortOutsideBrowseRange()
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-state-empty-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-state-empty-"))
     try {
       fs.mkdirSync(path.dirname(relayStatePath(root, configured)), { recursive: true })
       fs.writeFileSync(relayStatePath(root, configured), JSON.stringify({

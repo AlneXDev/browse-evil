@@ -29,28 +29,28 @@ createInterface({ input: process.stdin }).on("line", (line) => {
 
 /**
  * A home with 0.0.15-dev.108 under runtime/versions run by the old shim (the real one, fixtures/legacy-shim.mjs), a
- * relay token, an opencode entry that runs the shim with an absolute node as old installs wrote it, and npm's global
+ * relay token, an opencodevil entry that runs the shim with an absolute node as old installs wrote it, and npm's global
  * package of a current release beside it (a stand-in CLI until a test installs a real build there).
  */
 export function oldRuntimeHome(homes: string[]) {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-takeover-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-takeover-"))
   homes.push(home)
-  const oldData = path.join(home, ".local", "share", "opencode-browser")
-  const shim = path.join(oldData, "bin", "opencode-browser.mjs")
+  const oldData = path.join(home, ".local", "share", "opencodevil-browser")
+  const shim = path.join(oldData, "bin", "opencodevil-browser.mjs")
   write(shim, fs.readFileSync(path.join(import.meta.dir, "..", "fixtures", "legacy-shim.mjs"), "utf8"), 0o755)
   write(path.join(oldData, "runtime", "current.json"), JSON.stringify({ version: "0.0.15-dev.108", previous: "0.0.11-dev.75", channel: "dev" }), 0o600)
-  const oldEntry = path.join(oldData, "runtime", "versions", "0.0.15-dev.108", "node_modules", "@opencode", "browse", "dist", "cli.mjs")
-  write(path.join(path.dirname(path.dirname(oldEntry)), "package.json"), JSON.stringify({ name: "@opencode/browse", version: "0.0.15-dev.108" }))
+  const oldEntry = path.join(oldData, "runtime", "versions", "0.0.15-dev.108", "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
+  write(path.join(path.dirname(path.dirname(oldEntry)), "package.json"), JSON.stringify({ name: "@opencode/browsevil", version: "0.0.15-dev.108" }))
   write(oldEntry, fakeCli("0.0.15-dev.108"))
   write(path.join(oldData, "relay-token"), `${relayToken}\n`, 0o600)
-  const packageDir = path.join(home, "global", "lib", "node_modules", "@opencode", "browse")
+  const packageDir = path.join(home, "global", "lib", "node_modules", "@opencodevil", "browsevil")
   const current = path.join(packageDir, "dist", "cli.mjs")
-  write(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browse", version: "0.0.16-dev.130" }))
+  write(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version: "0.0.16-dev.130" }))
   write(current, fakeCli("0.0.16-dev.130"))
-  const opencode = path.join(home, ".config", "opencode", "opencode.json")
-  write(opencode, JSON.stringify({ mcp: { servers: { browse: { type: "local", command: [node, shim, "mcp"] } } } }))
+  const opencodevil = path.join(home, ".config", "opencodevil", "opencodevil.json")
+  write(opencodevil, JSON.stringify({ mcp: { servers: { browsevil: { type: "local", command: [node, shim, "mcp"] } } } }))
   const runtime = { kind: "npm" as const, entry: current, version: "0.0.16-dev.130" }
-  return { home, oldData, shim, oldEntry, packageDir, current, opencode, runtime }
+  return { home, oldData, shim, oldEntry, packageDir, current, opencodevil, runtime }
 }
 
 /** Runs `run` with OPENCODE_BROWSEVIL_HOME unset, as migration needs, and restores it after (once a promise settles). */

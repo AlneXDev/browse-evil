@@ -10,7 +10,7 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 // drops the target the way a reported close does, so a client's page closes instead of hanging, and no later session
 // is handed a page that no longer exists.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-missing-tab-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-missing-tab-"))
 let port = 0
 let relay: ChildProcess | undefined
 let token = ""
@@ -42,7 +42,7 @@ async function scene(session: string, tabId: number, beforeConnect?: () => Promi
     })
   expect(await extension.pair()).toBe(true)
   await beforeConnect?.()
-  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${session}`, { authorization: `Bearer ${token}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${session}`, { authorization: `Bearer ${token}` })
   if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
   const events = collect(socket)
   await cdpCall(socket, 1, "Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: false, flatten: true })
@@ -96,7 +96,7 @@ test("deleting a session never announces its closing tab to a connecting session
     method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify({ id }),
   })
   const { extension, socket, targetId } = await scene(id, 94, async () => { expect((await post("new")).ok).toBe(true) })
-  const next = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=arriving`, { authorization: `Bearer ${token}` })
+  const next = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=arriving`, { authorization: `Bearer ${token}` })
   if (!(next instanceof WebSocket)) throw new Error("CDP connection refused")
   try {
     const events = collect(next)

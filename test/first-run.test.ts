@@ -72,7 +72,7 @@ describe("relay probe", () => {
     expect(shouldProbe(undefined)).toBe(false)
   })
 
-  test("recognizes browse's own answers and nothing else", () => {
+  test("recognizes browsevil's own answers and nothing else", () => {
     expect(relayProbeResult(200, { version: "0.0.2", buildId: "x", instanceId: "abc", pid: 1 })).toBe("found")
     expect(relayProbeResult(403, { error: "Cross-origin browser requests are not allowed" })).toBe("found")
     expect(relayProbeResult(403, { error: "Cross-origin browser requests are not allowed", installWaiting: true })).toBe("install-waiting")

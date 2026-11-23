@@ -1,8 +1,8 @@
-// Packs every compiled binary in dist-bin/ (script/compile.ts) into its npm tarball, opencode-browse-<target>-<version>.tgz,
+// Packs every compiled binary in dist-bin/ (script/compile.ts) into its npm tarball, opencodevil-browsevil-<target>-<version>.tgz,
 // and checks it (scripts/check-artifacts.ts):
 //   bun script/pack.ts [--out <dir>]    default dist-bin/npm
 // npm pack gives every entry a fixed mtime and normalizes modes, so the binary is made executable first: GitHub artifact
-// downloads lose execute bits, and the install script runs package/bin/browse straight from the tarball.
+// downloads lose execute bits, and the install script runs package/bin/browsevil straight from the tarball.
 import { $ } from "bun"
 import { chmod, cp, mkdir, readdir, rm, utimes } from "node:fs/promises"
 import path from "node:path"
@@ -18,14 +18,14 @@ const epoch = new Date("1980-01-01T00:00:00Z")
 
 await rm(out, { recursive: true, force: true })
 await mkdir(out, { recursive: true })
-const names = (await readdir(dist)).filter((name) => name.startsWith("browse-")).sort()
+const names = (await readdir(dist)).filter((name) => name.startsWith("browsevil-")).sort()
 if (!names.length) throw new Error(`No binaries in ${dist}; run script/compile.ts first`)
 
 const problems: string[] = []
 for (const name of names) {
   const directory = path.join(dist, name)
-  const target = name.slice("browse-".length)
-  const binary = path.join(directory, "bin", target.startsWith("windows-") ? "browse.exe" : "browse")
+  const target = name.slice("browsevil-".length)
+  const binary = path.join(directory, "bin", target.startsWith("windows-") ? "browsevil.exe" : "browsevil")
   const pkg = await Bun.file(path.join(directory, "package.json")).json()
   if (pkg.version !== version) throw new Error(`${name} is version ${pkg.version}, expected ${version}`)
   if (!Bun.file(binary).size) throw new Error(`Missing binary ${binary}`)

@@ -53,7 +53,7 @@ type PairingFile = { readonly code?: PairingCode; readonly port?: number }
 
 /**
  * The token a loopback relay on another port may still accept: the most recently stored loopback token for a port
- * browse can listen on (each is a token a relay proved). Storing one moves its key to the end (rememberToken).
+ * browsevil can listen on (each is a token a relay proved). Storing one moves its key to the end (rememberToken).
  */
 function loopbackToken(tokens: Record<string, unknown>): string | undefined {
   let found: string | undefined
@@ -187,7 +187,7 @@ export function createRelayHandshake(deps: {
     const spent = new Set(Array.isArray(stored[SPENT_KEY]) ? (stored[SPENT_KEY] as unknown[]) : [])
     const tokens = isJsonObject(stored[TOKENS_KEY]) ? stored[TOKENS_KEY] : {}
     const own = typeof tokens[address] === "string" ? tokens[address] : undefined
-    // A fallback only moves an automatic connection to a browse port; an explicit port's token is its own key only.
+    // A fallback only moves an automatic connection to a browsevil port; an explicit port's token is its own key only.
     const token = local && automatic ? (loopbackToken(tokens) ?? own) : own
     const entered = normalizePairingCode(stored[PAIRING_KEY])
     const file = local ? await pairingFile() : undefined
@@ -265,7 +265,7 @@ export function createRelayHandshake(deps: {
           // when a relay releases it instead of closing it.
           capabilities: [extensionCapabilityTabRelease],
           profileId: profile.id,
-          profileName: profile.name ?? "browse",
+          profileName: profile.name ?? "browsevil",
           // What agents call this browser: the name set on the status page, else the relay names it from these
           // and the computer ("Chrome on MacBook").
           browser: browserBrand(),
@@ -534,7 +534,7 @@ export function createRelayHandshake(deps: {
     deps.log.add("pairing.link")
     const stored = await chrome.storage.local.get([RELAY_ADDRESS_KEY, PAIRING_KEY])
     const saved = relayAddress(stored[RELAY_ADDRESS_KEY])
-    // A link with no browse-range port is still for this computer. Keep a saved loopback address only when it pins a
+    // A link with no browsevil-range port is still for this computer. Keep a saved loopback address only when it pins a
     // port outside the relay range (OPENCODE_BROWSEVIL_PORT=9222, say): that browser is deliberately pinned there. Every
     // other address (remote, or an in-range loopback) is cleared so the link dials its port or 29698.
     const keepPinned = port === undefined && saved?.host === "127.0.0.1" &&

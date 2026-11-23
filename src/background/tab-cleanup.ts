@@ -14,7 +14,7 @@ type Tracked = { touched: number; keepOpen?: boolean }
 
 const STORAGE_KEY = "tabCleanup"
 const SESSION_KEY = "tabCleanupSession"
-const ALARM = "opencode-browser-tab-cleanup"
+const ALARM = "opencodevil-browser-tab-cleanup"
 
 const tracked = new Map<number, Tracked>()
 /** Tabs a close is ungrouping; their group-change event must not drop idle tracking. */
@@ -65,7 +65,7 @@ export function touch(tabId: number) {
 }
 
 /**
- * A tab the user took back, or an agent gave back: idle cleanup no longer has it, and the sound browse muted it with
+ * A tab the user took back, or an agent gave back: idle cleanup no longer has it, and the sound browsevil muted it with
  * comes back. A mute the user set stays theirs.
  */
 export function forget(tabId: number) {
@@ -74,13 +74,13 @@ export function forget(tabId: number) {
   void unmuteIfOurs(tabId)
 }
 
-/** Whether browse's own mute is what keeps this tab quiet; a mute the user set is theirs. */
+/** Whether browsevil's own mute is what keeps this tab quiet; a mute the user set is theirs. */
 function mutedByUs(tab: chrome.tabs.Tab) {
   const mute = tab.mutedInfo
   return mute?.muted === true && mute.reason === "extension" && mute.extensionId === chrome.runtime.id
 }
 
-/** Unmutes a tab only if browse muted it. */
+/** Unmutes a tab only if browsevil muted it. */
 async function unmuteIfOurs(tabId: number) {
   const tab = await chrome.tabs.get(tabId).catch(() => undefined)
   if (tab && mutedByUs(tab)) await chrome.tabs.update(tabId, { muted: false }).catch(() => undefined)
@@ -114,7 +114,7 @@ const MUTE_TIMEOUT_MS = 2_000
 /** Mute toggles run one at a time: an on followed at once by an off must end unmuted, not half applied. */
 const muteSerially = serialQueue()
 
-/** Mutes every tab agents opened (the mute agent tabs setting turned on), or unmutes the ones browse muted. */
+/** Mutes every tab agents opened (the mute agent tabs setting turned on), or unmutes the ones browsevil muted. */
 export function setMuted(muted: boolean): Promise<void> {
   return muteSerially(async () => {
     await restore()
@@ -122,7 +122,7 @@ export function setMuted(muted: boolean): Promise<void> {
   })
 }
 
-/** Mutes a tab, or unmutes it only if browse muted it. */
+/** Mutes a tab, or unmutes it only if browsevil muted it. */
 async function setTabMuted(tabId: number, muted: boolean) {
   if (!muted) {
     await unmuteIfOurs(tabId)
@@ -278,7 +278,7 @@ export async function cleanup(options: { minutes?: number; own?: { tabIds: reado
  * Whether the stored list is from the browser session still running. Session storage is cleared by both a browser
  * restart and an extension reload. A browser start is handled by the onStartup listener below, which clears the list;
  * without one, a missing marker means a reload or update, which keeps tab ids, so restore() may trust stored tabs that
- * remain in browse's groups.
+ * remain in browsevil's groups.
  */
 function sameBrowserSession() {
   browserSession ??= (async () => {
@@ -290,7 +290,7 @@ function sameBrowserSession() {
   return browserSession
 }
 
-/** Loads the stored list once. A browser start clears it; without one, a reload trusts only ids still in a browse group. */
+/** Loads the stored list once. A browser start clears it; without one, a reload trusts only ids still in a browsevil group. */
 function restore() {
   const mine = generation
   restored ??= (async () => {
@@ -315,7 +315,7 @@ function restore() {
     const open = new Map(tabs.filter((tab) => tab.id !== undefined).map((tab) => [tab.id!, tab]))
     const ownedGroups = new Set(groups.filter((group) => ownedGroup(group.title)).map((group) => group.id))
     const kept: Record<string, Tracked> = {}
-    /** Stored tabs that are still open but no longer tracked: the sound browse muted them with comes back. */
+    /** Stored tabs that are still open but no longer tracked: the sound browsevil muted them with comes back. */
     const dropped: number[] = []
     for (const [tabId, entry] of Object.entries(saved)) {
       const tab = open.get(Number(tabId))

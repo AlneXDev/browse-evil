@@ -1,7 +1,7 @@
-# Stress testing browse
+# Stress testing browsevil
 
-Scripts that stress browse end to end on a real, headed Chrome: a scenario suite, a soak with chaos, a fuzzer and a
-smoke test. They run on a disposable Linux box (we use the exe.dev VM `browse-stress.exe.xyz`), never on a machine
+Scripts that stress browsevil end to end on a real, headed Chrome: a scenario suite, a soak with chaos, a fuzzer and a
+smoke test. They run on a disposable Linux box (we use the exe.dev VM `browsevil-stress.exe.xyz`), never on a machine
 whose browser or relay someone uses.
 
 ## The box
@@ -10,24 +10,24 @@ whose browser or relay someone uses.
 
 - Node 24 (in `/usr/local`), Bun (the `packageManager` version), Xvfb + fluxbox, Noto fonts (CJK, emoji), ffmpeg,
   x11vnc + noVNC, and Chrome for Testing stable (`~/chrome-for-testing/current`).
-- `~/browse`: a clone of this repo, built and paired with `bun run setup`.
-- systemd units (`exe/units/`): `browse-xvfb` (display `:99`), `browse-wm`, `browse-chrome` (headed Chrome with the
-  extension, restarted on crash), `browse-vnc` (localhost only) and `browse-novnc` (port 8000).
+- `~/browsevil`: a clone of this repo, built and paired with `bun run setup`.
+- systemd units (`exe/units/`): `browsevil-xvfb` (display `:99`), `browsevil-wm`, `browsevil-chrome` (headed Chrome with the
+  extension, restarted on crash), `browsevil-vnc` (localhost only) and `browsevil-novnc` (port 8000).
 - The relay is not a service: like on a laptop, any CLI or MCP call starts it on `127.0.0.1:29698`.
 
-Chrome's flags are in `exe/chrome.sh`. The profile is `~/stress-profile` with developer mode on (browse's
+Chrome's flags are in `exe/chrome.sh`. The profile is `~/stress-profile` with developer mode on (browsevil's
 `install`/`update` reload the extension, and Chrome disables reloaded unpacked extensions while developer mode is
 off). Chrome also listens on `127.0.0.1:9222` (`--remote-debugging-port`): **that port is for the harness only**, to
 click handoff cards like a person, stop the extension's service worker and count tabs, groups and debugger
-attachments. browse never uses it.
+attachments. browsevil never uses it.
 
 Watch the browser at <https://browse-stress.exe.xyz/vnc.html> (exe.dev's proxy, private to people with access to the
 VM; keep it private). Click **Connect**; no VNC password, the proxy is the gate.
 
 ```sh
-wssh browse-stress.exe.xyz                                 # shell (wssh: ssh with the work key)
-wssh browse-stress.exe.xyz 'node ~/browse/cli/dist/cli.mjs status'
-wssh browse-stress.exe.xyz 'sudo systemctl restart browse-chrome'
+wssh browsevil-stress.exe.xyz                                 # shell (wssh: ssh with the work key)
+wssh browsevil-stress.exe.xyz 'node ~/browsevil/cli/dist/cli.mjs status'
+wssh browsevil-stress.exe.xyz 'sudo systemctl restart browsevil-chrome'
 stress/exe/deploy.sh                                       # copy this working tree to the box, rebuild, restart the relay
 ```
 
@@ -37,10 +37,10 @@ pairing code.
 ## Canary
 
 `bash stress/exe/provision.sh --canary-only` adds the release lane to a provisioned box without rebuilding its checkout
-or restarting `browse-chrome`. User `canary` installs the published dev binary via the real Bash installer. Its headed
+or restarting `browsevil-chrome`. User `canary` installs the published dev binary via the real Bash installer. Its headed
 Chrome for Testing uses the installer's checksum-verified dev zip, a private Xvfb and relay `:19770`; the kernel blocks
 that user's access to `:29698`. Every ~5 min the daemon checks npm. It observes the live relay **and loaded extension**
-switching, allows an idle update window, and flags and forces `browse update` after an hour. Each build gets core
+switching, allows an idle update window, and flags and forces `browsevil update` after an hour. Each build gets core
 scenarios and 30 min of chaos. At ~03:00 local time (or next idle slot) it runs 60 min of all chaos, 15 min of fuzz,
 an npx MCP smoke, then 30 min of two-browser affinity checks if Brave installed. Network faults affect only `canary`;
 the toolbar fault uses a real keyboard shortcut. Runs are serial. Between them it submits a fixture form, occasionally
@@ -48,18 +48,18 @@ visits example.com, samples RSS/fds/tabs and leaves quiet time before reconnecti
 restart; at 30 min it restarts its own browser and forces the relay restart. Both actions are recorded.
 
 ```sh
-sudo -Hu canary /usr/local/bin/node /opt/browse-canary/stress/canary/report.ts   # last 24 h + 7 d
-sudo systemctl stop browse-canary     # pause (disable --now to keep paused after reboot); start to resume
+sudo -Hu canary /usr/local/bin/node /opt/browsevil-canary/stress/canary/report.ts   # last 24 h + 7 d
+sudo systemctl stop browsevil-canary     # pause (disable --now to keep paused after reboot); start to resume
 ```
 
 History and private run folders (`result.json`, `summary.md`, `run.log` and the harness artifacts) live under
-`/home/canary/canary`. Optional: set `CANARY_SLACK_WEBHOOK` in root-only `/etc/browse-canary-alerts.env` and restart
-`browse-canary`; unset means journal only. Alerts link to the host with the run path (or `CANARY_RESULTS_URL/<run>/`
+`/home/canary/canary`. Optional: set `CANARY_SLACK_WEBHOOK` in root-only `/etc/browsevil-canary-alerts.env` and restart
+`browsevil-canary`; unset means journal only. Alerts link to the host with the run path (or `CANARY_RESULTS_URL/<run>/`
 if an existing private artifact viewer is configured). No success alerts. The canary doesn't publish results.
 
 ## Runners
 
-All of them run on the box from `~/browse`, write JSONL plus a `summary.md` under `~/stress-results/<time>-<kind>/`
+All of them run on the box from `~/browsevil`, write JSONL plus a `summary.md` under `~/stress-results/<time>-<kind>/`
 and exit non-zero when something failed.
 
 | Command | What it does |
@@ -71,8 +71,8 @@ and exit non-zero when something failed.
 | `bash stress/run-all.sh [soakMinutes] [fuzzMinutes]` | All of the above in order (run it in tmux) |
 
 ```sh
-wssh browse-stress.exe.xyz "tmux new -d -s stress 'bash ~/browse/stress/run-all.sh 60 15 2>&1 | tee ~/stress-results/run-all.log'"
-rsync -az -e wssh browse-stress.exe.xyz:stress-results/ /tmp/browse-stress-results/   # fetch results
+wssh browsevil-stress.exe.xyz "tmux new -d -s stress 'bash ~/browsevil/stress/run-all.sh 60 15 2>&1 | tee ~/stress-results/run-all.log'"
+rsync -az -e wssh browsevil-stress.exe.xyz:stress-results/ /tmp/browsevil-stress-results/   # fetch results
 ```
 
 Type-check the runners with `cli/node_modules/.bin/tsgo --noEmit -p stress/tsconfig.json` (they run with Node's type
@@ -102,10 +102,10 @@ displaces the real extension, and the MCP server never exits on bad input.
 
 ## Installed artifacts (what users run)
 
-`installed.ts` drives browse the way a user has it, not the checkout: the binary the curl installer put in a throwaway
+`installed.ts` drives browsevil the way a user has it, not the checkout: the binary the curl installer put in a throwaway
 `$HOME` (or the npm shim), a headed Chrome for Testing with the **release zip** as the store extension, paired through
 install's link or by typing the code into the settings page. Each scenario injects one fault a user meets and records how
-long browse took to work again and whether the user had to do anything:
+long browsevil took to work again and whether the user had to do anything:
 
 ```sh
 stress/exe/installed-setup.sh curl            # curl installer into ~/u/home-curl
@@ -135,18 +135,18 @@ on a disposable Linux stress VM; the canary retains its original chaos set and r
 The MCP server can run on the box over SSH, so an agent on a Mac drives the box's browser:
 
 ```sh
-node stress/smoke.ts --remote browse-stress.exe.xyz   # initialize, tools/list, status through wssh
+node stress/smoke.ts --remote browsevil-stress.exe.xyz   # initialize, tools/list, status through wssh
 ```
 
-An opencode MCP server entry for it (add it yourself; nothing here edits your config):
+An opencodevil MCP server entry for it (add it yourself; nothing here edits your config):
 
 ```json
 {
   "mcp": {
     "servers": {
-      "browse-stress": {
+      "browsevil-stress": {
         "type": "local",
-        "command": ["wssh", "browse-stress.exe.xyz", "/usr/local/bin/node", "/home/exedev/browse/cli/dist/cli.mjs", "mcp"]
+        "command": ["wssh", "browsevil-stress.exe.xyz", "/usr/local/bin/node", "/home/exedev/browsevil/cli/dist/cli.mjs", "mcp"]
       }
     }
   }
@@ -158,7 +158,7 @@ Use the full `/usr/local/bin/node` path: exe.dev's SSH `PATH` lists `/usr/local/
 ## Stealth on a real Mac (manual, never CI)
 
 The box above measures robustness, not stealth: Linux, Xvfb and Chrome for Testing look nothing like a user's
-browser. `stress/stealth/run.ts` measures what sites can tell about browse on a real browser (Chrome or Helium on a
+browser. `stress/stealth/run.ts` measures what sites can tell about browsevil on a real browser (Chrome or Helium on a
 Mac). It opens public detector sites, so it never runs in CI, isn't part of `run-all.sh`, and should run only when
 someone starts it.
 
@@ -170,13 +170,13 @@ node stress/stealth/run.ts --sites sannysoft,creepjs --wait-ms 10000
 node stress/stealth/run.ts --sites-file my-sites.json --out /tmp/stealth-run
 ```
 
-It drives browse the way an agent does, through the MCP server (`session_new`, then `execute` with `page.mouse`,
+It drives browsevil the way an agent does, through the MCP server (`session_new`, then `execute` with `page.mouse`,
 `page.click` and `page.keyboard`, so human-like input applies), against whichever relay `OPENCODE_BROWSEVIL_HOME` and
 `OPENCODE_BROWSEVIL_PORT` select. Prefer a separate browser profile paired to its own relay (a different
 `OPENCODE_BROWSEVIL_HOME` and `OPENCODE_BROWSEVIL_PORT`) over your everyday one, and note the browser version, macOS
 version and network. Report a clean-profile run and a warm-profile run separately: clearance cookies change verdicts.
 
-- **Local probe** (`stress/stealth/probe.html` and `snapshot.js`, served on `127.0.0.1`): records, while browse moves,
+- **Local probe** (`stress/stealth/probe.html` and `snapshot.js`, served on `127.0.0.1`): records, while browsevil moves,
   hovers, clicks, types and scrolls: `screenX`/`screenY` against `clientX`/`clientY` (Chromium bug 40280325),
   `getCoalescedEvents()`/`getPredictedEvents()` emptiness, `isTrusted`, `movementX/Y`, click `detail`, inter-event
   timing and key dwell distributions; `nextHopProtocol` of the document against its subresources (document

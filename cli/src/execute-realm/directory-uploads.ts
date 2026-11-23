@@ -11,7 +11,7 @@ export type DirectoryUploadBudget = { entries: number }
 
 /**
  * Walk a directory upload without following symlinks. Every entry goes through `check`, so the
- * existing root, ownership and browse-owned rules apply to files nested below the uploaded folder.
+ * existing root, ownership and browsevil-owned rules apply to files nested below the uploaded folder.
  */
 export function checkDirectoryUpload(
   root: string,

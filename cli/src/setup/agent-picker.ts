@@ -26,7 +26,7 @@ export function agentFlags(args: string[]) {
       if (arg === "*") { all = true; continue }
       if (arg === "none") { none = true; continue }
       const name = agentName(arg)
-      if (!name) throw new Error(`Unknown agent ${JSON.stringify(arg)}. Choose ${agentNames.join(", ")}, or none to add browse to another agent yourself.`)
+      if (!name) throw new Error(`Unknown agent ${JSON.stringify(arg)}. Choose ${agentNames.join(", ")}, or none to add browsevil to another agent yourself.`)
       requested.add(name)
     }
   }
@@ -35,7 +35,7 @@ export function agentFlags(args: string[]) {
 
 export function agentPlan(locations: AgentLocation[], flags: ReturnType<typeof agentFlags>, tty: boolean, caller?: AgentName, remembered?: AgentName[]) {
   const detected = locations.filter(a => a.installed).map(a => a.name)
-  // An agent running install gets browse itself. With no terminal and no caller, nothing says which agent asked, so
+  // An agent running install gets browsevil itself. With no terminal and no caller, nothing says which agent asked, so
   // no config is touched: install prints the entry and the --agent command instead.
   if (flags.none) return { picker: false, selected: [] }
   if (flags.requested.length) return { picker: false, selected: flags.requested }
@@ -59,13 +59,13 @@ export function agentSummary(labels: string[]) {
 
 /** The searchable agent list: OpenCode first, then the agents found on this computer, ticked; typing searches every agent install knows. */
 export async function pickAgents(locations: AgentLocation[], initial: AgentName[]): Promise<AgentName[] | undefined> {
-  const ordered = [...locations].sort((a, b) => Number(b.name === "opencode") - Number(a.name === "opencode") || Number(b.installed) - Number(a.installed) || agentLabels[a.name].localeCompare(agentLabels[b.name]))
+  const ordered = [...locations].sort((a, b) => Number(b.name === "opencodevil") - Number(a.name === "opencodevil") || Number(b.installed) - Number(a.installed) || agentLabels[a.name].localeCompare(agentLabels[b.name]))
   // The same option objects every render: clack keeps the cursor by identity, and loses it on fresh ones.
   const all = ordered.map((a) => ({ value: a.name, label: agentLabels[a.name] }))
   const shown = all.filter((_, i) => ordered[i]!.installed || initial.includes(ordered[i]!.name))
   let last = { query: "", list: shown }
   // Clack focuses the last initial selection, so listing OpenCode last starts the cursor on the top row.
-  const start = [...initial].sort((a, b) => Number(a === "opencode") - Number(b === "opencode"))
+  const start = [...initial].sort((a, b) => Number(a === "opencodevil") - Number(b === "opencodevil"))
   const prompt = new AutocompletePrompt<AgentOption>({
     options() {
       const query = this.userInput.trim().toLowerCase()
@@ -80,7 +80,7 @@ export async function pickAgents(locations: AgentLocation[], initial: AgentName[
     // pointer on the focused row and the picked names in the summary, so the rail stays consistent.
     render() {
       const guide = settings.withGuide
-      const head = `${guide ? `${styleText("gray", S_BAR)}\n` : ""}${symbol(this.state)}  Set browse up in these agents for you?`
+      const head = `${guide ? `${styleText("gray", S_BAR)}\n` : ""}${symbol(this.state)}  Set browsevil up in these agents for you?`
       const summary = agentSummary(ordered.filter((agent) => this.selectedValues.includes(agent.name)).map((agent) => agentLabels[agent.name]))
       if (this.state === "submit") return `${head}\n${guide ? `${styleText("gray", S_BAR)}  ` : ""}${styleText("dim", summary)}`
       if (this.state === "cancel") return `${head}\n${guide ? `${styleText("gray", S_BAR)}  ` : ""}${styleText(["strikethrough", "dim"], this.userInput)}`

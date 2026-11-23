@@ -1,5 +1,5 @@
 // The one release version: cli/package.json, the root package.json, the extension manifest and the Rust workspace
-// (rust/Cargo.toml and its lockfile; the browse binary also gets it as BROWSE_VERSION at build time) move together.
+// (rust/Cargo.toml and its lockfile; the browsevil binary also gets it as BROWSE_VERSION at build time) move together.
 // npm takes the version as is (0.1.0, or 0.1.1-dev.42 for a dev build). Chrome's manifest `version` must be one to four
 // dot-separated integers of at most 65535, so a dev build becomes 0.1.1.42 with `version_name` "0.1.1-dev.42" for
 // display. Dev builds never go to the Chrome Web Store (they're loaded unpacked from the release service), so a dev

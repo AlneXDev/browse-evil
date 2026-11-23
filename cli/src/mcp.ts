@@ -25,7 +25,7 @@ import {
 import * as RelayClient from "./relay/client.ts"
 import * as RelayLifecycle from "./relay/lifecycle.ts"
 import { createUpdateWatcher } from "./update.ts"
-import { opencodeBrowserVersion } from "./version.ts"
+import { opencodevilBrowserVersion } from "./version.ts"
 import { handoffAdvice, inspectActVerify, sessionAdvice, whatBrowseIs } from "./agent-guide.ts"
 
 export {
@@ -101,7 +101,7 @@ const registerTools = Effect.gen(function* () {
     id: configuredSession || inheritedSession() || `mcp-${crypto.randomUUID().slice(0, 8)}`,
     established: Boolean(configuredSession),
   }
-  // Checks for a newer browse in the background (cached; never delays a tool call). The first tool result after one
+  // Checks for a newer browsevil in the background (cached; never delays a tool call). The first tool result after one
   // is found carries a note for the agent to pass on, once per calling agent.
   const updates = createUpdateWatcher()
   // evil-v2: no update/upsell notes injected into tool results.
@@ -170,7 +170,7 @@ const registerTools = Effect.gen(function* () {
 
 export const mcpServerLayer = McpServer.layerStdio({
   name: "browsevil",
-  version: opencodeBrowserVersion,
+  version: opencodevilBrowserVersion,
   instructions: mcpInstructions,
   protocols: [McpProtocol.v2026_07_28, McpProtocol.v2025_11_25, McpProtocol.v2025_06_18, McpProtocol.v2025_03_26, McpProtocol.v2024_11_05],
 })

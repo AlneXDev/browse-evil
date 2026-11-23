@@ -77,7 +77,7 @@ export function targetDiagnosticIdentity(registry: TargetRegistry, target: Conne
     `target=${boundedToken(target.targetInfo.targetId)}`,
     `cdpSession=${boundedToken(target.sessionId)}`,
     `owner=${isRoot ? target.owner : root?.owner ?? "child"}`,
-    `bcSession=${boundedToken(isRoot ? target.opencodeBrowserSessionId : root?.opencodeBrowserSessionId)}`,
+    `bcSession=${boundedToken(isRoot ? target.opencodevilBrowserSessionId : root?.opencodevilBrowserSessionId)}`,
     `browserContext=${boundedToken(target.targetInfo.browserContextId ?? root?.targetInfo.browserContextId)}`,
   ].join(" ")
 }

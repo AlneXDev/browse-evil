@@ -28,7 +28,7 @@ export type BrowserSceneSetup = {
 }
 
 export type StartBrowserSceneOptions<T = undefined> = {
-  /** Temp directory prefix under <tmp>/opencode, to recognise a failed run's files. */
+  /** Temp directory prefix under <tmp>/opencodevil, to recognise a failed run's files. */
   readonly name?: string
   /** Chromium executable; defaults to PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH, then patchright-core's own. */
   readonly browser?: string
@@ -75,7 +75,7 @@ export async function startBrowserScene<T = undefined>(options: StartBrowserScen
   )
 
   const cliRoot = path.resolve(import.meta.dirname, "../..")
-  const tmp = path.join(fs.realpathSync(os.tmpdir()), "opencode")
+  const tmp = path.join(fs.realpathSync(os.tmpdir()), "opencodevil")
   fs.mkdirSync(tmp, { recursive: true })
   const root = fs.mkdtempSync(path.join(tmp, options.name ?? "browser-scene-"))
   const home = path.join(root, "home")

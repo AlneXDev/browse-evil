@@ -322,11 +322,11 @@ export class CdpRuntime<Client extends object> {
     const { registry } = this.options
     const generation = this.options.generation(route.tabId)
     const root = registry.targets.get(route.rootSessionId)
-    const owner = root?.opencodeBrowserSessionId
+    const owner = root?.opencodevilBrowserSessionId
     const child = route.chromeSessionId === undefined ? undefined : registry.childTargets.get(route.chromeSessionId)
     return () => {
       const currentRoot = registry.routingRootTarget(route.tabId)
-      if (!root || generation !== this.options.generation(route.tabId) || currentRoot?.sessionId !== root.sessionId || currentRoot.targetInfo.targetId !== root.targetInfo.targetId || currentRoot.opencodeBrowserSessionId !== owner) return false
+      if (!root || generation !== this.options.generation(route.tabId) || currentRoot?.sessionId !== root.sessionId || currentRoot.targetInfo.targetId !== root.targetInfo.targetId || currentRoot.opencodevilBrowserSessionId !== owner) return false
       if (route.chromeSessionId === undefined) return true
       const currentChild = registry.childTargets.get(route.chromeSessionId)
       return child !== undefined && currentChild?.tabId === route.tabId && currentChild.targetInfo.targetId === child.targetInfo.targetId && currentChild.parentSessionId === child.parentSessionId

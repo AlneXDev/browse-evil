@@ -12,7 +12,7 @@ import { RelayShutdownRequest, type ExtensionStatus, type RelayVersion } from ".
 import { launchWindowsRelay, quoteWindowsArgument } from "./windows-launch.ts"
 import { compareVersions, installedRuntime, installedVersion } from "../update/auto-update.ts"
 import { cliCommand, compiledBinary, installCommand, scriptEntry } from "../paths.ts"
-import { opencodeBrowserBuildId } from "../version.ts"
+import { opencodevilBrowserBuildId } from "../version.ts"
 
 // From source the CLI entry is ../main.ts; the published bundle may split into chunks beside cli.mjs.
 // A compiled binary is its own entry.
@@ -83,7 +83,7 @@ function supersededRuntime(): boolean {
   }
 }
 
-export function relayBuildProblem(version: RelayVersion, buildId = opencodeBrowserBuildId): string | undefined {
+export function relayBuildProblem(version: RelayVersion, buildId = opencodevilBrowserBuildId): string | undefined {
   if (!version.buildId) {
     return `Running relay does not report a build id; use \`${cliCommand("relay restart")}\` for upgrade guidance (${buildId}).`
   }
@@ -97,7 +97,7 @@ export function relayBuildProblem(version: RelayVersion, buildId = opencodeBrows
 }
 
 /** Whether the running relay is a later build than this client: the state after an automatic update. */
-export function relayIsNewerThanClient(version: RelayVersion, buildId = opencodeBrowserBuildId): boolean {
+export function relayIsNewerThanClient(version: RelayVersion, buildId = opencodevilBrowserBuildId): boolean {
   return version.buildId !== undefined && version.buildId !== buildId && isNewerBuild(version.buildId, buildId)
 }
 
@@ -105,7 +105,7 @@ export function relayIsNewerThanClient(version: RelayVersion, buildId = opencode
  * What an MCP tool call says when a newer relay answered one of this older server's requests in a way it can't use:
  * the update restarted the relay, and the agent must start the new server rather than keep the old one running.
  */
-export function olderMcpClientAdvice(version: RelayVersion, error: unknown, buildId = opencodeBrowserBuildId): string | undefined {
+export function olderMcpClientAdvice(version: RelayVersion, error: unknown, buildId = opencodevilBrowserBuildId): string | undefined {
   if (!relayIsNewerThanClient(version, buildId)) return undefined
   const incompatible = error instanceof RelayClient.RelayDecodeFailed
     ? error.path !== "/version"
@@ -115,11 +115,11 @@ export function olderMcpClientAdvice(version: RelayVersion, error: unknown, buil
         (error.status === 400 && error.code === "invalid-request" &&
           error.message.startsWith("Invalid ") && error.message.includes(" request:")))
   if (!incompatible) return undefined
-  return "browse was updated, and the running relay can't serve this MCP server's older build. Reconnect browse in the agent so it starts the new version (in OpenCode: /mcps)."
+  return "browsevil was updated, and the running relay can't serve this MCP server's older build. Reconnect browsevil in the agent so it starts the new version (in OpenCode: /mcps)."
 }
 
 export const ensureRelay = Effect.fn("RelayLifecycle.ensureRelay")(function* (options: EnsureRelayOptions) {
-  const buildId = options.buildId ?? opencodeBrowserBuildId
+  const buildId = options.buildId ?? opencodevilBrowserBuildId
   const found = (version: RelayVersion, started: boolean): RelayReadiness => {
     const buildProblem = relayBuildProblem(version, buildId)
     return { version, started, ...(buildProblem ? { buildProblem } : {}) }
@@ -169,7 +169,7 @@ function waitForRelayReady(options: EnsureRelayOptions): Effect.Effect<RelayVers
     }),
     Effect.mapError((error) => retry(error)
       ? new RelayStartFailed({
-        message: `browse relay did not start at ${options.relay.endpoint}`,
+        message: `browsevil relay did not start at ${options.relay.endpoint}`,
         endpoint: options.relay.endpoint,
         cause: error,
       })
@@ -189,7 +189,7 @@ export const restartRelay = Effect.fn("RelayLifecycle.restartRelay")(function* (
   /** Runs once the old relay accepted the shutdown, before it exits. */
   readonly onShutdownAccepted?: Effect.Effect<void>
 }) {
-  const buildId = options.buildId ?? opencodeBrowserBuildId
+  const buildId = options.buildId ?? opencodevilBrowserBuildId
   const absent = (error: unknown) => isRelayUnreachable(error) || isForeignListener(error, options.pinned)
   const initial = yield* Effect.result(options.relay.version)
   let original: RelayVersion | undefined
@@ -277,7 +277,7 @@ function waitForRelayExitOrReplacement(options: {
   const stillRecorded = () => relayRecorded(options.instanceId)
   return options.relay.version.pipe(
     Effect.flatMap((version) => version.instanceId !== undefined && version.instanceId === options.instanceId
-      ? Effect.fail(new RelayStillRunning("browse relay is still draining; no replacement was started"))
+      ? Effect.fail(new RelayStillRunning("browsevil relay is still draining; no replacement was started"))
       : Effect.succeed(version)),
     // A foreign listener appears at the endpoint the moment the draining relay stops answering on this port but before
     // its relay.json goes. That is still this relay's shutdown, not an exit: starting a replacement now would hit the
@@ -288,7 +288,7 @@ function waitForRelayExitOrReplacement(options: {
       // While relay.json still names this relay, a decode failure is its drain, on a pinned or fallback port. Once the
       // record is gone, a pinned port keeps the decode failure (a real foreign listener); a fallback port moves on.
       if (error instanceof RelayClient.RelayDecodeFailed && stillRecorded()) {
-        return Effect.fail(new RelayStillRunning("browse relay is still draining; no replacement was started", error))
+        return Effect.fail(new RelayStillRunning("browsevil relay is still draining; no replacement was started", error))
       }
       return isForeignListener(error, options.pinned) ? Effect.succeed(undefined) : Effect.fail(error)
     }),
@@ -374,7 +374,7 @@ export const ensureExtensionConnected = Effect.fn("RelayLifecycle.ensureExtensio
     return status.connected
       ? Effect.succeed(status)
       : Effect.fail(new ExtensionDisconnected({
-        message: status.nextStep ?? `browse extension is not connected. Open the browser with browse installed (\`${installCommand()}\`); it reconnects automatically after relay or browser startup.`,
+        message: status.nextStep ?? `browsevil extension is not connected. Open the browser with browsevil installed (\`${installCommand()}\`); it reconnects automatically after relay or browser startup.`,
         needsPairing: status.pairingState === "refused" || status.pairingState === "unpaired",
       }))
   }))
@@ -422,7 +422,7 @@ export function startManagedRelay(
   return Effect.try({
     try: () => {
       if (!entrypoint) {
-        throw new Error("Cannot locate the browse CLI entrypoint")
+        throw new Error("Cannot locate the browsevil CLI entrypoint")
       }
       const launch = managedRelayLaunch(entrypoint, executable, execArgv)
       // relayEnvironment keeps every OPENCODE_BROWSEVIL_ name, whatever its casing, so strip the inherited restart id
@@ -450,7 +450,7 @@ export function startManagedRelay(
       })
       child.unref()
     },
-    catch: (cause) => cause instanceof Error ? cause : new Error("Failed to start browse relay", { cause }),
+    catch: (cause) => cause instanceof Error ? cause : new Error("Failed to start browsevil relay", { cause }),
   })
 }
 
@@ -494,7 +494,7 @@ export function managedRelayLaunch(
 
 export function managedRelayEntrypoint(entrypoint: string): string {
   const name = path.basename(entrypoint)
-  if (name === "index.ts" || name === "opencode-browser-client.ts" || name === "cli.ts")
+  if (name === "index.ts" || name === "opencodevil-browser-client.ts" || name === "cli.ts")
     return path.join(path.dirname(entrypoint), "main.ts")
   return entrypoint
 }

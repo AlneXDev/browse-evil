@@ -4,14 +4,14 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-const binary = process.platform === "win32" ? "browse.exe" : "browse"
+const binary = process.platform === "win32" ? "browsevil.exe" : "browsevil"
 
 type Home = { home: string; bin: string; root: string; installer: string; managed: string; settings: string }
 
 function makeHome(): Home {
-  const home = mkdtempSync(path.join(tmpdir(), "browse-uninstall-binary-"))
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil-uninstall-binary-"))
   const bin = path.join(home, "xdg-bin")
-  const root = path.join(home, "browse-home")
+  const root = path.join(home, "browsevil-home")
   mkdirSync(bin)
   mkdirSync(root)
   return {
@@ -20,7 +20,7 @@ function makeHome(): Home {
     root,
     installer: path.join(bin, binary),
     managed: path.join(root, "bin", binary),
-    settings: path.join(home, ".config", "browse", "settings.json"),
+    settings: path.join(home, ".config", "browsevil", "settings.json"),
   }
 }
 
@@ -82,7 +82,7 @@ await uninstall(["--yes"])
     expect(result.status, result.stderr || result.stdout).toBe(0)
     expect(existsSync(home.installer)).toBe(false)
     expect(existsSync(home.managed)).toBe(false)
-    expect(readFileSync(path.join(home.home, ".profile"), "utf8")).not.toContain("# browse")
+    expect(readFileSync(path.join(home.home, ".profile"), "utf8")).not.toContain("# browsevil")
   } finally {
     rmSync(home.home, { recursive: true, force: true })
   }
@@ -109,7 +109,7 @@ await uninstall(["--yes"])
     expect(existsSync(home.installer)).toBe(true)
     expect(readFileSync(home.installer, "utf8")).toBe("#!/bin/sh\nexit 0\n")
     expect(existsSync(home.managed)).toBe(false)
-    expect(result.stdout).toContain(`! Left ${home.installer}; delete it if you no longer use browse there.`)
+    expect(result.stdout).toContain(`! Left ${home.installer}; delete it if you no longer use browsevil there.`)
   } finally {
     rmSync(home.home, { recursive: true, force: true })
   }

@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test"
 import type { ConnectedTarget } from "../src/relay/types.ts"
 import { keepsTabVisible } from "../src/relay/tab-presentation.ts"
 
-const target = (owner: "relay" | "user", opencodeBrowserSessionId?: string): ConnectedTarget => ({
+const target = (owner: "relay" | "user", opencodevilBrowserSessionId?: string): ConnectedTarget => ({
   tabId: 10,
   sessionId: "cdp-10",
   owner,
-  ...(opencodeBrowserSessionId ? { opencodeBrowserSessionId } : {}),
+  ...(opencodevilBrowserSessionId ? { opencodevilBrowserSessionId } : {}),
   targetInfo: {
     targetId: "target-10",
     type: "page",

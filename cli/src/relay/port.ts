@@ -3,7 +3,7 @@
 // The configured port is OPENCODE_BROWSEVIL_PORT, else 29698. Everything an install keeps by port (the session catalog,
 // the lifecycle log, the current-session key) stays on the configured port, so a fallback never moves data. Only the
 // listen port changes: another product (Playwriter) also uses 29698, and an unpinned relay steps to the next free
-// browse port instead of failing onboarding. The extension learns the listen port when it pairs.
+// browsevil port instead of failing onboarding. The extension learns the listen port when it pairs.
 //
 // <state root>/relays/<configured port>/relay.json records the port the running relay actually bound. Clients resolve
 // through it so a CLI or MCP server started after a fallback finds the relay. It never holds the relay token.
@@ -134,11 +134,11 @@ export function relayPortCandidates(configuredPort = configuredRelayPort()): num
   return [...new Set([configuredPort, ...fallbackPorts])]
 }
 
-export type RelayPortOwner = "browse" | "other" | "nobody"
+export type RelayPortOwner = "browsevil" | "other" | "nobody"
 
 type BrowseVersion = { readonly version: string; readonly instanceId: string }
 
-const browseVersion = (body: unknown): body is BrowseVersion =>
+const browsevilVersion = (body: unknown): body is BrowseVersion =>
   typeof body === "object" && body !== null &&
   typeof (body as { version?: unknown }).version === "string" &&
   typeof (body as { instanceId?: unknown }).instanceId === "string"
@@ -147,7 +147,7 @@ const relayStarting = (body: unknown): boolean =>
   typeof body === "object" && body !== null && (body as { code?: unknown }).code === "relay-starting"
 
 /**
- * Who holds a port, from the open `/version` probe: a browse relay (current, or answering 503 while it starts), some
+ * Who holds a port, from the open `/version` probe: a browsevil relay (current, or answering 503 while it starts), some
  * other program, or nothing answering. Sent without credentials: whoever holds the port must never see the token.
  */
 export async function probeRelayPort(port: number, timeoutMs = 500): Promise<RelayPortOwner> {
@@ -157,16 +157,16 @@ export async function probeRelayPort(port: number, timeoutMs = 500): Promise<Rel
       signal: AbortSignal.timeout(timeoutMs),
     })
     const body: unknown = await response.json().catch(() => undefined)
-    if (response.status === 200 && browseVersion(body)) return "browse"
-    if (response.status === 503 && relayStarting(body)) return "browse"
+    if (response.status === 200 && browsevilVersion(body)) return "browsevil"
+    if (response.status === 503 && relayStarting(body)) return "browsevil"
     return "other"
   } catch {
     return "nobody"
   }
 }
 
-/** A browse relay's own `/version` answer on `port`, or undefined for anything else. Never carries credentials. */
-async function browseVersionAt(port: number, timeoutMs: number): Promise<BrowseVersion | undefined> {
+/** A browsevil relay's own `/version` answer on `port`, or undefined for anything else. Never carries credentials. */
+async function browsevilVersionAt(port: number, timeoutMs: number): Promise<BrowseVersion | undefined> {
   try {
     const response = await fetch(`${endpointForPort(port)}/version`, {
       redirect: "manual",
@@ -174,14 +174,14 @@ async function browseVersionAt(port: number, timeoutMs: number): Promise<BrowseV
     })
     if (response.status !== 200) return undefined
     const body: unknown = await response.json().catch(() => undefined)
-    return browseVersion(body) ? body : undefined
+    return browsevilVersion(body) ? body : undefined
   } catch {
     return undefined
   }
 }
 
 /**
- * The running browse relay, proven before any caller attaches the relay token: its open `/version` must have browse's
+ * The running browsevil relay, proven before any caller attaches the relay token: its open `/version` must have browsevil's
  * shape and, when a live relay.json exists for this configured port, the same port and instanceId. A live relay.json
  * naming another port means the endpoint under test is not trusted, not that there is no relay.
  */
@@ -196,7 +196,7 @@ export async function verifiedRelay(
     : undefined
   // This one read decides the port: a pinned port stays pinned, otherwise a live relay.json names it, else 29698.
   const port = envPort() ?? live?.port ?? defaultPort
-  const version = await browseVersionAt(port, options.timeoutMs ?? 3_000)
+  const version = await browsevilVersionAt(port, options.timeoutMs ?? 3_000)
   if (!version) return undefined
   // The record must not have changed while /version was in flight. A live record when the probe started must still be
   // the same; one that appears during the probe is allowed only when it describes exactly this reply.
@@ -219,7 +219,7 @@ export async function verifiedRelayEndpoint(
   return (await verifiedRelay(options))?.endpoint
 }
 
-/** A live relay recorded in relay.json for `configuredPort`, still answering as the same browse instance. */
+/** A live relay recorded in relay.json for `configuredPort`, still answering as the same browsevil instance. */
 async function liveRecordedRelay(
   configuredPort: number,
   root: string,
@@ -227,7 +227,7 @@ async function liveRecordedRelay(
 ): Promise<RelayState | undefined> {
   const state = readRelayState(root, configuredPort)
   if (!state || state.configuredPort !== configuredPort || !processAlive(state.pid)) return undefined
-  const version = await browseVersionAt(state.port, timeoutMs)
+  const version = await browsevilVersionAt(state.port, timeoutMs)
   return version?.instanceId === state.instanceId ? state : undefined
 }
 
@@ -292,7 +292,7 @@ const loopbackHost = (host: string) =>
 /**
  * The listen port for this relay. Pinned returns the configured port untouched (the listen then fails as before when
  * it is taken). Unpinned first refuses to run beside the relay.json instance that is still live here, then tries each
- * candidate: a free one wins; one held by a browse relay stops the start, so an install never runs a second relay
+ * candidate: a free one wins; one held by a browsevil relay stops the start, so an install never runs a second relay
  * elsewhere; one held by another HTTP server moves on. A port that can't be bound but doesn't answer HTTP is in use by
  * something else: the start stops there too, rather than racing a slow relay with a second one.
  */
@@ -313,12 +313,12 @@ export async function chooseRelayPort(options: ChooseRelayPortOptions = {}): Pro
   for (const port of candidates) {
     if (await canListen(host, port)) return port
     const owner = await probeRelayPort(port, probeTimeoutMs)
-    if (owner === "browse") throw alreadyInUse(host, port)
-    // A definite non-browse HTTP server leaves the port to it. No answer at all is a port something holds that isn't
+    if (owner === "browsevil") throw alreadyInUse(host, port)
+    // A definite non-browsevil HTTP server leaves the port to it. No answer at all is a port something holds that isn't
     // HTTP: starting a relay elsewhere would leave two relays with two sets of state.
     if (owner === "nobody") throw alreadyInUse(host, port)
   }
   throw new Error(
-    `browse relay ports ${portListText(candidates)} are all in use. Set OPENCODE_BROWSEVIL_PORT to a free port, or stop the program holding them.`,
+    `browsevil relay ports ${portListText(candidates)} are all in use. Set OPENCODE_BROWSEVIL_PORT to a free port, or stop the program holding them.`,
   )
 }

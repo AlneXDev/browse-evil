@@ -1,8 +1,8 @@
-# browse privacy policy
+# browsevil privacy policy
 
 _Last updated: October 28, 2026_
 
-browse is a browser extension that lets OpenCode, running on your own computer, use your browser. This policy explains what it handles and where that goes.
+browsevil is a browser extension that lets OpenCode, running on your own computer, use your browser. This policy explains what it handles and where that goes.
 
 ## What the extension handles
 - **Page content, screenshots, network traffic, and actions** in tabs an agent opened, or tabs you let agents use with the toolbar button.
@@ -19,7 +19,7 @@ Anomaly, the maker of OpenCode, doesn't run a server for this extension and does
 
 ## Your choices
 - Agents can't use your tabs unless you click the toolbar button on them. Click again to take a tab back.
-- Remove the extension and run `browse uninstall` (`npx @opencode/browsevil uninstall` if you installed with npx, `node cli/dist/cli.mjs uninstall` from a checkout) to delete everything it set up.
+- Remove the extension and run `browsevil uninstall` (`npx @opencode/browsevil uninstall` if you installed with npx, `node cli/dist/cli.mjs uninstall` from a checkout) to delete everything it set up.
 
 ## Contact
 Questions: open an issue at https://github.com/anomalyco/browse.

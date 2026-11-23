@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// browse: one command for setup, updates and driving the browser.
+// browsevil: one command for setup, updates and driving the browser.
 //   Setup (setup.ts): install, extension, pair, uninstall. Updating (update.ts): update.
 //   Driving the browser (cli.ts): serve, relay, execute, session, network, recording, journal,
 //   mcp, status. The relay is the local server agents use; the extension connects to it.
-// `browse mcp` runs the MCP server over stdio (as does the bundle invoked as `opencode-browser-mcp`).
+// `browsevil mcp` runs the MCP server over stdio (as does the bundle invoked as `opencodevil-browser-mcp`).
 import path from "node:path"
 import { agentHelp } from "./agent-guide.ts"
 import { legacyRootsLeft, legacyRuntime, legacyRuntimeActive, settleLegacyHome } from "./setup/legacy.ts"
@@ -15,7 +15,7 @@ const args = process.argv.slice(3)
 const invokedAs = path.basename(process.argv[1] ?? "")
 // Setup commands and update run before the Effect CLI parses arguments (below), so they would act on --help instead of
 // printing it. This mirrors the help check in cli.ts's quiet-JSON handling, but stops at `--`: everything after it belongs
-// to another program, so it is not a help request for browse.
+// to another program, so it is not a help request for browsevil.
 const separator = args.indexOf("--")
 const options = separator === -1 ? args : args.slice(0, separator)
 const askedForHelp = command === "--help" || command === "-h" || options.some((arg) => arg === "--help" || arg === "-h")
@@ -50,22 +50,22 @@ if (command === "serve" && !askedForHelp) {
   }
 }
 
-// Earlier layouts (~/.browse, and the old opencode-browser data root) move to the XDG folders on the first run.
-// opencode briefly shows the update, and no other command pays for the import.
+// Earlier layouts (~/.browsevil, and the old opencodevil-browser data root) move to the XDG folders on the first run.
+// opencodevil briefly shows the update, and no other command pays for the import.
 // A takeover migrates once its relay owns the port.
 if (command !== "--version" && command !== "-v" && !askedForHelp && !takingOver && !process.env.OPENCODE_BROWSEVIL_HOME && legacyRootsLeft()) {
   try {
     const { migrateLegacy } = await import("./setup/migrate.ts")
     migrateLegacy()
   } catch {
-    // Migration must never stop browse from starting; the next run tries again.
+    // Migration must never stop browsevil from starting; the next run tries again.
   }
 }
 
 if (command === "--version" || command === "-v") {
-  const opencodeBrowserVersion = embeddedVersion ?? (await import("./version.ts")).opencodeBrowserVersion
-  process.stdout.write(`${opencodeBrowserVersion}\n`)
-} else if (invokedAs === "opencode-browser-mcp" || (command === "mcp" && process.argv.length === 3)) {
+  const opencodevilBrowserVersion = embeddedVersion ?? (await import("./version.ts")).opencodevilBrowserVersion
+  process.stdout.write(`${opencodevilBrowserVersion}\n`)
+} else if (invokedAs === "opencodevil-browser-mcp" || (command === "mcp" && process.argv.length === 3)) {
   const { NodeRuntime } = await import("@effect/platform-node")
   const { defaultTeardown } = await import("effect/Runtime")
   const { runMcpServer } = await import("./mcp.ts")
@@ -108,7 +108,7 @@ if (command === "--version" || command === "-v") {
 } else {
   if (preCliHelp || !command || command === "--help" || command === "-h") {
     process.stdout.write(`SETUP
-  install [--opencode <path>]    Install browse: choose agents for the browse MCP server, check which browsers
+  install [--opencodevil <path>]    Install browsevil: choose agents for the browsevil MCP server, check which browsers
                                  have the extension and pair it (when none does, say to add it from the Chrome
                                  Web Store, open its page, and wait for it)
     --remote                     For a browser on another computer: open the relay to other computers and print
@@ -127,13 +127,13 @@ if (command === "--version" || command === "-v") {
                                  \`--revoke legacy\` retires the shared code of earlier versions
   set hostname <address>         Where the relay listens: 127.0.0.1 (this computer, the default) or 0.0.0.0
                                  (browsers on other computers can connect too, after pairing)
-  update [--check]               Update now: rerun whatever installed browse (the install script for a binary
+  update [--check]               Update now: rerun whatever installed browsevil (the install script for a binary
                                  install, npm install -g for an npm one); --check only says whether there's an
                                  update. A git clone pulls the newer commits and runs setup again.
   uninstall                      Remove everything install set up
 
-browse keeps its files in $XDG_CONFIG_HOME/browse, $XDG_DATA_HOME/browse, $XDG_STATE_HOME/browse and
-$XDG_CACHE_HOME/browse (defaults under ~/.config, ~/.local/share, ~/.local/state and ~/.cache), and the
+browsevil keeps its files in $XDG_CONFIG_HOME/browsevil, $XDG_DATA_HOME/browsevil, $XDG_STATE_HOME/browsevil and
+$XDG_CACHE_HOME/browsevil (defaults under ~/.config, ~/.local/share, ~/.local/state and ~/.cache), and the
 executable in ~/.local/bin (or $XDG_BIN_HOME).
 
 ${agentHelp}

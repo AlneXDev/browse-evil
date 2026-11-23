@@ -10,7 +10,7 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 // yet (or the initial about:blank). That is not a violation: the popup stays fresh and its first real document is
 // checked, while navigations after an allowed first document are blanked like any other tab.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-allowlist-popup-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-allowlist-popup-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -65,7 +65,7 @@ async function createScene(id: string, openerTabId: number) {
   expect(await extension.pair()).toBe(true)
   const response = await api("/cli/session/new", { id, allowedOrigins: [allowed] })
   expect(response.status).toBe(200)
-  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${id}`, { authorization: `Bearer ${token}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${id}`, { authorization: `Bearer ${token}` })
   if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
   expect((await cdpCall(socket, 1, "Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: false, flatten: true })).error).toBeUndefined()
   let calls = 2

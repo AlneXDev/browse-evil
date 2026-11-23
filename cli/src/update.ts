@@ -2,12 +2,12 @@
 //   update          fast-forwards the clone to the remote branch it tracks and reruns setup's steps (bun install,
 //                   build, install). It refuses, saying what to do, when the clone has local changes, has diverged,
 //                   isn't on a tracking branch, or can't reach the remote, and does nothing when it's up to date.
-//                   When the tracked branch is gone from the remote (browse's `main` became `dev`), it follows the
+//                   When the tracked branch is gone from the remote (browsevil's `main` became `dev`), it follows the
 //                   remote's default branch instead and points the local branch's upstream there.
 //   update check    asks the remote for its branch head (`git ls-remote`, never a fetch), at most every 6 hours,
 //                   cached in the cache root. `status`, the MCP server and the extension's status page show
 //                   its notice. It never blocks startup and fails silently. OPENCODE_BROWSEVIL_UPDATE_CHECK=0 turns it off.
-// An installed binary or npm global install (`browse install`) reruns the installer (auto-update.ts); `update` installs
+// An installed binary or npm global install (`browsevil install`) reruns the installer (auto-update.ts); `update` installs
 // the newest version on its channel now, and the notice shows a newer version in "notify" mode. npx is a no-op.
 import { execFile, spawnSync } from "node:child_process"
 import { existsSync, mkdirSync, readFileSync, realpathSync, renameSync, writeFileSync } from "node:fs"
@@ -62,7 +62,7 @@ export const gitIn = (repo: string): Git => (args, timeoutMs = 5_000) =>
 
 const short = (sha: string) => sha.slice(0, 7)
 
-/** The remote's default branch (`refs/heads/dev` for browse), from `git ls-remote --symref <remote> HEAD`. */
+/** The remote's default branch (`refs/heads/dev` for browsevil), from `git ls-remote --symref <remote> HEAD`. */
 async function defaultBranch(remote: string, git: Git) {
   return parseDefaultBranch(await git(["ls-remote", "--symref", remote, "HEAD"], 10_000))
 }
@@ -174,7 +174,7 @@ export function updateJson(update: UpdateNotice | undefined): UpdateJson | null 
 }
 
 export function formatUpdateNotice(notice: Pick<UpdateNotice, "summary" | "command">): string {
-  return `Update available: ${notice.summary}. Run \`${notice.command}\`, then restart opencode.`
+  return `Update available: ${notice.summary}. Run \`${notice.command}\`, then restart opencodevil.`
 }
 
 /**
@@ -209,7 +209,7 @@ export function npmUpdateNotice(): UpdateNotice | undefined | false {
   if (!latest || !updateAvailable(status) || status.effective === "off") return undefined
   if (status.effective === "on" && !status.lastError) return undefined
   const check: UpdateCheck = { repo: "npm", checkedAt: Date.now(), head: runtime.version, upstream: `npm ${status.channel ?? "latest"}`, latest, available: true }
-  return { summary: `browse ${latest} is available (you have ${runtime.version})`, command: cliCommand("update"), check }
+  return { summary: `browsevil ${latest} is available (you have ${runtime.version})`, command: cliCommand("update"), check }
 }
 
 /**
@@ -311,13 +311,13 @@ function installArgs(args: readonly string[]) {
   const passed: string[] = []
   for (let index = 0; index < args.length; index++) {
     const arg = args[index]!
-    if (arg === "--opencode" && args[index + 1] !== undefined) passed.push(arg, args[++index]!)
+    if (arg === "--opencodevil" && args[index + 1] !== undefined) passed.push(arg, args[++index]!)
     else if (arg === "--no-open") passed.push(arg)
   }
   return [...passed, "--no-wait"]
 }
 
-/** `browse update`: returns the exit code. */
+/** `browsevil update`: returns the exit code. */
 export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   const { log } = deps
   const refuse = (problem: string, fix: string) => {
@@ -327,9 +327,9 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   }
   const repo = deps.repo
   if (!repo) {
-    log("browse was installed from npm. Update it with:")
+    log("browsevil was installed from npm. Update it with:")
     log("  npx @opencode/browsevil@latest install")
-    log("then restart opencode.")
+    log("then restart opencodevil.")
     return 0
   }
   const git = deps.git ?? syncGit(repo)
@@ -338,7 +338,7 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   if (version.error || version.status !== 0) return refuse("git isn't installed or isn't on PATH.", "Install git, then run this again.")
   const top = git(["rev-parse", "--show-toplevel"]).stdout
   if (!top || realpath(top) !== realpath(repo))
-    return refuse(`${repo} isn't a git clone.`, `Clone it again: git clone https://github.com/anomalyco/browse.git && cd browse && bun run setup`)
+    return refuse(`${repo} isn't a git clone.`, `Clone it again: git clone https://github.com/anomalyco/browse.git && cd browsevil && bun run setup`)
   if (!(deps.hasBun ?? (() => !spawnSync("bun", ["--version"], { stdio: "ignore" }).error))())
     return refuse("bun isn't installed or isn't on PATH (setup builds with it).", "Install Bun from https://bun.sh, then run this again.")
 
@@ -362,7 +362,7 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
     )
   }
 
-  // The tracked branch is gone from a reachable remote (browse's main became dev): follow the remote's default branch,
+  // The tracked branch is gone from a reachable remote (browsevil's main became dev): follow the remote's default branch,
   // and track it from now on so later checks and updates ask for it directly.
   if (git(["ls-remote", "--exit-code", remote, merge], 30_000).status === 2) {
     const fallback = parseDefaultBranch(git(["ls-remote", "--symref", remote, "HEAD"], 30_000).stdout)
@@ -404,7 +404,7 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   const rootDeps = changed("package.json", "bun.lock")
   const cliDeps = changed("cli/package.json", "cli/bun.lock")
 
-  log(`Updating browse ${short(head)} → ${short(latest)} (${count} new commit${count === 1 ? "" : "s"} on ${upstream}):`)
+  log(`Updating browsevil ${short(head)} → ${short(latest)} (${count} new commit${count === 1 ? "" : "s"} on ${upstream}):`)
   for (const line of commits.split(/\r?\n/).filter(Boolean)) log(`  ${line}`)
   if (count > 20) log(`  … and ${count - 20} more`)
   log("")
@@ -421,19 +421,19 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
     return 1
   }
   log("")
-  log(`✓ Updated browse ${short(head)} → ${short(latest)}.`)
-  log("  Restart opencode to load the new browse MCP server.")
+  log(`✓ Updated browsevil ${short(head)} → ${short(latest)}.`)
+  log("  Restart opencodevil to load the new browsevil MCP server.")
   return 0
 }
 
-/** `browse update [--check]`. */
+/** `browsevil update [--check]`. */
 export async function runUpdateCommand(args: readonly string[]) {
   const log = (line: string) => process.stdout.write(line + "\n")
   const { runInstalledUpdate } = await import("./update/runtime-update.ts")
   if (await runInstalledUpdate(args)) return
   // An executable that `install` hasn't set up (one downloaded and run in place) has nothing to update.
   if (compiledBinary()) {
-    log(`This browse isn't installed. Run \`${cliCommand("install")}\` to set it up; it updates itself from then on.`)
+    log(`This browsevil isn't installed. Run \`${cliCommand("install")}\` to set it up; it updates itself from then on.`)
     process.exitCode = 1
     return
   }

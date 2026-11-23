@@ -21,16 +21,16 @@ import { targetDiagnosticIdentity } from "./process-guard.ts"
 
 export type TabGroupingMethod = "tabs.group" | "tabs.ungroup"
 
-export const attachedBadge = { text: "ON", color: "#7c3aed", title: "Detach from browse" }
-export const executingBadge = { text: "RUN", color: "#f59e0b", title: "browse is running a script. Click to stop it and take this tab back." }
-export const waitingBadge = (message: string) => ({ text: "WAIT", color: "#2563eb", title: `browse is waiting for you: ${message} Click here when you're done.` })
+export const attachedBadge = { text: "ON", color: "#7c3aed", title: "Detach from browsevil" }
+export const executingBadge = { text: "RUN", color: "#f59e0b", title: "browsevil is running a script. Click to stop it and take this tab back." }
+export const waitingBadge = (message: string) => ({ text: "WAIT", color: "#2563eb", title: `browsevil is waiting for you: ${message} Click here when you're done.` })
 
 /**
  * Whether a session keeps focus emulation on for this tab between calls: only a keepVisible session, and only a tab it
  * opened itself (relay-owned), never a tab the user lent it.
  */
 export function keepsTabVisible(sessionId: string, keepVisible: boolean, target: ConnectedTarget | undefined): boolean {
-  return keepVisible && target?.owner === "relay" && target.opencodeBrowserSessionId === sessionId
+  return keepVisible && target?.owner === "relay" && target.opencodevilBrowserSessionId === sessionId
 }
 
 export function createTabPresentation(options: {
@@ -72,7 +72,7 @@ export function createTabPresentation(options: {
     executing && !getSessions().isReadOnly(sessionId) ? executingBadge : attachedBadge
 
   function pageStatusSessionId(target: ConnectedTarget): string | undefined {
-    return target.opencodeBrowserSessionId
+    return target.opencodevilBrowserSessionId
   }
 
   function activeHandoffSessionIdForTab(tabId: number): string | undefined {
@@ -161,12 +161,12 @@ export function createTabPresentation(options: {
   }
 
   function setActivityForSessionTabs(
-    opencodeBrowserSessionId: string,
+    opencodevilBrowserSessionId: string,
     state: PageStatus["state"],
     badge: { readonly text: string; readonly color: string; readonly title: string },
   ): void {
     for (const target of registry.listRootTargets()) {
-      if (pageStatusSessionId(target) !== opencodeBrowserSessionId) continue
+      if (pageStatusSessionId(target) !== opencodevilBrowserSessionId) continue
       sendExtensionBestEffort({ method: "action.setBadge", params: { tabId: target.tabId, ...badge } })
       sendPageStatus(target, state)
     }
@@ -311,7 +311,7 @@ export function createTabPresentation(options: {
       }
       if (action === "stop-execution" && sessionId) {
         relayLog("execute.stopped", { tabId, session: sessionId, from: "toolbar" })
-        sessions.stopExecution(sessionId, `The user took tab ${tabId} back (browse toolbar button) while this script ran, so it was stopped. Don't use that tab again unless the user lends it back; ask the user how to continue.`)
+        sessions.stopExecution(sessionId, `The user took tab ${tabId} back (browsevil toolbar button) while this script ran, so it was stopped. Don't use that tab again unless the user lends it back; ask the user how to continue.`)
       }
     }
     Effect.runPromise(toggleTab(tabId)).catch((error: unknown) => {
@@ -340,8 +340,8 @@ export function createTabPresentation(options: {
     const tabId = committedTarget.tabId
     mainFrameIdsByTab.set(tabId, committedTarget.targetInfo.targetId)
     contextDebugLog?.(`target-attached kind=root ${targetDiagnosticIdentity(registry, committedTarget)} ${summarizeDiagnosticUrl(committedTarget.targetInfo.url)}`)
-    if (committedTarget.opencodeBrowserSessionId) {
-      pruneInvisibleAnnouncementsForSession(committedTarget.opencodeBrowserSessionId)
+    if (committedTarget.opencodevilBrowserSessionId) {
+      pruneInvisibleAnnouncementsForSession(committedTarget.opencodevilBrowserSessionId)
     }
     if (browsers.browserTab(tabId)?.link.rpc.connected) {
       refreshTabGrouping(tabId)
@@ -354,7 +354,7 @@ export function createTabPresentation(options: {
         handoffId: pendingHandoff.id,
       })
     } else {
-      sendPageStatus(committedTarget, committedTarget.opencodeBrowserSessionId && getSessions().isExecuting(committedTarget.opencodeBrowserSessionId) ? "running" : "attached")
+      sendPageStatus(committedTarget, committedTarget.opencodevilBrowserSessionId && getSessions().isExecuting(committedTarget.opencodevilBrowserSessionId) ? "running" : "attached")
     }
   }
 

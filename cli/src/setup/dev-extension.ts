@@ -40,7 +40,7 @@ export async function syncDevExtension(extension: DevExtension, options: { reado
   // up doesn't use up pending codes.
   if (installedDevExtension(root)?.sha256 === extension.sha256) return "current"
   const url = devExtensionUrl(extension, options.env)
-  const response = await (options.fetch ?? fetch)(url, { signal: AbortSignal.timeout(120_000), headers: { "user-agent": "browse/dev" } })
+  const response = await (options.fetch ?? fetch)(url, { signal: AbortSignal.timeout(120_000), headers: { "user-agent": "browsevil/dev" } })
   if (!response.ok) throw new Error(`downloading the dev extension from ${url} failed: HTTP ${response.status}`)
   const zip = Buffer.from(await response.arrayBuffer())
   const sha256 = createHash("sha256").update(zip).digest("hex")
@@ -57,7 +57,7 @@ export async function syncDevExtension(extension: DevExtension, options: { reado
       if (!entry.directory) writeFileSync(target, entry.data)
     }
     const manifest = JSON.parse(readFileSync(path.join(staging, "manifest.json"), "utf8")) as { version_name?: string; version?: string; key?: string }
-    if (!manifest.key) throw new Error("the dev extension has no manifest key, so it wouldn't have browse's unpacked ID")
+    if (!manifest.key) throw new Error("the dev extension has no manifest key, so it wouldn't have browsevil's unpacked ID")
     // The relay's listen port when the caller knows it (relay startup); install writes a fresh code with the live port.
     writeExtensionPairing(staging, mintPairingCode(undefined, { ttlMs: bundledPairingCodeTtlMs }), options.port)
     const build = (() => {

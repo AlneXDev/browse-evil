@@ -12,11 +12,11 @@ export type ConnectedTarget = {
   readonly tabId: number
   readonly sessionId: string
   /**
-   * The browse session the tab was created for. Owned tabs are
+   * The browsevil session the tab was created for. Owned tabs are
    * visible only to that session's CDP clients; unowned tabs (user
    * toolbar-attached or raw-client-created) are visible to every client.
    */
-  readonly opencodeBrowserSessionId?: string
+  readonly opencodevilBrowserSessionId?: string
   readonly targetInfo: TargetInfo
   readonly owner: "relay" | "user"
   readonly crashed?: boolean

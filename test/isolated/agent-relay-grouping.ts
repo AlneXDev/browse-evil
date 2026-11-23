@@ -344,7 +344,7 @@ describe("grouping: one shared group for all agents (default)", () => {
       const first = await agentTab("github")
       const second = await agentTab("linear")
       await command("debugger.attach", { tabId: userTab })
-      // Chrome reports a foreign frame taking over as target_closed, which browse reattaches: the user hears nothing.
+      // Chrome reports a foreign frame taking over as target_closed, which browsevil reattaches: the user hears nothing.
       event("debugger.onDetach").emit({ tabId: first.tabId }, "target_closed")
       await new Promise((resolve) => setTimeout(resolve, 60))
       expect(stub.state.notificationCreates).toBe(0)
@@ -355,7 +355,7 @@ describe("grouping: one shared group for all agents (default)", () => {
       await until(() => stub.state.notifications.size === 1)
       expect(stub.state.notificationCreates).toBe(1)
       expect([...stub.state.notifications.entries()]).toEqual([
-        ["opencode-browser-debugging-bar", expect.objectContaining({ title: "browse stopped using your tabs" })],
+        ["opencodevil-browser-debugging-bar", expect.objectContaining({ title: "browsevil stopped using your tabs" })],
       ])
     } finally {
       setSystemTime()
@@ -461,7 +461,7 @@ describe("group collapse: never (off)", () => {
     expect(group(agent.groupId)!.collapsed).toBe(false)
     await switchToAnotherTab(user.id)
     expect(group(agent.groupId)!.collapsed).toBe(false)
-    // The user folds it: browse leaves it folded too.
+    // The user folds it: browsevil leaves it folded too.
     await stub.chrome.tabGroups.update(agent.groupId, { collapsed: true })
     await switchToAnotherTab(user.id)
     expect(group(agent.groupId)!.collapsed).toBe(true)
@@ -563,7 +563,7 @@ describe("toolbar clicks that can't attach", () => {
     expect(stub.state.notifications.size).toBe(0)
     await failedAttach(userTab, "Cannot access a chrome:// URL")
     await until(() => stub.state.notifications.size === 1)
-    expect(notice()?.message).toBe("browse can't use this page. Chrome doesn't let extensions control browser pages or the Chrome Web Store.")
+    expect(notice()?.message).toBe("browsevil can't use this page. Chrome doesn't let extensions control browser pages or the Chrome Web Store.")
   })
 
   test("a chrome:// tab Chrome dropped from the debugger still sends a connected take-back", async () => {
@@ -698,7 +698,7 @@ describe("the relay's settings tool", () => {
     expect((await command("settings.get", {})).settings).toMatchObject({ grouping: "shared" })
   })
 
-  test("turning muteTabs on mutes the tabs agents already have open; off unmutes only the ones browse muted", async () => {
+  test("turning muteTabs on mutes the tabs agents already have open; off unmutes only the ones browsevil muted", async () => {
     const { userTab } = await userWindow()
     const first = await agentTab("github")
     const second = await agentTab("linear")

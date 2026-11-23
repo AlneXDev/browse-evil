@@ -26,7 +26,7 @@ afterEach(() => {
 })
 
 function fakeHome() {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-autoupdate-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-autoupdate-"))
   roots.push(home)
   fs.mkdirSync(path.join(home, ".local/bin"), { recursive: true })
   return home
@@ -40,7 +40,7 @@ function executable(file: string, version: string) {
 
 /** An installer stand-in that replaces the executable with one reporting `version`. */
 function installerWriting(version: string) {
-  return `#!/bin/sh\ncat > "$HOME/.local/bin/browse" <<'EOF'\n#!/bin/sh\nif [ "$1" = "--version" ]; then echo ${version}; exit 0; fi\nexit 0\nEOF\nchmod 755 "$HOME/.local/bin/browse"\n`
+  return `#!/bin/sh\ncat > "$HOME/.local/bin/browsevil" <<'EOF'\n#!/bin/sh\nif [ "$1" = "--version" ]; then echo ${version}; exit 0; fi\nexit 0\nEOF\nchmod 755 "$HOME/.local/bin/browsevil"\n`
 }
 
 /** The same, for `entry`, with no HOME needed. */
@@ -49,7 +49,7 @@ function installerReplacing(entry: string, version: string) {
 }
 
 function runtimeAt(home: string, version: string): Runtime {
-  const entry = path.join(home, ".local/bin", "browse")
+  const entry = path.join(home, ".local/bin", "browsevil")
   executable(entry, version)
   return { kind: "binary", entry, version }
 }
@@ -88,8 +88,8 @@ describe("channels and versions", () => {
 
 describe("where this process runs from", () => {
   test("npx's cache is recognized, and a checkout is not an installed runtime", () => {
-    expect(installKind("/home/u/.npm/_npx/abc/node_modules/@opencode/browse/dist/cli.mjs", false)).toBe("npx")
-    expect(installKind("/home/u/.local/share/pnpm/global/5/node_modules/@opencode/browse/dist/cli.mjs", false)).toBe("npm")
+    expect(installKind("/home/u/.npm/_npx/abc/node_modules/@opencode/browsevil/dist/cli.mjs", false)).toBe("npx")
+    expect(installKind("/home/u/.local/share/pnpm/global/5/node_modules/@opencode/browsevil/dist/cli.mjs", false)).toBe("npm")
   })
 })
 
@@ -108,7 +108,7 @@ describe("updating reruns the installer", () => {
     })
     expect(installed).toBe("0.0.2")
     expect(installedVersion(runtime)).toBe("0.0.2")
-    expect(fs.readdirSync(path.join(home, ".local/bin"))).toEqual(["browse"])
+    expect(fs.readdirSync(path.join(home, ".local/bin"))).toEqual(["browsevil"])
   })
 
   test("a binary install runs the installer that shipped with the release, not one fetched at update time", async () => {
@@ -161,13 +161,13 @@ describe("updating reruns the installer", () => {
     })
     expect(calls).toHaveLength(1)
     expect(calls[0]![0]).toBe("sh")
-    expect(calls[0]!.slice(1)).toEqual([expect.stringContaining("browse-install-"), "--channel", "dev", "--no-setup"])
+    expect(calls[0]!.slice(1)).toEqual([expect.stringContaining("browsevil-install-"), "--channel", "dev", "--no-setup"])
   })
 
   test("an npm install runs npm install -g at the requested version", async () => {
     const calls: string[][] = []
     const installed = await runInstaller({
-      runtime: { kind: "npm", entry: "/prefix/node_modules/@opencode/browse/dist/cli.mjs", version: "1.0.0" },
+      runtime: { kind: "npm", entry: "/prefix/node_modules/@opencode/browsevil/dist/cli.mjs", version: "1.0.0" },
       version: "1.0.1",
       run: async (command, args) => {
         calls.push([command, ...args])
@@ -175,7 +175,7 @@ describe("updating reruns the installer", () => {
       },
       env: {},
     })
-    expect(calls).toEqual([["npm", "install", "-g", "@opencode/browse@1.0.1"]])
+    expect(calls).toEqual([["npm", "install", "-g", "@opencode/browsevil@1.0.1"]])
     // The stub installed nothing, so the caller keeps the version it asked for.
     expect(installed).toBe("1.0.1")
   })
@@ -273,7 +273,7 @@ describe("the relay's updater", () => {
   const manifest = (options: { version: string; rollout?: number; required?: boolean; channel?: string }) =>
     JSON.stringify({
       schema: 1,
-      app: "browse",
+      app: "browsevil",
       artifact: "cli",
       channel: options.channel ?? "stable",
       sequence: 2,
@@ -283,7 +283,7 @@ describe("the relay's updater", () => {
         rollout_percent: options.rollout ?? 100,
         ...(options.required ? { required: true } : {}),
         targets: {
-          "linux-x64": { url: `/release/browse/files/${SHA}/opencode-browse-linux-x64-${options.version}.tgz`, size: 1, sha256: SHA },
+          "linux-x64": { url: `/release/browsevil/files/${SHA}/opencodevil-browsevil-linux-x64-${options.version}.tgz`, size: 1, sha256: SHA },
         },
         distributions: [{ kind: "direct" }],
       },
@@ -317,7 +317,7 @@ describe("the relay's updater", () => {
       })
       await updater.tick()
       expect(requests[0]!.url).toBe("https://anoma.ly/release/browse/cli/stable.json")
-      expect(requests[0]!.headers.get("user-agent")).toBe("browse/stable/0.0.1/cli")
+      expect(requests[0]!.headers.get("user-agent")).toBe("browsevil/stable/0.0.1/cli")
       expect(requests[0]!.headers.get("if-none-match")).toBeNull()
       expect(readState()).toMatchObject({ latest: "0.0.2", latestAt: time, etag: '"one"' })
       expect(spawned).toEqual([])
@@ -685,11 +685,11 @@ describe("the relay's updater", () => {
   })
 })
 
-describe("a runtime the old opencode-browser shim starts from runtime/versions", () => {
+describe("a runtime the old opencodevil-browser shim starts from runtime/versions", () => {
   const ok = { status: 0, stdout: "", stderr: "" }
   const writePackage = (dir: string, version: string) => {
     fs.mkdirSync(path.join(dir, "dist"), { recursive: true })
-    fs.writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name: "@opencode/browse", version }))
+    fs.writeFileSync(path.join(dir, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version }))
     fs.writeFileSync(path.join(dir, "dist", "cli.mjs"), "")
     return path.join(dir, "dist", "cli.mjs")
   }
@@ -699,8 +699,8 @@ describe("a runtime the old opencode-browser shim starts from runtime/versions",
     const previous = { XDG_DATA_HOME: process.env.XDG_DATA_HOME, LOCALAPPDATA: process.env.LOCALAPPDATA, OPENCODE_BROWSEVIL_HOME: process.env.OPENCODE_BROWSEVIL_HOME }
     process.env.XDG_DATA_HOME = process.env.LOCALAPPDATA = path.join(home, "data")
     process.env.OPENCODE_BROWSEVIL_HOME = home
-    const versions = path.join(home, "data", "opencode-browser", "runtime", "versions")
-    const runtime: Runtime = { kind: "npm", entry: writePackage(path.join(versions, "0.0.15-dev.108", "node_modules", "@opencode", "browse"), "0.0.15-dev.108"), version: "0.0.15-dev.108" }
+    const versions = path.join(home, "data", "opencodevil-browser", "runtime", "versions")
+    const runtime: Runtime = { kind: "npm", entry: writePackage(path.join(versions, "0.0.15-dev.108", "node_modules", "@opencodevil", "browsevil"), "0.0.15-dev.108"), version: "0.0.15-dev.108" }
     const globalRoot = path.join(home, "global", "lib", "node_modules")
     const npm = (install?: () => void, root = () => true) => async (_command: string, args: readonly string[]) => {
       if (args[0] === "root") return root() ? { ...ok, stdout: `${globalRoot}\n` } : { status: 1, stdout: "", stderr: "npm: not found" }
@@ -713,7 +713,7 @@ describe("a runtime the old opencode-browser shim starts from runtime/versions",
         else process.env[name] = value
       }
     }
-    return { runtime, global: path.join(globalRoot, "@opencode", "browse"), npm, restore }
+    return { runtime, global: path.join(globalRoot, "@opencodevil", "browsevil"), npm, restore }
   }
 
   test("npm install -g puts the update in npm's global folder, which is the version it reports", async () => {

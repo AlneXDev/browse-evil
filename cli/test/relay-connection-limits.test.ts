@@ -8,7 +8,7 @@ import { maxPreAuthMessageBytes, preAuthHandshakeTimeoutMs } from "../src/relay/
 import { stableUnpackedExtensionOrigin } from "../src/relay/helpers.ts"
 import { FakeExtension, startRelay, stopRelay } from "./relay-harness.ts"
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-limits-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-limits-"))
 let port = 0
 let relay: ChildProcess | undefined
 

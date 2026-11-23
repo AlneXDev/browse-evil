@@ -11,7 +11,7 @@ import {
 import { richParts } from "./describe"
 import "./pages.css"
 
-/** The opencode dark theme, unless the system asks for light. */
+/** The opencodevil dark theme, unless the system asks for light. */
 export function applyColorScheme() {
   const light = matchMedia("(prefers-color-scheme: light)")
   const apply = () => (document.documentElement.dataset.colorScheme = light.matches ? "light" : "dark")
@@ -103,7 +103,7 @@ export function CopyBox(props: { text: string; label?: string }) {
   )
 }
 
-/** The browse mark and name, with an optional page name and something on the right. */
+/** The browsevil mark and name, with an optional page name and something on the right. */
 export function Brand(props: { page?: string; end?: JSX.Element }) {
   return (
     <header class="brand">

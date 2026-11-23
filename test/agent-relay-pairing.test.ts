@@ -54,7 +54,7 @@ const until = async (check: () => boolean) => {
   for (let i = 0; i < 100 && !check(); i++) await settle()
   expect(check()).toBe(true)
 }
-const alarm = () => (chrome.alarms.onAlarm as unknown as StubEvent).emit({ name: "opencode-browser-relay" })
+const alarm = () => (chrome.alarms.onAlarm as unknown as StubEvent).emit({ name: "opencodevil-browser-relay" })
 
 test("without a pairing file, the extension sends only anonymous protocol presence", async () => {
   await until(() => relay.state().status === "unpaired")

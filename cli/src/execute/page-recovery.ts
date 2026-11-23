@@ -21,11 +21,11 @@ export const timedOut = Symbol("timed-out")
 
 export const defaultPageClosedWarning = "The session default page was closed; created a new page. References to the old page in state are stale."
 /** The user dismissed the browser's debugging bar, which detaches the debugger from every tab but leaves them open. */
-export const debuggingBarDismissedWarning = "The user dismissed the browser's debugging bar (Cancel/OK), which disconnects browse from every tab. Browse no longer controls the session's page; tabs an agent opened stay open until idle cleanup closes them. To use a tab the user lent, ask them to lend it again with the browse toolbar button."
-export const debuggingBarDismissedStop = "The user dismissed the browser's debugging bar (Cancel/OK) while this script ran, which disconnects browse from every tab, so it was stopped. The tab may still be open but browse no longer controls it. Run execute again to continue in a new tab; to use a tab the user lent, ask them to lend it again with the browse toolbar button."
+export const debuggingBarDismissedWarning = "The user dismissed the browser's debugging bar (Cancel/OK), which disconnects browsevil from every tab. Browse no longer controls the session's page; tabs an agent opened stay open until idle cleanup closes them. To use a tab the user lent, ask them to lend it again with the browsevil toolbar button."
+export const debuggingBarDismissedStop = "The user dismissed the browser's debugging bar (Cancel/OK) while this script ran, which disconnects browsevil from every tab, so it was stopped. The tab may still be open but browsevil no longer controls it. Run execute again to continue in a new tab; to use a tab the user lent, ask them to lend it again with the browsevil toolbar button."
 export const defaultPageRecoveredWarning = "The session default page was unresponsive; created a new page. References to the old page in state are stale."
 export const defaultPageCrashedWarning = "The session default page target crashed; checking it before the next execute."
-export const defaultPageRepairedWarning = "The session default page stopped answering automation; browse reconnected and re-resolved the same tab. References to the old page in state are stale."
+export const defaultPageRepairedWarning = "The session default page stopped answering automation; browsevil reconnected and re-resolved the same tab. References to the old page in state are stale."
 export const protectedExtensionUiWarning = "Chromium blocked protected extension UI, possibly a password manager. Ask the user to finish or dismiss it in the browser, then retry."
 export const protectedExtensionUiDiagnostic = "target/cross-extension-page"
 export const syntheticInputWarning = "fillInput/fillInputs set the value with synthetic input events (isTrusted: false, no key presses), which pages and bot protection can tell apart from typing. Prefer locator.fill() or locator.pressSequentially()."
@@ -247,10 +247,10 @@ export async function finishHandoff(options: {
   } catch (error) {
     const kind = runtimeFailureKind(error)
     if (kind !== "context-destroyed" && kind !== "context-missing") throw error
-    // The user finished the handoff; only browse's view of the page is stale. Keep that
+    // The user finished the handoff; only browsevil's view of the page is stale. Keep that
     // distinction visible and let the next execute health-check and repair the same tab.
     throw new Error(
-      `Handoff resolved (${options.message}), but the page execution context did not become available within ${contextTimeoutMs}ms: ${error instanceof Error ? error.message : String(error)}. The tab was kept; run a short follow-up execute so browse can re-check it.`,
+      `Handoff resolved (${options.message}), but the page execution context did not become available within ${contextTimeoutMs}ms: ${error instanceof Error ? error.message : String(error)}. The tab was kept; run a short follow-up execute so browsevil can re-check it.`,
       { cause: error },
     )
   }

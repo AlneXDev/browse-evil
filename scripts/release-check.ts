@@ -2,8 +2,8 @@
 //   bun run release:check [--tag v0.1.0] [--require-changelog] [--versions-only]
 // 1. the version is one release version everywhere: cli/package.json, package.json, public/manifest.json, the Rust
 //    workspace (rust/Cargo.toml and every workspace crate in rust/Cargo.lock), and the tag
-// 2. the extension zip (scripts/package.ts): release/browse-extension-<version>.zip, the store build (stable) or the
-//    release service's unpacked build (dev); then release/opencode-browse-<version>.tgz, the npm launcher package
+// 2. the extension zip (scripts/package.ts): release/browsevil-extension-<version>.zip, the store build (stable) or the
+//    release service's unpacked build (dev); then release/opencodevil-browsevil-<version>.tgz, the npm launcher package
 //    (scripts/npm-package.ts)
 // 3. scripts/check-artifacts.ts on both, then release/SHA256SUMS. The npm install check needs a platform package, so
 //    the release workflow runs it once the binaries are built (--platform-tarball here runs it too).
@@ -60,10 +60,10 @@ if (import.meta.main) {
   console.log(`✓ version ${version} agrees across cli/package.json, package.json, public/manifest.json and the Rust workspace${values.tag ? ` and ${values.tag}` : ""}`)
   if (values["versions-only"]) process.exit(0)
   const dev = parseReleaseVersion(version).channel === "dev"
-  // The Rust CLI has the public store item built in (rust/crates/browse-relay/src/protocol.rs PUBLIC_STORE_ID), where
+  // The Rust CLI has the public store item built in (rust/crates/browsevil-relay/src/protocol.rs PUBLIC_STORE_ID), where
   // the TypeScript CLI took it from OPENCODE_BROWSEVIL_STORE_ID (the CWS_ITEM_ID repository variable) at build time.
   const storeId = process.env.OPENCODE_BROWSEVIL_STORE_ID?.trim()
-  const builtIn = /PUBLIC_STORE_ID: &str = "([a-p]{32})"/.exec(await readFile(path.join(root, "rust", "crates", "browse-relay", "src", "protocol.rs"), "utf8"))?.[1]
+  const builtIn = /PUBLIC_STORE_ID: &str = "([a-p]{32})"/.exec(await readFile(path.join(root, "rust", "crates", "browsevil-relay", "src", "protocol.rs"), "utf8"))?.[1]
   if (storeId && storeId !== builtIn) fail([`OPENCODE_BROWSEVIL_STORE_ID is ${storeId}, but the Rust CLI points installs at ${String(builtIn)} (PUBLIC_STORE_ID)`])
 
   // The stress harness's hooks must never be built into a release (vite.config.ts).

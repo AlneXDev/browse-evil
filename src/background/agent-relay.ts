@@ -1,5 +1,5 @@
-// The link to the browse relay (ws://127.0.0.1:29698/extension). The relay runs agent sessions
-// for the browse MCP server and the browse CLI (page tools, `execute` scripts, recordings, handoffs) and drives tabs
+// The link to the browsevil relay (ws://127.0.0.1:29698/extension). The relay runs agent sessions
+// for the browsevil MCP server and the browsevil CLI (page tools, `execute` scripts, recordings, handoffs) and drives tabs
 // through this extension; this module runs its commands. The wire protocol is in ../agent-relay/protocol.ts,
 // the relay itself in cli/src/relay.ts.
 import { checkoutReloadPrefix, extensionProtocolVersion, unpackedExtensionId } from "../../cli/src/protocol"
@@ -119,12 +119,12 @@ export function createAgentRelay(input: { changed: (state: AgentRelayState) => v
     input.badgesChanged()
     log.add("attach.dropped", { reason, tabs })
   }
-  /** The badge for a queued click: the ellipsis says browse has the tab and hasn't handed it to the relay yet. */
+  /** The badge for a queued click: the ellipsis says browsevil has the tab and hasn't handed it to the relay yet. */
   const queuedBadge = (lending: boolean): AgentBadge => ({
     text: "…",
     title: lending
-      ? "browse is waiting for the relay, which starts when an agent next uses browse. Click again to cancel."
-      : "browse will take this tab back when the relay connects, which happens when an agent next uses browse. Click again to cancel.",
+      ? "browsevil is waiting for the relay, which starts when an agent next uses browsevil. Click again to cancel."
+      : "browsevil will take this tab back when the relay connects, which happens when an agent next uses browsevil. Click again to cancel.",
   })
   /** The queue a previous worker left. attachTab and the flush wait for it, so neither acts on half a queue. */
   const restored = (async () => {
@@ -526,7 +526,7 @@ export function createAgentRelay(input: { changed: (state: AgentRelayState) => v
       } else if (presenceOnly) setStatus("unpaired")
       else if (event.code === 4004) setStatus("conflict")
       else if (event.code === 4006) setStatus("untrusted")
-      // A missing relay is normal until an agent's browse tools (or the browse CLI) start one.
+      // A missing relay is normal until an agent's browsevil tools (or the browsevil CLI) start one.
       else setStatus(openedAt === undefined ? "offline" : "connecting")
       handshake.settle(mine)
       // One rate-limited scan may find a relay that moved to a fallback port (cli/src/relay/port.ts).
@@ -735,7 +735,7 @@ export function createAgentRelay(input: { changed: (state: AgentRelayState) => v
       const manifest = chrome.runtime.getManifest()
       const { pairing } = handshake.pairingState()
       return [
-        "browse diagnostics",
+        "browsevil diagnostics",
         `extension: ${manifest.version} (${chrome.runtime.id})`,
         `browser: ${navigator.userAgent}`,
         `relay: ws://${host}:${port}/extension, protocol ${extensionProtocolVersion}`,

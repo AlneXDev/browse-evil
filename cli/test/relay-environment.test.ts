@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test"
 import { binRoot, cacheRoot, configRoot, dataRoot, installedBinaryPath, stateRoot } from "../src/paths.ts"
 import { relayEnvironment } from "../src/relay/lifecycle.ts"
 
-// paths.ts resolves browse's config, data, state, cache and bin roots from these, and OPENCODE_BROWSEVIL_HOME overrides
+// paths.ts resolves browsevil's config, data, state, cache and bin roots from these, and OPENCODE_BROWSEVIL_HOME overrides
 // all of them. The managed relay must resolve the same roots as the CLI that started it, or files they share (pairing
 // codes included) land under different folders.
 const pathOverrides = [
@@ -47,18 +47,18 @@ const resolvedRoots = () => ({
 
 describe("managed relay environment", () => {
   test("forwards every path override paths.ts reads", () => {
-    const env: NodeJS.ProcessEnv = Object.fromEntries(pathOverrides.map((name) => [name, `/tmp/browse-test/${name.toLowerCase()}`]))
+    const env: NodeJS.ProcessEnv = Object.fromEntries(pathOverrides.map((name) => [name, `/tmp/browsevil-test/${name.toLowerCase()}`]))
     expect(relayEnvironment(env)).toEqual(env)
   })
 
-  test("the relay resolves browse's roots exactly as the CLI that started it", () => {
+  test("the relay resolves browsevil's roots exactly as the CLI that started it", () => {
     const env: NodeJS.ProcessEnv = {
       OPENCODE_BROWSEVIL_HOME: undefined,
-      XDG_CONFIG_HOME: "/tmp/browse-env/config",
-      XDG_DATA_HOME: "/tmp/browse-env/data",
-      XDG_STATE_HOME: "/tmp/browse-env/state",
-      XDG_CACHE_HOME: "/tmp/browse-env/cache",
-      XDG_BIN_HOME: "/tmp/browse-env/bin",
+      XDG_CONFIG_HOME: "/tmp/browsevil-env/config",
+      XDG_DATA_HOME: "/tmp/browsevil-env/data",
+      XDG_STATE_HOME: "/tmp/browsevil-env/state",
+      XDG_CACHE_HOME: "/tmp/browsevil-env/cache",
+      XDG_BIN_HOME: "/tmp/browsevil-env/bin",
     }
     // A fresh relay child only has the forwarded variables, so each side is evaluated with exactly its own environment.
     expect(withEnvironment(relayEnvironment(env), resolvedRoots)).toEqual(withEnvironment(env, resolvedRoots))

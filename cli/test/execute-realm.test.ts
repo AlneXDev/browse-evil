@@ -10,7 +10,7 @@ import { handleRelayProcessFault } from "../src/relay/process-guard.ts"
 import { legacyDataRoot } from "../src/setup/legacy.ts"
 import { nodeRealmRunner, values, type NodeOutcome } from "./support/node-realm.ts"
 
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browse-realm-"))
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-realm-"))
 const home = path.join(scratch, "home")
 let previousHome: string | undefined
 
@@ -500,7 +500,7 @@ describe("execute file access", () => {
   test("refuses paths outside the temp roots, relative paths and symlinks out", async () => {
     const files = createExecuteFiles()
     await expect(files.read("/etc/hosts")).rejects.toThrow(/outside the execute file roots/)
-    await expect(files.write(path.join(os.homedir(), ".zshrc-browse-test"), "x")).rejects.toThrow(/outside the execute file roots/)
+    await expect(files.write(path.join(os.homedir(), ".zshrc-browsevil-test"), "x")).rejects.toThrow(/outside the execute file roots/)
     expect(() => files.path("../../../etc/passwd")).toThrow(/outside the execute file roots/)
     expect(() => assertExecuteFilePath("relative.png", "screenshot")).toThrow(/absolute path/)
     const link = path.join(scratch, "escape")
@@ -508,14 +508,14 @@ describe("execute file access", () => {
     expect(() => assertExecuteFilePath(path.join(link, "hosts"), "files.read")).toThrow(/outside the execute file roots/)
   })
 
-  test("refuses browse's own folders even inside a temp root", async () => {
+  test("refuses browsevil's own folders even inside a temp root", async () => {
     const files = createExecuteFiles()
     fs.writeFileSync(path.join(home, "relay-token"), "secret")
-    await expect(files.read(path.join(home, "relay-token"))).rejects.toThrow(/browse's own files/)
+    await expect(files.read(path.join(home, "relay-token"))).rejects.toThrow(/browsevil's own files/)
   })
 
-  test("refuses every browse root, the installed binary and its install siblings", () => {
-    const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "browse-realm-xdg-"))
+  test("refuses every browsevil root, the installed binary and its install siblings", () => {
+    const xdg = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-realm-xdg-"))
     const variables = {
       XDG_CONFIG_HOME: path.join(xdg, "config"),
       XDG_DATA_HOME: path.join(xdg, "data"),
@@ -534,7 +534,7 @@ describe("execute file access", () => {
         const file = path.join(root, "secret.json")
         fs.mkdirSync(root, { recursive: true })
         fs.writeFileSync(file, "secret")
-        expect(() => assertExecuteFilePath(file, "files.read")).toThrow(/inside browse's own files/)
+        expect(() => assertExecuteFilePath(file, "files.read")).toThrow(/inside browsevil's own files/)
       }
 
       const binary = installedBinaryPath()
@@ -544,30 +544,30 @@ describe("execute file access", () => {
         binary, `${binary}.new`, `${binary}.${process.pid}.new`, `${binary}.old-0123abcd`, `${binary}.migrate-${process.pid}`,
         `${binary}.new/payload`, `${binary}.old-1/x`,
       ]) {
-        expect(() => assertExecuteFilePath(denied, "files.write")).toThrow(/inside browse's own files/)
+        expect(() => assertExecuteFilePath(denied, "files.write")).toThrow(/inside browsevil's own files/)
       }
       // A child literally named `..bypass` is inside the root, not a way out of it.
-      expect(() => assertExecuteFilePath(path.join(stateRoot(), "..bypass"), "files.write")).toThrow(/inside browse's own files/)
+      expect(() => assertExecuteFilePath(path.join(stateRoot(), "..bypass"), "files.write")).toThrow(/inside browsevil's own files/)
 
       // Staging lands beside the resolved install folder even when the bin folder and the binary are both symlinks.
       const realBin = path.join(xdg, "real-bin")
       fs.mkdirSync(realBin, { recursive: true })
       fs.rmSync(variables.XDG_BIN_HOME, { recursive: true, force: true })
       fs.symlinkSync(realBin, variables.XDG_BIN_HOME)
-      fs.writeFileSync(path.join(realBin, "browse-target"), "binary", { mode: 0o755 })
-      fs.symlinkSync(path.join(realBin, "browse-target"), path.join(realBin, "browse"))
-      for (const staging of [path.join(variables.XDG_BIN_HOME, "browse.new"), path.join(realBin, "browse.new")]) {
-        expect(() => assertExecuteFilePath(staging, "files.write")).toThrow(/inside browse's own files/)
+      fs.writeFileSync(path.join(realBin, "browsevil-target"), "binary", { mode: 0o755 })
+      fs.symlinkSync(path.join(realBin, "browsevil-target"), path.join(realBin, "browsevil"))
+      for (const staging of [path.join(variables.XDG_BIN_HOME, "browsevil.new"), path.join(realBin, "browsevil.new")]) {
+        expect(() => assertExecuteFilePath(staging, "files.write")).toThrow(/inside browsevil's own files/)
       }
 
       // Migration copies these roots into the live ones on the next run, so execute code must not stage files there.
-      const legacyData = path.join(variables.XDG_DATA_HOME, "opencode-browser")
+      const legacyData = path.join(variables.XDG_DATA_HOME, "opencodevil-browser")
       fs.mkdirSync(legacyData, { recursive: true })
       const legacyFile = path.join(legacyData, "relay-token")
       fs.writeFileSync(legacyFile, "secret")
-      expect(() => assertExecuteFilePath(legacyFile, "files.read")).toThrow(/inside browse's own files/)
-      expect(() => assertExecuteFilePath(path.join(os.homedir(), ".browse", "bin", "browse"), "files.read"))
-        .toThrow(/inside browse's own files/)
+      expect(() => assertExecuteFilePath(legacyFile, "files.read")).toThrow(/inside browsevil's own files/)
+      expect(() => assertExecuteFilePath(path.join(os.homedir(), ".browsevil", "bin", "browsevil"), "files.read"))
+        .toThrow(/inside browsevil's own files/)
 
       const unrelated = path.join(xdg, "unrelated.txt")
       fs.writeFileSync(unrelated, "fine")
@@ -588,7 +588,7 @@ describe("execute file access", () => {
   })
 
   test("refuses the everyday folders and installer binary while OPENCODE_BROWSEVIL_HOME points elsewhere", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-realm-override-"))
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-realm-override-"))
     const variables = {
       OPENCODE_BROWSEVIL_HOME: path.join(root, "home"),
       XDG_CONFIG_HOME: path.join(root, "config"),
@@ -605,21 +605,21 @@ describe("execute file access", () => {
       const overrideFile = path.join(variables.OPENCODE_BROWSEVIL_HOME, "pairing-codes.json")
       fs.mkdirSync(variables.OPENCODE_BROWSEVIL_HOME, { recursive: true })
       fs.writeFileSync(overrideFile, "{}")
-      expect(() => assertExecuteFilePath(overrideFile, "files.read")).toThrow(/inside browse's own files/)
+      expect(() => assertExecuteFilePath(overrideFile, "files.read")).toThrow(/inside browsevil's own files/)
 
       // So do the everyday XDG folders the override hides from paths.ts.
-      const state = path.join(variables.XDG_STATE_HOME, "browse", "pairing-codes.json")
+      const state = path.join(variables.XDG_STATE_HOME, "browsevil", "pairing-codes.json")
       fs.mkdirSync(path.dirname(state), { recursive: true })
       fs.writeFileSync(state, "{}")
-      expect(() => assertExecuteFilePath(state, "files.read")).toThrow(/inside browse's own files/)
+      expect(() => assertExecuteFilePath(state, "files.read")).toThrow(/inside browsevil's own files/)
 
       // The installer still writes its binary at the installer path, not under the override.
       const installer = installerBinaryPath()
       expect(installer).toBe(path.join(variables.XDG_BIN_HOME, path.basename(installer)))
       fs.mkdirSync(path.dirname(installer), { recursive: true })
       fs.writeFileSync(installer, "binary", { mode: 0o755 })
-      expect(() => assertExecuteFilePath(installer, "files.write")).toThrow(/inside browse's own files/)
-      expect(() => assertExecuteFilePath(`${installer}.new/payload`, "files.write")).toThrow(/inside browse's own files/)
+      expect(() => assertExecuteFilePath(installer, "files.write")).toThrow(/inside browsevil's own files/)
+      expect(() => assertExecuteFilePath(`${installer}.new/payload`, "files.write")).toThrow(/inside browsevil's own files/)
     } finally {
       for (const name of names) {
         const value = saved.get(name)
@@ -635,29 +635,29 @@ describe("execute file access", () => {
     try {
       for (const value of ["", "relative/data"]) {
         process.env.XDG_DATA_HOME = value
-        expect(legacyDataRoot()).toBe(path.join(os.homedir(), ".local", "share", "opencode-browser"))
+        expect(legacyDataRoot()).toBe(path.join(os.homedir(), ".local", "share", "opencodevil-browser"))
       }
       const absolute = path.join(scratch, "xdg-data")
       process.env.XDG_DATA_HOME = absolute
-      expect(legacyDataRoot()).toBe(path.join(absolute, "opencode-browser"))
+      expect(legacyDataRoot()).toBe(path.join(absolute, "opencodevil-browser"))
     } finally {
       if (saved === undefined) delete process.env.XDG_DATA_HOME
       else process.env.XDG_DATA_HOME = saved
     }
   })
 
-  test("browse-owned checks ignore case where the platform's filesystem does", () => {
+  test("browsevil-owned checks ignore case where the platform's filesystem does", () => {
     for (const platform of ["darwin", "win32"] as const) {
-      expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browse", platform), platform).toBe(true)
-      expect(isInside("/TMP/xdg/browse/config.json", "/tmp/xdg/browse", platform), platform).toBe(true)
-      for (const sibling of ["/bin/BROWSE.NEW", "/bin/browse.NEW", "/bin/Browse.Old-1", "/BIN/browse.new", "/bin/browse.MIGRATE-9"]) {
-        expect(isInstallSibling(sibling, "/bin/browse", platform), `${platform} ${sibling}`).toBe(true)
+      expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
+      expect(isInside("/TMP/xdg/browsevil/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
+      for (const sibling of ["/bin/BROWSE.NEW", "/bin/browsevil.NEW", "/bin/Browse.Old-1", "/BIN/browsevil.new", "/bin/browsevil.MIGRATE-9"]) {
+        expect(isInstallSibling(sibling, "/bin/browsevil", platform), `${platform} ${sibling}`).toBe(true)
       }
     }
     // Linux keeps paths case-sensitive, so these are different files and stay allowed.
-    expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browse", "linux")).toBe(false)
-    expect(isInstallSibling("/bin/BROWSE.NEW", "/bin/browse", "linux")).toBe(false)
-    expect(isInstallSibling("/bin/browse.NEW", "/bin/browse", "linux")).toBe(false)
+    expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browsevil", "linux")).toBe(false)
+    expect(isInstallSibling("/bin/BROWSE.NEW", "/bin/browsevil", "linux")).toBe(false)
+    expect(isInstallSibling("/bin/browsevil.NEW", "/bin/browsevil", "linux")).toBe(false)
   })
 
   test("private helper directory and descriptor checks reject symlinks and hard links", async () => {

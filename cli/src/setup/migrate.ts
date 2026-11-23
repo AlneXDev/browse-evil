@@ -1,10 +1,10 @@
-// One-time migration from earlier layouts to browse's XDG folders:
-//   ~/.browse                     the installer's executable plus, in early versions, the data root
-//   ~/.local/share/opencode-browser  the data root until 0.0.11 (or %LOCALAPPDATA%\opencode-browser on Windows)
+// One-time migration from earlier layouts to browsevil's XDG folders:
+//   ~/.browsevil                     the installer's executable plus, in early versions, the data root
+//   ~/.local/share/opencodevil-browser  the data root until 0.0.11 (or %LOCALAPPDATA%\opencodevil-browser on Windows)
 // Every file is copied beside its destination and renamed into place, so an interrupted run simply continues. Existing
 // new files always win (the old copy is removed, not merged), which makes a second run a no-op. Agent MCP entries that
-// point at ~/.browse/bin/browse are rewritten to ~/.local/bin/browse; entries that record an absolute node path are
-// rewritten to the stable `browse` command, since nvm/fnm change node between sessions. Then the old roots are removed;
+// point at ~/.browsevil/bin/browsevil are rewritten to ~/.local/bin/browsevil; entries that record an absolute node path are
+// rewritten to the stable `browsevil` command, since nvm/fnm change node between sessions. Then the old roots are removed;
 // the old data root waits LEGACY_HANDOVER_GRACE_MS after its runtime was taken over (legacy-runtime.ts).
 import fs from "node:fs"
 import os from "node:os"
@@ -14,7 +14,7 @@ import { parse as parseJsonc, type ParseError } from "jsonc-parser"
 import { parse as parseToml } from "smol-toml"
 import { parseDocument } from "yaml"
 import { binRoot, binaryName, cacheRoot, configRoot, dataRoot, devExtensionFolder, stateRoot } from "../paths.ts"
-import { agentLocations, browseServerCommand, editAgentConfig, type AgentName } from "./agent-config.ts"
+import { agentLocations, browsevilServerCommand, editAgentConfig, type AgentName } from "./agent-config.ts"
 import { LEGACY_HANDOVER_GRACE_MS, legacyDataRoot, legacyRoots, legacyRuntime } from "./legacy.ts"
 import type { Settings } from "./environment.ts"
 import { configureMcp, OPENCODE_CONFIG_NAMES } from "./mcp.ts"
@@ -126,7 +126,7 @@ function writeTextAtomic(file: string, text: string) {
 }
 
 /** Replaces an old binary path in valid config text, including the JSON-escaped Windows form. Invalid configs are left
- * for `browse install` or a person to fix, so migration never rewrites something it can't parse. */
+ * for `browsevil install` or a person to fix, so migration never rewrites something it can't parse. */
 function rewriteBinaryText(file: string, oldBinary: string, newBinary: string) {
   if (!configIsValid(file)) return false
   let text: string
@@ -156,28 +156,28 @@ function referencesPath(file: string, needle: string): boolean {
 const absoluteNode = (command: string) => /(^|[\\/])(node|node\.exe)$/i.test(command)
 /** An npm or npx entry (not a checkout) whose command is an absolute node plus a package script. */
 const npmEntry = (entry: string) =>
-  /(?:opencode-browser\.mjs|_npx[\\/].*@opencode[\\/]browse|node_modules[\\/]@opencode[\\/]browse)/i.test(entry)
+  /(?:opencodevil-browser\.mjs|_npx[\\/].*@opencodevil[\\/]browsevil|node_modules[\\/]@opencodevil[\\/]browsevil)/i.test(entry)
 
 /**
- * Rewrites one agent's browse entry. Returns true when it changed. The old entry is removed and re-added with
- * editAgentConfig, so unrelated settings and comments stay; opencode's different schema goes through configureMcp.
+ * Rewrites one agent's browsevil entry. Returns true when it changed. The old entry is removed and re-added with
+ * editAgentConfig, so unrelated settings and comments stay; opencodevil's different schema goes through configureMcp.
  */
 function rewriteAgent(name: AgentName, file: string, oldBinary: string, newBinary: string): boolean {
   if (!fs.existsSync(file)) return false
-  const command = browseServerCommand(name, file)
+  const command = browsevilServerCommand(name, file)
   if (!command || command.at(-1) !== "mcp") return false
   const target = command.at(-2)
   if (!target) return false
   if (command[0] === oldBinary || normalized(command[0] ?? "") === normalized(oldBinary)) {
-    if (name === "opencode") return !!configureMcp(file, newBinary, oldBinary)
-    const changed = editAgentConfig({ name: name as Exclude<AgentName, "opencode">, file, entry: oldBinary }, true)
-    return changed === "removed" && editAgentConfig({ name: name as Exclude<AgentName, "opencode">, file, entry: newBinary }) === "added"
+    if (name === "opencodevil") return !!configureMcp(file, newBinary, oldBinary)
+    const changed = editAgentConfig({ name: name as Exclude<AgentName, "opencodevil">, file, entry: oldBinary }, true)
+    return changed === "removed" && editAgentConfig({ name: name as Exclude<AgentName, "opencodevil">, file, entry: newBinary }) === "added"
   }
   if (absoluteNode(command[0] ?? "") && npmEntry(target)) {
-    // An npm install ran an absolute node and a package path; both move under nvm/fnm. `browse` on PATH is stable.
-    if (name === "opencode") return !!configureMcp(file, "browse", target)
-    const changed = editAgentConfig({ name: name as Exclude<AgentName, "opencode">, file, node: command[0]!, entry: target }, true)
-    return changed === "removed" && editAgentConfig({ name: name as Exclude<AgentName, "opencode">, file, entry: "browse" }) === "added"
+    // An npm install ran an absolute node and a package path; both move under nvm/fnm. `browsevil` on PATH is stable.
+    if (name === "opencodevil") return !!configureMcp(file, "browsevil", target)
+    const changed = editAgentConfig({ name: name as Exclude<AgentName, "opencodevil">, file, node: command[0]!, entry: target }, true)
+    return changed === "removed" && editAgentConfig({ name: name as Exclude<AgentName, "opencodevil">, file, entry: "browsevil" }) === "added"
   }
   return false
 }
@@ -228,11 +228,11 @@ function readCopied(record: string): string[] {
 
 /** What earlier installs recorded in settings.json: the OpenCode configs and agent entries they wrote. */
 function recordedConfigs(home: string): AgentLocationRecord[] {
-  return [path.join(configRoot(home), "settings.json"), path.join(home, ".browse", "settings.json"), path.join(legacyDataRoot(home), "settings.json")].flatMap((file) => {
+  return [path.join(configRoot(home), "settings.json"), path.join(home, ".browsevil", "settings.json"), path.join(legacyDataRoot(home), "settings.json")].flatMap((file) => {
     try {
       const settings = JSON.parse(fs.readFileSync(file, "utf8")) as Settings
       return [
-        ...(settings.opencodeConfigs ?? []).filter((config) => typeof config === "string").map((config) => ({ name: "opencode" as const, file: config })),
+        ...(settings.opencodevilConfigs ?? []).filter((config) => typeof config === "string").map((config) => ({ name: "opencodevil" as const, file: config })),
         ...(settings.agents ?? []).filter((agent) => typeof agent?.file === "string").map((agent) => ({ name: agent.name, file: agent.file })),
       ]
     } catch {
@@ -285,7 +285,7 @@ function linkLegacyExtension(root: string, home: string) {
   }
 }
 
-/** Idempotent, never throws: migration must not stop browse from starting. */
+/** Idempotent, never throws: migration must not stop browsevil from starting. */
 export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationResult {
   const result: MigrationResult = { moved: 0, rewritten: 0, removed: [] }
   if (process.env.OPENCODE_BROWSEVIL_HOME) return result
@@ -315,7 +315,7 @@ export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationR
     }
     if (complete) result.removed.push(root)
   }
-  const oldBinary = path.join(home, ".browse", "bin", binaryName())
+  const oldBinary = path.join(home, ".browsevil", "bin", binaryName())
   const newBinary = path.join(binRoot(home), binaryName())
   // settings.json records the entry too; keep status and uninstall pointing at the new executable.
   const settingsFile = path.join(configRoot(home), "settings.json")
@@ -327,11 +327,11 @@ export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationR
   const config = home === os.homedir() && process.env.XDG_CONFIG_HOME && path.isAbsolute(process.env.XDG_CONFIG_HOME)
     ? process.env.XDG_CONFIG_HOME
     : path.join(home, ".config")
-  // Every config the installer may have written browse into: OpenCode's default candidates, then what settings recorded.
-  const opencodeConfigs = OPENCODE_CONFIG_NAMES.map((name) => path.join(config, "opencode", name))
+  // Every config the installer may have written browsevil into: OpenCode's default candidates, then what settings recorded.
+  const opencodevilConfigs = OPENCODE_CONFIG_NAMES.map((name) => path.join(config, "opencodevil", name))
   const locations = [
-    ...agentLocations(home, config, () => undefined, opencodeConfigs[0]!).filter((location) => location.name !== "opencode"),
-    ...opencodeConfigs.map((file) => ({ name: "opencode" as const, file })),
+    ...agentLocations(home, config, () => undefined, opencodevilConfigs[0]!).filter((location) => location.name !== "opencodevil"),
+    ...opencodevilConfigs.map((file) => ({ name: "opencodevil" as const, file })),
     ...recorded,
   ].filter((location, index, all) => all.findIndex((other) => other.name === location.name && normalized(other.file) === normalized(location.file)) === index)
   for (const location of locations) {
@@ -339,15 +339,15 @@ export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationR
       if (rewriteAgent(location.name, location.file, oldBinary, newBinary)) result.rewritten++
       else if (rewriteBinaryText(location.file, oldBinary, newBinary)) result.rewritten++
     } catch {
-      // A malformed or conflicting config is left alone; `browse install` reports it.
+      // A malformed or conflicting config is left alone; `browsevil install` reports it.
     }
   }
   // Re-scan rather than trusting the rewrite result: if any agent still points into an old root, deleting it would
   // break that agent. Keep the referenced root so the next run retries; the other root can still go.
   const stillReferences = (needle: string) => locations.some((location) => referencesPath(location.file, needle))
   const keep = new Set<string>()
-  const browseRoot = path.join(home, ".browse")
-  if (stillReferences(oldBinary)) keep.add(normalized(browseRoot))
+  const browsevilRoot = path.join(home, ".browsevil")
+  if (stillReferences(oldBinary)) keep.add(normalized(browsevilRoot))
   if (stillReferences(oldData)) keep.add(normalized(oldData))
   // Just taken over (legacy-runtime.ts): agents' running shims still read runtime/current.json to reach the new server.
   const takenOver = legacyRuntime(home)
@@ -360,7 +360,7 @@ export function migrateLegacy(home = os.homedir(), now = Date.now()): MigrationR
       // A stale record only means a later takeover's copy removes these; there won't be one.
     }
   }
-  if (referencesPath(settingsFile, oldBinary)) keep.add(normalized(browseRoot))
+  if (referencesPath(settingsFile, oldBinary)) keep.add(normalized(browsevilRoot))
   result.removed = result.removed.filter((root) => !keep.has(normalized(root)))
   const removable = result.removed.splice(0)
   for (const root of removable) {

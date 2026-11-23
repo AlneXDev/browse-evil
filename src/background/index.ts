@@ -1,4 +1,4 @@
-// Service worker: keeps the link to the local browse relay (agent-relay.ts), which drives tabs for agents. The
+// Service worker: keeps the link to the local browsevil relay (agent-relay.ts), which drives tabs for agents. The
 // toolbar button lets agents use the current tab, or stops them (before setup, it opens the onboarding page). The
 // onboarding page (onboarding.html) walks through setup; the settings page (settings.html, the options page) shows the
 // connection.
@@ -27,7 +27,7 @@ declare const __OPENCODE_BROWSEVIL_TEST_HOOKS__: boolean
 // this worker's DevTools target, as CDP can't click browser UI. Pages can't reach the worker's globals, and other
 // builds compile this out.
 if (__OPENCODE_BROWSEVIL_TEST_HOOKS__)
-  Object.assign(globalThis, { __opencodeBrowserTest: { toolbarClick: (tabId: number) => agents.attachTab(tabId) } })
+  Object.assign(globalThis, { __opencodevilBrowserTest: { toolbarClick: (tabId: number) => agents.attachTab(tabId) } })
 
 chrome.runtime.onConnect.addListener((port) => {
   // Only this extension's own pages may drive the relay: a content script in a page shares our extension id, but its

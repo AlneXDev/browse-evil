@@ -168,12 +168,12 @@ export class TargetRegistry {
     const pendingReservation = this.pendingOwnershipReservations.get(existing.targetInfo.targetId)
     const inheritedOpenCodeBrowserSessionId = pendingReservation
       ? pendingReservation.previousOpenCodeBrowserSessionId
-      : existing.opencodeBrowserSessionId
-    const { opencodeBrowserSessionId: _incomingOwner, ...targetWithoutOwner } = target
+      : existing.opencodevilBrowserSessionId
+    const { opencodevilBrowserSessionId: _incomingOwner, ...targetWithoutOwner } = target
     return {
       ...targetWithoutOwner,
       owner: existing.owner,
-      ...(inheritedOpenCodeBrowserSessionId ? { opencodeBrowserSessionId: inheritedOpenCodeBrowserSessionId } : {}),
+      ...(inheritedOpenCodeBrowserSessionId ? { opencodevilBrowserSessionId: inheritedOpenCodeBrowserSessionId } : {}),
     }
   }
 
@@ -231,7 +231,7 @@ export class TargetRegistry {
 
   getRootTargetBySessionId(sessionId: string): ConnectedTarget | undefined {
     return this.targets.get(sessionId) ?? this.listRootTargets().find((target) => {
-      return target.opencodeBrowserSessionId === sessionId
+      return target.opencodevilBrowserSessionId === sessionId
     })
   }
 
@@ -240,11 +240,11 @@ export class TargetRegistry {
     if (!target) {
       throw new TargetOwnershipError({ reason: "not-found", message: `Target detached before adoption: ${targetId}` })
     }
-    const owner = target.opencodeBrowserSessionId
+    const owner = target.opencodevilBrowserSessionId
     if (owner && owner !== sessionId) {
       throw targetOwnedError(owner)
     }
-    this.addRootTarget({ ...target, opencodeBrowserSessionId: sessionId })
+    this.addRootTarget({ ...target, opencodevilBrowserSessionId: sessionId })
     const reservation = {
       targetId,
       targetSessionId: target.sessionId,
@@ -259,12 +259,12 @@ export class TargetRegistry {
   rollbackTargetOwnership(reservation: TargetOwnershipReservation): TargetOwnershipChange {
     this.pendingOwnershipReservations.delete(reservation.targetId)
     const target = this.targetsByTargetId.get(reservation.targetId)
-    if (!target || target.sessionId !== reservation.targetSessionId || target.opencodeBrowserSessionId !== reservation.sessionId) {
+    if (!target || target.sessionId !== reservation.targetSessionId || target.opencodevilBrowserSessionId !== reservation.sessionId) {
       return emptyOwnershipChange
     }
-    const { opencodeBrowserSessionId: _owner, ...unowned } = target
+    const { opencodevilBrowserSessionId: _owner, ...unowned } = target
     this.addRootTarget(reservation.previousOpenCodeBrowserSessionId
-      ? { ...unowned, opencodeBrowserSessionId: reservation.previousOpenCodeBrowserSessionId }
+      ? { ...unowned, opencodevilBrowserSessionId: reservation.previousOpenCodeBrowserSessionId }
       : unowned)
     return ownershipChange(target.targetInfo.targetId, target.tabId)
   }
@@ -275,7 +275,7 @@ export class TargetRegistry {
   }): TargetOwnershipChange {
     this.pendingOwnershipReservations.delete(options.reservation.targetId)
     const target = this.targetsByTargetId.get(options.reservation.targetId)
-    if (!target || target.sessionId !== options.reservation.targetSessionId || target.opencodeBrowserSessionId !== options.reservation.sessionId) {
+    if (!target || target.sessionId !== options.reservation.targetSessionId || target.opencodevilBrowserSessionId !== options.reservation.sessionId) {
       throw new TargetOwnershipError({
         reason: "generation-changed",
         message: `Target detached or changed during adoption: ${options.reservation.targetId}`,
@@ -293,10 +293,10 @@ export class TargetRegistry {
 
   releaseTargetOwnership(targetId: string, sessionId: string): TargetOwnershipChange {
     const target = this.targetsByTargetId.get(targetId)
-    if (!target || target.opencodeBrowserSessionId !== sessionId) {
+    if (!target || target.opencodevilBrowserSessionId !== sessionId) {
       return emptyOwnershipChange
     }
-    const { opencodeBrowserSessionId: _owner, ...released } = target
+    const { opencodevilBrowserSessionId: _owner, ...released } = target
     this.addRootTarget(released)
     return ownershipChange(target.targetInfo.targetId, target.tabId)
   }

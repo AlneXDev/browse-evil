@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs every stress pass in order on the box: smoke, scenario suite, soak + chaos, fuzz. Each writes its own results
 # directory under ~/stress-results/. Run it in tmux so it survives the SSH session:
-#   tmux new -d -s stress 'bash ~/browse/stress/run-all.sh 60 15 2>&1 | tee ~/stress-results/run-all.log'
+#   tmux new -d -s stress 'bash ~/browsevil/stress/run-all.sh 60 15 2>&1 | tee ~/stress-results/run-all.log'
 set -uo pipefail
 SOAK_MINUTES="${1:-60}"
 FUZZ_MINUTES="${2:-15}"

@@ -3,7 +3,7 @@ import path from "node:path"
 
 export type McpReply = { result?: Record<string, unknown>; error?: unknown }
 
-/** The real `browse mcp` server over stdio, with its data under `home`, talking to the relay on `port` when given. */
+/** The real `browsevil mcp` server over stdio, with its data under `home`, talking to the relay on `port` when given. */
 export function mcpStdio(options: {
   readonly home: string
   readonly port?: number

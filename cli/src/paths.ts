@@ -1,8 +1,8 @@
-// Where browse keeps its files, on every OS (the same scheme opencode uses on macOS):
-//   config  $XDG_CONFIG_HOME/browse      settings.json, config.json
-//   data    $XDG_DATA_HOME/browse        session catalogs, relay token, paired browsers
-//   state   $XDG_STATE_HOME/browse       logs, journals, current session, pairing codes, update state
-//   cache   $XDG_CACHE_HOME/browse       update checks and the dev extension (re-creatable)
+// Where browsevil keeps its files, on every OS (the same scheme opencodevil uses on macOS):
+//   config  $XDG_CONFIG_HOME/browsevil      settings.json, config.json
+//   data    $XDG_DATA_HOME/browsevil        session catalogs, relay token, paired browsers
+//   state   $XDG_STATE_HOME/browsevil       logs, journals, current session, pairing codes, update state
+//   cache   $XDG_CACHE_HOME/browsevil       update checks and the dev extension (re-creatable)
 //   bin     $XDG_BIN_HOME              the installer's executable (XDG_BIN_HOME, else ~/.local/bin)// Unset variables fall back to ~/.config, ~/.local/share, ~/.local/state, ~/.cache and ~/.local/bin;
 // Windows uses the same paths under %USERPROFILE%. OPENCODE_BROWSEVIL_HOME overrides all of them for isolated
 // test relays (the executable then lives in <root>/bin).
@@ -129,9 +129,9 @@ export type EntrySpawnOptions = {
 }
 
 /**
- * The installed browse CLI a Windows shim entry runs, found with filesystem checks only. For a bare name (or a bare
+ * The installed browsevil CLI a Windows shim entry runs, found with filesystem checks only. For a bare name (or a bare
  * .cmd/.bat) walk PATH in order; for an explicit .cmd/.bat path use its folder. npm's global prefix puts its shims and
- * node_modules side by side, so the bundle is <folder>\node_modules\@opencode\browse\dist\cli.mjs.
+ * node_modules side by side, so the bundle is <folder>\node_modules\@opencodevil\browsevil\dist\cli.mjs.
  */
 export function resolveWindowsShim(
   entry: string,
@@ -155,7 +155,7 @@ export function resolveWindowsShim(
     }
     const shim = withFolder ? entry : pathModule.join(directory, shimmed ? entry : `${entry}.cmd`)
     if (!exists(shim)) continue
-    const script = pathModule.join(directory, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
+    const script = pathModule.join(directory, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
     if (exists(script)) return [node, script]
   }
   return undefined
@@ -163,7 +163,7 @@ export function resolveWindowsShim(
 
 /**
  * The command this process starts to run the CLI again at `entry`. A Windows npm install records itself as a bare
- * `browse` shim, which child_process can't start without a shell: resolve the installed CLI through PATH first. If
+ * `browsevil` shim, which child_process can't start without a shell: resolve the installed CLI through PATH first. If
  * nothing installed resolves, use this process's script unless it is an npx copy or a source checkout; a compiled
  * binary never falls back to itself. Other platforms keep the old behavior.
  */
@@ -212,7 +212,7 @@ export function cliInstall(): CliInstall {
 }
 
 /**
- * The command that runs browse in a terminal: `browse` for a binary or global npm install on PATH (install adds the
+ * The command that runs browsevil in a terminal: `browsevil` for a binary or global npm install on PATH (install adds the
  * binary's folder), the executable's full path when it isn't on PATH, `npx @opencode/browsevil` (`@dev` on the dev
  * channel) for an npx run, and this checkout's bundle from a checkout, where the package may not be published.
  */
@@ -220,14 +220,14 @@ export function cliPrefix(install: CliInstall = cliInstall()): string {
   if (install.kind === "binary") {
     const dir = path.dirname(install.binary)
     const onPath = (install.pathEnv ?? "").split(path.delimiter).some((entry) => entry && path.resolve(entry) === dir)
-    return onPath ? "browse" : quoted(install.binary)
+    return onPath ? "browsevil" : quoted(install.binary)
   }
   if (install.kind === "checkout") return `node ${quoted(install.bundle)}`
   if (install.npx) return install.version?.includes("-dev.") ? "npx @opencode/browsevil@dev" : "npx @opencode/browsevil"
-  return "browse"
+  return "browsevil"
 }
 
-/** How to tell the user to run `browse <args>` (cliPrefix). */
+/** How to tell the user to run `browsevil <args>` (cliPrefix). */
 export const cliCommand = (args: string, install: CliInstall = cliInstall()): string => `${cliPrefix(install)} ${args}`
 
 declare global {
@@ -241,8 +241,8 @@ declare global {
 const STORE_ITEM_ID = /^[a-p]{32}$/
 
 /**
- * browse's public Chrome Web Store item (the CWS_ITEM_ID repository variable, RELEASING.md). A checkout, or a package
- * built without one, still points users at this item: every channel installs browse from the store.
+ * browsevil's public Chrome Web Store item (the CWS_ITEM_ID repository variable, RELEASING.md). A checkout, or a package
+ * built without one, still points users at this item: every channel installs browsevil from the store.
  */
 export const PUBLIC_STORE_ID = "lfmeghngagemglmdnplimokblljgmnoj"
 
@@ -276,7 +276,7 @@ export function devExtension(baked = globalThis.__OPENCODE_BROWSEVIL_EXTENSION__
 
 /** Where the release service serves a file; OPENCODE_BROWSEVIL_RELEASE_SERVICE points it elsewhere (tests; the sha256 is still checked). */
 export const devExtensionUrl = (extension: DevExtension, env: NodeJS.ProcessEnv = process.env) =>
-  `${(env.OPENCODE_BROWSEVIL_RELEASE_SERVICE || RELEASE_SERVICE).replace(/\/+$/, "")}/browse/files/${extension.sha256}/${extension.file}`
+  `${(env.OPENCODE_BROWSEVIL_RELEASE_SERVICE || RELEASE_SERVICE).replace(/\/+$/, "")}/browsevil/files/${extension.sha256}/${extension.file}`
 
 /** The folder a dev install's unpacked extension lives in (loaded once with Load unpacked; updates replace its files). */
 export const devExtensionFolder = (root = cacheRoot()) => path.join(root, "extension")
@@ -284,7 +284,7 @@ export const devExtensionFolder = (root = cacheRoot()) => path.join(root, "exten
 /** The store page of an item. */
 export const storeUrl = (id: string) => `https://chromewebstore.google.com/detail/${id}`
 
-/** How to tell the user to install (or update) browse. */
+/** How to tell the user to install (or update) browsevil. */
 export function installCommand(): string {
   return fromCheckout() ? `cd ${quoted(path.dirname(packageRoot()))} && bun run setup` : cliCommand("install")
 }

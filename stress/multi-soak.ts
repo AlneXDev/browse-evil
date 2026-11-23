@@ -15,7 +15,7 @@ import { Jsonl, oneLine, percentile } from "./lib/results.ts"
 
 const lanes = process.argv.slice(2, 4).map(spec => {
   const [id, port, unit] = spec.split(",")
-  assert(id && Number(port) > 0 && unit && unit.startsWith("browse-"))
+  assert(id && Number(port) > 0 && unit && unit.startsWith("browsevil-"))
   return { id, port: Number(port), unit }
 })
 const remote = process.argv[4] ?? ""
@@ -109,7 +109,7 @@ for (const id of pending) await clients[0]!.call("session_delete", { id }).catch
 await Promise.all(clients.map(c => c.close())); await fx.close(); await sleep(5000)
 const after = await Promise.all([pages(0), pages(1)])
 const leaked = after.flatMap((ps, lane) => ps.filter(p => !before[lane]!.some(b => b.url === p.url)))
-const targets = await relayJson<any[]>("/json/list"), residual = targets.filter(t => t.opencodeBrowserSessionId?.startsWith(own))
+const targets = await relayJson<any[]>("/json/list"), residual = targets.filter(t => t.opencodevilBrowserSessionId?.startsWith(own))
 const calm = history.filter(t => !windows.some(e => (e.lane === null || t.w % 2 === e.lane) && t.from < e.to && t.to > e.from))
 const rate = calm.filter(t => t.ok).length / calm.length
 const summary = { started, lastTask: Math.max(...history.map(t => t.to)), before, after, leaked, residual, total: history.length, successes: history.filter(t=>t.ok).length, calm: calm.length, calmFailures: calm.filter(t=>!t.ok).length, rate, crossings: history.filter(t=>t.crossed).length, p95Ms: percentile(calm.filter(t=>t.ok).map(t=>t.to-t.from),95), windows }

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// browse's stable entry, written by install (cli/src/auto-update.ts). opencode's browse MCP server runs this
+// browsevil's stable entry, written by install (cli/src/auto-update.ts). opencodevil's browsevil MCP server runs this
 // file, so its configuration never changes when the runtime updates. Don't edit; install rewrites it.
 import { spawn } from "node:child_process"
 import { readFileSync } from "node:fs"
@@ -11,7 +11,7 @@ const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const runtime = path.join(root, "runtime")
 const installed = () => JSON.parse(readFileSync(path.join(runtime, "current.json"), "utf8"))
 const current = () => installed().version
-const entry = (version) => path.join(runtime, "versions", version, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
+const entry = (version) => path.join(runtime, "versions", version, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
 process.env.OPENCODE_BROWSEVIL_HOME ??= root
 const relayPort = Number(process.env.OPENCODE_BROWSEVIL_PORT) || 29698
 
@@ -25,7 +25,7 @@ if (binary) {
   process.argv[1] = entry(current())
   await import(pathToFileURL(entry(current())).href)
 } else {
-  const REPLAY = "opencode-browser-shim-initialize"
+  const REPLAY = "opencodevil-browser-shim-initialize"
   // Every server this supervisor starts keeps one implicit session, and the relay watches this process (not the
   // server it replaces), so an update doesn't end the agent's session or close its tabs.
   process.env.OPENCODE_BROWSEVIL_MCP_SESSION ??= "mcp-" + Math.random().toString(16).slice(2, 10).padEnd(8, "0")

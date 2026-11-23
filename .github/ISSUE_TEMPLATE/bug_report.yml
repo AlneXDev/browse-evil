@@ -1,10 +1,10 @@
 name: Bug report
-description: Report something that does not work as expected in browse.
+description: Report something that does not work as expected in browsevil.
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping improve browse. Please search existing issues first.
+        Thanks for helping improve browsevil. Please search existing issues first.
         Do not share passwords, cookies, pairing codes, or full session journals.
         Review and redact any diagnostic excerpts or screenshots before attaching them.
         Diagnoses and proposed fixes are welcome here. We don't accept outside pull
@@ -12,8 +12,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: browse version
-      description: Run `browse --version`.
+      label: browsevil version
+      description: Run `browsevil --version`.
       placeholder: "0.4.2, installed with the install script"
     validations:
       required: true
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Agent
       description: The agent or MCP client that was driving the browser, and its version.
-      placeholder: "opencode 1.4.0"
+      placeholder: "opencodevil 1.4.0"
     validations:
       required: true
   - type: dropdown

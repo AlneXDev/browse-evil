@@ -10,7 +10,7 @@ import { shouldExposeChildTarget, type RootTargetChange, type TargetRegistry } f
 type AttachOptions = {
   readonly tabId: number
   readonly owner: "relay" | "user"
-  readonly opencodeBrowserSessionId?: string
+  readonly opencodevilBrowserSessionId?: string
   readonly alreadyAttached?: boolean
   readonly expectedExtensionGeneration?: number
   readonly autoAttachParams?: JsonObject
@@ -209,7 +209,7 @@ export class RootTargetLifecycle {
               tabId: options.tabId,
               owner: root.owner,
               alreadyAttached: true,
-              ...(root.opencodeBrowserSessionId ? { opencodeBrowserSessionId: root.opencodeBrowserSessionId } : {}),
+              ...(root.opencodevilBrowserSessionId ? { opencodevilBrowserSessionId: root.opencodevilBrowserSessionId } : {}),
             }).pipe(Effect.asVoid)
           }
           if (lifecycle.options.registry.routingRootTarget(options.tabId)) {
@@ -360,7 +360,7 @@ export class RootTargetLifecycle {
     const supportsTargetRelease = this.options.extension.supportsTargetRelease(tabId)
     const legacyOwnership = !supportsTargetRelease
     const browserKey = legacyOwnership ? undefined : this.options.browserKeyForTab?.(tabId)
-    const restored = options.opencodeBrowserSessionId || options.restoreOwnership === false
+    const restored = options.opencodevilBrowserSessionId || options.restoreOwnership === false
       ? undefined
       : this.options.sessions.persistedTargetOwner(targetInfo.targetId, {
           includeHeldTargets: !legacyOwnership && options.reclaimHeldTargets === true,
@@ -368,21 +368,21 @@ export class RootTargetLifecycle {
           ...(browserKey ? { browserKey } : {}),
         })
     let owner = restored?.owner ?? options.owner
-    let opencodeBrowserSessionId = options.opencodeBrowserSessionId ?? restored?.sessionId
+    let opencodevilBrowserSessionId = options.opencodevilBrowserSessionId ?? restored?.sessionId
     // A remembered page is only published for its session once the session's allowlist accepts it. A denied entry is
     // blanked by the caller and comes back as an ordinary user tab, never as a session page host.
     if (
-      owner === "relay" && opencodeBrowserSessionId && !options.opencodeBrowserSessionId && this.options.authorizeRestoredTarget &&
+      owner === "relay" && opencodevilBrowserSessionId && !options.opencodevilBrowserSessionId && this.options.authorizeRestoredTarget &&
       !this.options.authorizeRestoredTarget({
         tabId,
         targetId: targetInfo.targetId,
         url: targetInfo.url,
         owner,
-        sessionId: opencodeBrowserSessionId,
+        sessionId: opencodevilBrowserSessionId,
       })
     ) {
       owner = "user"
-      opencodeBrowserSessionId = undefined
+      opencodevilBrowserSessionId = undefined
       // The page keeps its forbidden URL only until the blank navigation lands; publish it as blank already so a
       // guardrail reading visible pages never sees a URL the session's allowlist refused.
       publishedTargetInfo = { ...targetInfo, url: "about:blank", title: "" }
@@ -392,7 +392,7 @@ export class RootTargetLifecycle {
       sessionId: `bc-tab-${this.nextSessionId++}`,
       targetInfo: publishedTargetInfo,
       owner,
-      ...(opencodeBrowserSessionId ? { opencodeBrowserSessionId } : {}),
+      ...(opencodevilBrowserSessionId ? { opencodevilBrowserSessionId } : {}),
     })
     transition.staged = target
     return yield* this.finish(transition, target, options.autoAttachParams, options.deferHeldTarget === true, legacyOwnership, options.restoreOwnership === false)
@@ -420,7 +420,7 @@ export class RootTargetLifecycle {
     if (!owner) return
     yield* this.attachUnlocked(transition, {
       tabId: transition.tabId, owner: owner.owner, alreadyAttached: true,
-      ...(owner.opencodeBrowserSessionId ? { opencodeBrowserSessionId: owner.opencodeBrowserSessionId } : {}),
+      ...(owner.opencodevilBrowserSessionId ? { opencodevilBrowserSessionId: owner.opencodevilBrowserSessionId } : {}),
     })
   })
 
@@ -452,8 +452,8 @@ export class RootTargetLifecycle {
     // back as a user's (a lend, or a denied reclaim) must stop being a remembered agent target. A caller that still
     // has to run the allowlist guard records it itself once the guard passes.
     if (!deferHeldTarget) {
-      if (change.target.owner === "relay" && change.target.opencodeBrowserSessionId) {
-        sessions.noteTargetHeld(change.target.targetInfo.targetId, change.target.opencodeBrowserSessionId)
+      if (change.target.owner === "relay" && change.target.opencodevilBrowserSessionId) {
+        sessions.noteTargetHeld(change.target.targetInfo.targetId, change.target.opencodevilBrowserSessionId)
       } else if (!legacyOwnership) {
         sessions.forgetTargetHeld(change.target.targetInfo.targetId, {
           releasedByUser,

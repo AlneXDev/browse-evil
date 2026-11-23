@@ -9,7 +9,7 @@ import { agentLabels, agentNames, type AgentName } from "./agents.ts"
 
 export { agentLabels, agentNames, type AgentName }
 /** What install wrote: `<node> <entry> mcp`, or `<entry> mcp` when there is no node (a binary install's executable). */
-export type AgentReceipt = { name: Exclude<AgentName, "opencode">; file: string; node?: string; entry: string }
+export type AgentReceipt = { name: Exclude<AgentName, "opencodevil">; file: string; node?: string; entry: string }
 export type AgentLocation = { name: AgentName; file: string; installed: boolean }
 
 const aliases: Record<string, AgentName> = {
@@ -32,13 +32,13 @@ export function callingAgent(env: NodeJS.ProcessEnv): AgentName | undefined {
   if (env.COPILOT_CLI === "1") return "copilot"
   const identified = agentName(env.AI_AGENT?.split("@")[0] ?? "") ?? agentName(env.AGENT ?? "")
   if (identified) return identified
-  if (env.OPENCODE === "1" || env.OPENCODE_SESSION_ID) return "opencode"
+  if (env.OPENCODE === "1" || env.OPENCODE_SESSION_ID) return "opencodevil"
   if (env.PI_SESSION_ID) return "pi"
   return undefined
 }
 
 /** User scope only; never write a project, workspace or managed config. */
-export function agentLocations(home: string, config: string, onPath: (name: string) => unknown, opencodeConfig: string, opencodeBinary?: string): AgentLocation[] {
+export function agentLocations(home: string, config: string, onPath: (name: string) => unknown, opencodevilConfig: string, opencodevilBinary?: string): AgentLocation[] {
   const at = (...parts: string[]) => path.join(home, ...parts)
   const { env, platform } = process
   const support = platform === "darwin" ? at("Library/Application Support") : platform === "win32" ? env.APPDATA ?? at("AppData/Roaming") : config
@@ -60,7 +60,7 @@ export function agentLocations(home: string, config: string, onPath: (name: stri
   const windsurf = at(".codeium/windsurf/mcp_config.json")
   const claude = process.env.CLAUDE_CONFIG_DIR ? path.join(process.env.CLAUDE_CONFIG_DIR, ".claude.json") : at(".claude.json")
   return [
-    { name: "opencode", file: opencodeConfig, installed: !!opencodeBinary || app("OpenCode") || fs.existsSync(path.join(config, "opencode")) },
+    { name: "opencodevil", file: opencodevilConfig, installed: !!opencodevilBinary || app("OpenCode") || fs.existsSync(path.join(config, "opencodevil")) },
     { name: "claude", file: claude, installed: !!onPath("claude") || fs.existsSync(claude) || fs.existsSync(at(".claude")) },
     { name: "cursor", file: at(".cursor/mcp.json"), installed: !!onPath("cursor") || app("Cursor") || fs.existsSync(at(".cursor")) },
     { name: "codex", file: path.join(codex, "config.toml"), installed: !!onPath("codex") || app("Codex") || fs.existsSync(codex) },
@@ -101,8 +101,8 @@ type EditResult = "added" | "unchanged" | "removed" | "conflict"
 /** Parse YAML without rounding integers beyond 2^53: install only adds its entry. */
 const yamlOptions = { merge: true, intAsBigInt: true } as const
 
-/** The command array of the browse server in an agent config, if it has one (for migration). */
-export function browseServerCommand(name: AgentName, file: string): string[] | undefined {
+/** The command array of the browsevil server in an agent config, if it has one (for migration). */
+export function browsevilServerCommand(name: AgentName, file: string): string[] | undefined {
   if (!fs.existsSync(file)) return undefined
   const before = fs.readFileSync(file, "utf8")
   const toml = name === "codex" || name === "grok" || name === "vibe"
@@ -112,25 +112,25 @@ export function browseServerCommand(name: AgentName, file: string): string[] | u
     if (yaml) {
       const config = parseDocument(before, yamlOptions).toJS() as Record<string, unknown>
       const key = name === "goose" ? "extensions" : "mcp_servers"
-      current = object(config[key]) ? (config[key] as Record<string, unknown>).browse : undefined
+      current = object(config[key]) ? (config[key] as Record<string, unknown>).browsevil : undefined
     } else if (toml) {
       const config = parseToml(before) as Record<string, unknown>
       if (name === "vibe") {
         const list = Array.isArray(config.mcp_servers) ? config.mcp_servers : []
-        current = list.find((entry) => object(entry) && entry.name === "browse")
-      } else current = object(config.mcp_servers) ? (config.mcp_servers as Record<string, unknown>).browse : undefined
+        current = list.find((entry) => object(entry) && entry.name === "browsevil")
+      } else current = object(config.mcp_servers) ? (config.mcp_servers as Record<string, unknown>).browsevil : undefined
     } else {
       const config = parse(before, [], { allowTrailingComma: true }) as Record<string, unknown>
-      if (name === "opencode") {
+      if (name === "opencodevil") {
         const mcp = object(config.mcp) ? config.mcp : undefined
         const servers = mcp && object(mcp.servers) ? mcp.servers : undefined
-        current = servers?.browse
+        current = servers?.browsevil
       } else {
         const key = serverKeys[name] ?? "mcpServers"
         const container = config[key]
         current = Array.isArray(container)
-          ? container.find((entry) => object(entry) && entry.name === "browse")
-          : object(container) ? container.browse : undefined
+          ? container.find((entry) => object(entry) && entry.name === "browsevil")
+          : object(container) ? container.browsevil : undefined
       }
     }
     if (!object(current)) return undefined
@@ -145,9 +145,9 @@ export function browseServerCommand(name: AgentName, file: string): string[] | u
 
 function serverDefinition(name: AgentReceipt["name"], command: string, args: string[]) {
   if (name === "kilo") return { type: "local", command: [command, ...args] }
-  if (name === "goose") return { type: "stdio", name: "browse", enabled: true, cmd: command, args }
+  if (name === "goose") return { type: "stdio", name: "browsevil", enabled: true, cmd: command, args }
   if (name === "copilot") return { type: "local", command, args, tools: ["*"] }
-  if (name === "vibe") return { name: "browse", transport: "stdio", command, args }
+  if (name === "vibe") return { name: "browsevil", transport: "stdio", command, args }
   if (["claude", "vscode", "cortex", "droid", "codebuddy"].includes(name)) return { type: "stdio", command, args }
   return { command, args }
 }
@@ -173,40 +173,40 @@ export function editAgentConfig(receipt: AgentReceipt, remove = false): EditResu
   const container = config[key]
   if (container !== undefined && !(name === "vibe" ? Array.isArray(container) : object(container))) throw invalid()
   const list = Array.isArray(container) ? container : []
-  const matches = list.filter(s => s?.name === "browse")
+  const matches = list.filter(s => s?.name === "browsevil")
   if (matches.length > 1) return "conflict"
   const servers = (container ?? Object.create(null)) as Record<string, unknown>
   const [command, args] = node ? [node, [entry, "mcp"]] : [entry, ["mcp"]]
   const expected = serverDefinition(name, command, args)
-  const current = name === "vibe" ? matches[0] : servers.browse
+  const current = name === "vibe" ? matches[0] : servers.browsevil
   if (current !== undefined && !isDeepStrictEqual({ ...(object(current) ? current : {}) }, expected)) return "conflict"
   if (remove ? current === undefined : current !== undefined) return "unchanged"
   let after: string
   if (toml) {
-    const header = name === "vibe" ? '[[mcp_servers]]\nname = "browse"\ntransport = "stdio"' : "[mcp_servers.browse]"
+    const header = name === "vibe" ? '[[mcp_servers]]\nname = "browsevil"\ntransport = "stdio"' : "[mcp_servers.browsevil]"
     const block = `${header}\ncommand = ${JSON.stringify(command)}\nargs = ${JSON.stringify(args)}\n`
     if (remove && !before.includes(block)) return "conflict"
     after = remove ? before.replace(block, "") : `${before}${before.endsWith("\n") || !before ? "" : "\n"}\n${block}`
     // A matching string could also occur inside a multiline value. Check the *entire* parsed result before writing.
     const result = parseToml(after)
     if (name === "vibe") config[key] = remove ? list.filter(s => s !== current) : [...list, Object.assign(Object.create(null), expected)]
-    else if (remove) delete servers.browse
-    else servers.browse = Object.assign(Object.create(null), expected)
+    else if (remove) delete servers.browsevil
+    else servers.browsevil = Object.assign(Object.create(null), expected)
     if (name !== "vibe") config[key] = servers
     if (remove && !Object.keys(config[key] as object).length && result[key] === undefined) delete config[key]
     if (!isDeepStrictEqual(result, config)) return "conflict"
   } else if (doc) {
     if (!isMap(doc.contents) || (container !== undefined && !isMap(doc.get(key, true)))) throw invalid()
-    if (remove) doc.deleteIn([key, "browse"])
-    else doc.setIn([key, "browse"], expected)
+    if (remove) doc.deleteIn([key, "browsevil"])
+    else doc.setIn([key, "browsevil"], expected)
     after = doc.toString({ lineWidth: 0 }) // Keep long strings on one line.
     // Shared YAML anchors can make a single edit visible elsewhere. Refuse rather than change another entry.
     config[key] = { ...servers }
-    if (remove) delete (config[key] as Record<string, unknown>).browse
-    else (config[key] as Record<string, unknown>).browse = expected
+    if (remove) delete (config[key] as Record<string, unknown>).browsevil
+    else (config[key] as Record<string, unknown>).browsevil = expected
     if (!isDeepStrictEqual(parseDocument(after, yamlOptions).toJS(), config)) return "conflict"
   } else {
-    after = applyEdits(before, modify(before, [key, "browse"], remove ? undefined : expected, { formattingOptions: { insertSpaces: true, tabSize: 2 } }))
+    after = applyEdits(before, modify(before, [key, "browsevil"], remove ? undefined : expected, { formattingOptions: { insertSpaces: true, tabSize: 2 } }))
   }
   fs.mkdirSync(path.dirname(file), { recursive: true })
   if (exists && fs.readFileSync(file, "utf8") !== before) throw new Error(`${file} changed during setup; try again`)

@@ -23,7 +23,7 @@ import { RelayForm } from "./relay-form"
 import { applyColorScheme, Brand, createFlash, createRelay, Note, Rich, type Relay } from "./ui"
 import "./onboarding.css"
 
-// `browse install` opens the setup page with a one-time code in the fragment (welcome.html#code=…, which forwards
+// `browsevil install` opens the setup page with a one-time code in the fragment (welcome.html#code=…, which forwards
 // here), plus the relay's port when it isn't 29698, for a store build (cli/src/setup.ts pairStoreExtension). Take
 // them, then drop the whole fragment from the URL (address bar and history) before anything else.
 const link = pairingLink(location.hash)
@@ -34,7 +34,7 @@ if (link !== undefined || /^#(code|ticket|pair)=/.test(location.hash))
   history.replaceState(null, "", location.pathname + location.search)
 
 const settingsUrl = () => chrome.runtime.getURL("settings.html")
-const AGENT_PROMPT = `Set up browse so you can use my Chrome: run ${installCommand}`
+const AGENT_PROMPT = `Set up browsevil so you can use my Chrome: run ${installCommand}`
 
 type Where = "here" | "remote"
 type How = "agent" | "manual"
@@ -91,7 +91,7 @@ function Onboarding() {
   })
 
   /**
-   * Asks the port the worker is using whether a browse relay answers (its /version is open), while the extension has
+   * Asks the port the worker is using whether a browsevil relay answers (its /version is open), while the extension has
    * no token or code to connect with. One probe at a time, and again while the page stays in that state. When the
    * worker finds the relay on another port (a fallback relay), the probe follows it right away.
    */
@@ -109,7 +109,7 @@ function Onboarding() {
     probedPort = port
     const result = port === undefined ? "absent" : await probeRelayPort(port)
     // A relay on a fallback port isn't pre-filled in the form (it may not be this browser's), but it still tells the
-    // step apart: "pair with it" rather than "install browse".
+    // step apart: "pair with it" rather than "install browsevil".
     const elsewhere = result === "absent"
       ? (await Promise.all(relayPorts.filter((candidate) => candidate !== port).map((candidate) => probeRelayPort(candidate))))
         .find((answer) => answer !== "absent")
@@ -128,7 +128,7 @@ function Onboarding() {
       number={number}
       title="Try it"
       done={list().tryIt === "done"}
-      description={list().tryIt === "done" ? "Your agent opened a tab. browse works." : "Ask your agent something like:"}
+      description={list().tryIt === "done" ? "Your agent opened a tab. browsevil works." : "Ask your agent something like:"}
     >
       <Show when={list().tryIt !== "done"}>
         <Command text={TRY_PROMPT} label="Copy prompt" />
@@ -148,9 +148,9 @@ function Onboarding() {
         connected() ? (
           <AgentDone relay={relay} pairedBy={pairedBy()} />
         ) : how === "agent" ? (
-          "OpenCode, Claude Code, Codex, Cursor or any agent that can run commands. It installs browse, adds it to itself and connects to this browser."
+          "OpenCode, Claude Code, Codex, Cursor or any agent that can run commands. It installs browsevil, adds it to itself and connects to this browser."
         ) : (
-          "Downloads browse, adds it to the agents it finds on this computer and connects to this browser."
+          "Downloads browsevil, adds it to the agents it finds on this computer and connects to this browser."
         )
       }
     >
@@ -247,7 +247,7 @@ function Onboarding() {
                 number={1}
                 title="On that computer, run"
                 done={connected()}
-                description="Installs browse there, opens its relay to other computers and prints its address and a pairing code."
+                description="Installs browsevil there, opens its relay to other computers and prints its address and a pairing code."
               >
                 <Show when={!connected()}>
                   <Command
@@ -299,7 +299,7 @@ function Onboarding() {
             <span class="sep" aria-hidden="true" />
             <span class="muted">
               You're set. When an agent needs you for a login, the page shows a card. The debugging bar's button (Cancel
-              or OK) disconnects browse from every tab; click the browse button on a tab to lend it again.
+              or OK) disconnects browsevil from every tab; click the browsevil button on a tab to lend it again.
             </span>
           </footer>
         </Show>
@@ -414,7 +414,7 @@ function AgentDone(props: { relay: Relay; pairedBy: "link" | "code" | undefined 
   )
 }
 
-/** Step 1 on this computer: the prompt or command that installs browse, and whatever the connection says to do next. */
+/** Step 1 on this computer: the prompt or command that installs browsevil, and whatever the connection says to do next. */
 function AgentStep(props: {
   relay: Relay
   step: FirstRunStep
@@ -451,12 +451,12 @@ function AgentStep(props: {
                   ? `${capitalized(here(pair().remote))} didn't accept the pairing code: it was mistyped, already used or expired.`
                   : pair().reason === "refused"
                     ? `${capitalized(here(pair().remote))} refused this browser's pairing: it was unpaired there, or that relay is a new install.`
-                    : `browse found ${here(pair().remote)}, but this browser isn't paired with it yet.`}{" "}
+                    : `browsevil found ${here(pair().remote)}, but this browser isn't paired with it yet.`}{" "}
                 {pair().remote ? "" : "Run install again: it pairs by itself, or prints a code to enter below."}
               </Note>
               <CodeForm
                 relay={props.relay}
-                label={pair().remote ? "Run `browse pair` on that computer and enter the code it prints:" : "Or enter the code `browse pair` prints:"}
+                label={pair().remote ? "Run `browsevil pair` on that computer and enter the code it prints:" : "Or enter the code `browsevil pair` prints:"}
                 onPaired={props.onPaired}
               />
             </>
@@ -469,7 +469,7 @@ function AgentStep(props: {
                 Code saved. It pairs as soon as {here(waiting().remote)} runs, within 10 minutes of <code>pair</code>.
               </Waiting>
             ) : (
-              <Waiting>Paired with {here(waiting().remote)}. The relay starts when your agent uses the browse tools.</Waiting>
+              <Waiting>Paired with {here(waiting().remote)}. The relay starts when your agent uses the browsevil tools.</Waiting>
             )
           }
         </Match>
@@ -478,7 +478,7 @@ function AgentStep(props: {
         </Match>
         <Match when={kind() === "update-cli"}>
           <Note tone="warn">
-            This extension is newer than the browse CLI on this computer. Run this, then restart your agent. (With automatic
+            This extension is newer than the browsevil CLI on this computer. Run this, then restart your agent. (With automatic
             updates on, the CLI catches up by itself within a day.)
           </Note>
           <Command text={props.relay.state()?.autoUpdate ? cliUpdateCommand(props.relay.state()!.autoUpdate!) : installCommand} label="Copy command" />
@@ -493,7 +493,7 @@ function AgentStep(props: {
             }
           >
             <Note tone="warn">
-              This extension is older than the browse CLI on this computer. Chrome updates it within a few hours; to update
+              This extension is older than the browsevil CLI on this computer. Chrome updates it within a few hours; to update
               now, open the extensions page, turn on Developer mode and click Update.
             </Note>
             <div class="actions">
@@ -504,7 +504,7 @@ function AgentStep(props: {
           </Show>
         </Match>
         <Match when={kind() === "mismatch"}>
-          <Note tone="warn">This extension and the browse CLI on this computer don't match. Run install again, then reconnect.</Note>
+          <Note tone="warn">This extension and the browsevil CLI on this computer don't match. Run install again, then reconnect.</Note>
           <div class="actions">
             <Button variant="neutral" icon="refresh" onClick={() => props.relay.send({ type: "agents.reconnect" })}>
               Reconnect
@@ -513,7 +513,7 @@ function AgentStep(props: {
         </Match>
         <Match when={kind() === "conflict"}>
           <Note tone="warn">
-            browse in another browser or profile holds the relay's connection. Close it there (or quit that browser), then
+            browsevil in another browser or profile holds the relay's connection. Close it there (or quit that browser), then
             reconnect.
           </Note>
           <div class="actions">
@@ -539,7 +539,7 @@ function CodeForm(props: { relay: Relay; label: string; onPaired: () => void }) 
     if (message.type !== "relay.result" || !pending()) return
     setPending(false)
     if (message.status === "connected") props.onPaired()
-    if (message.status === "invalid-code") return setNote("That isn't a pairing code. Enter the 8 characters `browse pair` prints (XXXX-XXXX).")
+    if (message.status === "invalid-code") return setNote("That isn't a pairing code. Enter the 8 characters `browsevil pair` prints (XXXX-XXXX).")
     setCode("")
     const address = message.address ?? ""
     setNote(message.status === "connecting" ? `The relay ${address.startsWith("localhost:") ? "on this computer" : `at ${address}`} hasn't answered yet. This updates when it does.` : undefined)

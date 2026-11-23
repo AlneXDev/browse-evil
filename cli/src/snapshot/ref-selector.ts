@@ -73,7 +73,7 @@ const refSelectorSource = `(() => {
   return (${refSelectorEngine.toString()})(${staleGraceMs}, ${snapshotNamingInBrowser.toString()})
 })()`
 
-const refSelectorName = `browse-ref-${globalThis.crypto.randomUUID().slice(0, 6)}`
+const refSelectorName = `browsevil-ref-${globalThis.crypto.randomUUID().slice(0, 6)}`
 const contextSelectors = new WeakMap<BrowserContext, Promise<void>>()
 const registeredContexts = new WeakSet<BrowserContext>()
 let nextCall = 1

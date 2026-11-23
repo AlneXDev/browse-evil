@@ -1,8 +1,8 @@
 name: Release
 run-name: "${{ github.event_name == 'workflow_dispatch' && format('Release {0} {1}', inputs.bump, inputs.version) || '' }}"
 
-# Releases browse: the extension zip, the @opencode/browsevil npm package (a Node launcher for the native binary) and the
-# browse binaries, built from the Rust workspace in rust/ (an npm package @opencode/browsevil-<target> per platform, and
+# Releases browsevil: the extension zip, the @opencode/browsevil npm package (a Node launcher for the native binary) and the
+# browsevil binaries, built from the Rust workspace in rust/ (an npm package @opencode/browsevil-<target> per platform, and
 # the same targets on Anomaly's release service, which the install script downloads). RELEASING.md has the flow and the
 # setup.
 #
@@ -26,7 +26,7 @@ run-name: "${{ github.event_name == 'workflow_dispatch' && format('Release {0} {
 #   that made it (and the attestation), and run those scripts on the artifacts as data. They never execute repository
 #   code. Jobs that hold a secret or publish run in environment release, which admits only dev.
 # - the jobs that need an AWS secret (tag, sign-macos, publish-cws, push-release-to-dev) assume
-#   arn:aws:iam::604439173067:role/github/browse-release over GitHub OIDC in environment release and read only the
+#   arn:aws:iam::604439173067:role/github/browsevil-release over GitHub OIDC in environment release and read only the
 #   secrets they use from AWS Secrets Manager; the Chrome Web Store ids are repository variables.
 # .github/ (CODEOWNERS) is the security boundary for releases.
 
@@ -121,13 +121,13 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: arn:aws:iam::604439173067:role/github/browse-release
-          role-session-name: browse-${{ github.run_id }}
+          role-to-assume: arn:aws:iam::604439173067:role/github/browsevil-release
+          role-session-name: browsevil-${{ github.run_id }}
           aws-region: us-east-1
       - name: Read the release tag key
         uses: aws-actions/aws-secretsmanager-get-secrets@2297f9a879480a9e3af9b293ed15c70caf8e1c88 # v3.0.2
         with:
-          secret-ids: RELEASE_TAG_KEY,browse/release/RELEASE_TAG_KEY
+          secret-ids: RELEASE_TAG_KEY,browsevil/release/RELEASE_TAG_KEY
           parse-json-secrets: false
       # Without the key the checkout falls back to the workflow token.
       - name: Check out
@@ -216,10 +216,10 @@ jobs:
           name: build
           path: release
 
-  # One browse binary per build (rust/script/release.sh's names): Linux cross-compiled with cargo-zigbuild (zig cc
-  # also builds QuickJS, browse-script's C code; the gnu builds against glibc 2.17), macOS with Xcode's clang on an
+  # One browsevil binary per build (rust/script/release.sh's names): Linux cross-compiled with cargo-zigbuild (zig cc
+  # also builds QuickJS, browsevil-script's C code; the gnu builds against glibc 2.17), macOS with Xcode's clang on an
   # arm64 runner, Windows with MSVC and a static C runtime. The version and the run's build id are baked in
-  # (BROWSE_VERSION, BROWSE_BUILD_ID: crates/browse/src/main.rs, serve.rs). The -baseline targets reuse these: Rust's
+  # (BROWSE_VERSION, BROWSE_BUILD_ID: crates/browsevil/src/main.rs, serve.rs). The -baseline targets reuse these: Rust's
   # x86-64 target doesn't use AVX2.
   build-binary:
     name: Build ${{ matrix.build }}
@@ -288,9 +288,9 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: "11.0"
         run: |
           [ "$(node -p 'require("../cli/package.json").version')" = "$VERSION" ] || { echo "::error::The checkout isn't version $VERSION."; exit 1; }
-          if [ -n "$ZIG_TARGET" ]; then cargo zigbuild --release --locked -p browse --target "$ZIG_TARGET"
-          else cargo build --release --locked -p browse --target "$TRIPLE"; fi
-          exe=browse; case "$BUILD" in windows-*) exe=browse.exe ;; esac
+          if [ -n "$ZIG_TARGET" ]; then cargo zigbuild --release --locked -p browsevil --target "$ZIG_TARGET"
+          else cargo build --release --locked -p browsevil --target "$TRIPLE"; fi
+          exe=browsevil; case "$BUILD" in windows-*) exe=browsevil.exe ;; esac
           mkdir -p "$RUNNER_TEMP/out/$BUILD"
           cp "target/$TRIPLE/release/$exe" "$RUNNER_TEMP/out/$BUILD/$exe"
           ls -l "$RUNNER_TEMP/out/$BUILD/$exe"
@@ -300,7 +300,7 @@ jobs:
         env:
           BUILD: ${{ matrix.build }}
         run: |
-          exe=browse; case "$BUILD" in windows-*) exe=browse.exe ;; esac
+          exe=browsevil; case "$BUILD" in windows-*) exe=browsevil.exe ;; esac
           actual=$("$RUNNER_TEMP/out/$BUILD/$exe" --version | tr -d '\r')
           [ "$actual" = "$VERSION" ] || { echo "::error::$BUILD --version printed $actual, expected $VERSION"; exit 1; }
           echo "$BUILD: $actual"
@@ -313,7 +313,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The platform packages: opencode-browse-<target>-<version>.tgz for every install script target (scripts/npm-package.ts,
+  # The platform packages: opencodevil-browsevil-<target>-<version>.tgz for every install script target (scripts/npm-package.ts,
   # which checks each binary's format, CPU, C library and glibc floor), from build-binary's executables. Then the
   # linux-x64 ones as users get them: the install script against a local copy of the release service, the relay and MCP
   # server, and `npm install` of build's @opencode/browsevil next to its platform package.
@@ -372,8 +372,8 @@ jobs:
         run: |
           for target in linux-x64 linux-x64-baseline linux-x64-musl linux-x64-baseline-musl; do
             dir=$(mktemp -d)
-            tar -xzf "$RUNNER_TEMP/binaries/opencode-browse-$target-$VERSION.tgz" -C "$dir"
-            actual=$("$dir/package/bin/browse" --version)
+            tar -xzf "$RUNNER_TEMP/binaries/opencodevil-browsevil-$target-$VERSION.tgz" -C "$dir"
+            actual=$("$dir/package/bin/browsevil" --version)
             [ "$actual" = "$VERSION" ] || { echo "::error::$target --version printed $actual, expected $VERSION"; exit 1; }
             echo "$target: $actual"
           done
@@ -384,14 +384,14 @@ jobs:
         run: |
           set -eu
           channel=stable; [ "$NPM_CHANNEL" = dev ] && channel=dev
-          file="opencode-browse-linux-x64-$VERSION.tgz"
+          file="opencodevil-browsevil-linux-x64-$VERSION.tgz"
           root=$(mktemp -d)
-          mkdir -p "$root/release/browse/cli" "$root/release/files"
+          mkdir -p "$root/release/browsevil/cli" "$root/release/files"
           cp "$RUNNER_TEMP/binaries/$file" "$root/release/files/"
           size=$(wc -c < "$root/release/files/$file" | tr -d ' ')
           sum=$(sha256sum "$root/release/files/$file" | cut -d' ' -f1)
-          printf '{"schema":1,"app":"browse","artifact":"cli","channel":"%s","release":{"version":"%s","targets":{"linux-x64":{"url":"/release/files/%s","size":%s,"sha256":"%s"}}}}\n' \
-            "$channel" "$VERSION" "$file" "$size" "$sum" > "$root/release/browse/cli/$channel.json"
+          printf '{"schema":1,"app":"browsevil","artifact":"cli","channel":"%s","release":{"version":"%s","targets":{"linux-x64":{"url":"/release/files/%s","size":%s,"sha256":"%s"}}}}\n' \
+            "$channel" "$VERSION" "$file" "$size" "$sum" > "$root/release/browsevil/cli/$channel.json"
           (cd "$root" && exec python3 -m http.server 29987 --bind 127.0.0.1) > /dev/null 2>&1 &
           server=$!
           trap 'kill "$server"' EXIT
@@ -399,17 +399,17 @@ jobs:
           home=$(mktemp -d)
           env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_RELEASE_SERVICE=http://127.0.0.1:29987/release \
             sh ./install --channel "$channel" --no-setup
-          actual=$("$home/.local/bin/browse" --version)
+          actual=$("$home/.local/bin/browsevil" --version)
           [ "$actual" = "$VERSION" ] || { echo "::error::the install script installed $actual, expected $VERSION"; exit 1; }
           echo "installed: $actual"
 
-      # `browse serve` is the relay; `browse mcp` serves the tools through it.
+      # `browsevil serve` is the relay; `browsevil mcp` serves the tools through it.
       - name: Smoke test the relay and MCP server
         run: |
           set -eu
           dir=$(mktemp -d)
-          tar -xzf "$RUNNER_TEMP/binaries/opencode-browse-linux-x64-$VERSION.tgz" -C "$dir"
-          binary="$dir/package/bin/browse"
+          tar -xzf "$RUNNER_TEMP/binaries/opencodevil-browsevil-linux-x64-$VERSION.tgz" -C "$dir"
+          binary="$dir/package/bin/browsevil"
           home=$(mktemp -d)
           port=29988
           relay=
@@ -451,8 +451,8 @@ jobs:
       - name: npm install of @opencode/browsevil with its linux-x64 package
         run: >-
           bun scripts/check-artifacts.ts --version "$VERSION"
-          --tarball "$RUNNER_TEMP/in/build/opencode-browse-$VERSION.tgz"
-          --platform-tarball "$RUNNER_TEMP/binaries/opencode-browse-linux-x64-$VERSION.tgz"
+          --tarball "$RUNNER_TEMP/in/build/opencodevil-browsevil-$VERSION.tgz"
+          --platform-tarball "$RUNNER_TEMP/binaries/opencodevil-browsevil-linux-x64-$VERSION.tgz"
 
       - id: upload
         name: Upload
@@ -495,8 +495,8 @@ jobs:
         if: needs.plan.outputs.dry_run != 'true'
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: arn:aws:iam::604439173067:role/github/browse-release
-          role-session-name: browse-${{ github.run_id }}
+          role-to-assume: arn:aws:iam::604439173067:role/github/browsevil-release
+          role-session-name: browsevil-${{ github.run_id }}
           aws-region: us-east-1
       - name: Read the signing certificate
         if: needs.plan.outputs.dry_run != 'true'
@@ -538,7 +538,7 @@ jobs:
           security delete-keychain build.keychain || true
 
   # OPTIONAL, off by default: Authenticode-signs the Windows binaries through Azure Trusted Signing once the repository
-  # variable WINDOWS_SIGNING is true. An unsigned browse.exe is blocked by Windows Smart App Control, so install fails.
+  # variable WINDOWS_SIGNING is true. An unsigned browsevil.exe is blocked by Windows Smart App Control, so install fails.
   # The Azure ids are repository variables (AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID and the
   # AZURE_TRUSTED_SIGNING_* names below); Azure trusts this workflow's environment release over OIDC, so there is no
   # secret. Until then this job is skipped and the Windows packages ship unsigned.
@@ -674,7 +674,7 @@ jobs:
 
   # Every channel: the extension zip and the CLI binaries to Anomaly's release service. Dev publishes from every push
   # to dev; stable from a dispatch on dev; a check run prints the same list as a dry run. The job's OIDC token is the
-  # only credential; the service checks it against registry/browse.json (workflow, refs/heads/dev, environment release).
+  # only credential; the service checks it against registry/browsevil.json (workflow, refs/heads/dev, environment release).
   publish-release-service:
     name: Publish to the release service
     needs: [plan, build, build-binaries, sign-macos, sign-windows, attest]
@@ -799,8 +799,8 @@ jobs:
         if: needs.plan.outputs.dry_run != 'true'
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: arn:aws:iam::604439173067:role/github/browse-release
-          role-session-name: browse-${{ github.run_id }}
+          role-to-assume: arn:aws:iam::604439173067:role/github/browsevil-release
+          role-session-name: browsevil-${{ github.run_id }}
           aws-region: us-east-1
       # A dry run fetches none: publish-cws.sh checks the zip and uploads nothing without a refresh token.
       - name: Read the store credentials
@@ -808,8 +808,8 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@2297f9a879480a9e3af9b293ed15c70caf8e1c88 # v3.0.2
         with:
           secret-ids: |
-            CWS_CLIENT_SECRET,browse/release/CWS_CLIENT_SECRET
-            CWS_REFRESH_TOKEN,browse/release/CWS_REFRESH_TOKEN
+            CWS_CLIENT_SECRET,browsevil/release/CWS_CLIENT_SECRET
+            CWS_REFRESH_TOKEN,browsevil/release/CWS_REFRESH_TOKEN
           parse-json-secrets: false
       - name: Upload and submit for review
         run: bash .github/release/publish-cws.sh "$RUNNER_TEMP/in/build"
@@ -870,13 +870,13 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
-          role-to-assume: arn:aws:iam::604439173067:role/github/browse-release
-          role-session-name: browse-${{ github.run_id }}
+          role-to-assume: arn:aws:iam::604439173067:role/github/browsevil-release
+          role-session-name: browsevil-${{ github.run_id }}
           aws-region: us-east-1
       - name: Read the release tag key
         uses: aws-actions/aws-secretsmanager-get-secrets@2297f9a879480a9e3af9b293ed15c70caf8e1c88 # v3.0.2
         with:
-          secret-ids: RELEASE_TAG_KEY,browse/release/RELEASE_TAG_KEY
+          secret-ids: RELEASE_TAG_KEY,browsevil/release/RELEASE_TAG_KEY
           parse-json-secrets: false
       # Without the key the checkout falls back to the workflow token.
       - name: Check out

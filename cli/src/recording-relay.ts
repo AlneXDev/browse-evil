@@ -98,7 +98,7 @@ export class RecordingRelay {
       return { success: false, error: "Recording frameRate must be an integer from 1 to 60" }
     }
     if (!this.options.isExtensionConnected()) {
-      return { success: false, error: "browse extension is not connected" }
+      return { success: false, error: "browsevil extension is not connected" }
     }
     if (this.activeRecordings.has(options.tabId) || this.startingRecordings.has(options.tabId)) {
       return { success: false, error: "Recording already in progress for this tab" }
@@ -124,7 +124,7 @@ export class RecordingRelay {
 
   async stopRecording(options: RecordingTargetOptions): Promise<RecordingStopResult> {
     if (!this.options.isExtensionConnected()) {
-      return { success: false, error: "browse extension is not connected" }
+      return { success: false, error: "browsevil extension is not connected" }
     }
     const recording = this.findRecording(options)
     if (!recording) {

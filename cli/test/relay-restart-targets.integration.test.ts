@@ -88,7 +88,7 @@ async function seed(home: string, options: {
     })
     expect(response.ok).toBe(true)
     const connected = await connectCdp(
-      `ws://127.0.0.1:${relay.port}/devtools/browser/test?opencodeBrowserSessionId=${options.sessionId}`,
+      `ws://127.0.0.1:${relay.port}/devtools/browser/test?opencodevilBrowserSessionId=${options.sessionId}`,
       { authorization: `Bearer ${relay.token}` },
     )
     if (!(connected instanceof WebSocket)) throw new Error(`CDP connection refused: ${connected}`)
@@ -115,7 +115,7 @@ async function seed(home: string, options: {
 
 async function owners(port: number, token: string) {
   const response = await fetch(`http://127.0.0.1:${port}/json/list`, { headers: { authorization: `Bearer ${token}` } })
-  return (await response.json()) as Array<{ tabId: number; title?: string; url?: string; opencodeBrowserSessionId?: string }>
+  return (await response.json()) as Array<{ tabId: number; title?: string; url?: string; opencodevilBrowserSessionId?: string }>
 }
 
 const frameTree = (tabId: number) => ({
@@ -154,7 +154,7 @@ async function waitForRestoredSession(port: number, token: string, sessionId: st
 }
 
 test("a fresh relay reclaims agent pages, releases an unclaimed one, and prunes stale hints", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-restart-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-restart-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -176,7 +176,7 @@ test("a fresh relay reclaims agent pages, releases an unclaimed one, and prunes 
     // The new relay reclaims all three announced pages; 302 is an agent tab no session claims.
     expect(await replacement.pair({ attachedTabs: [300, 301, 302], agentTabs: [300, 301, 302], capabilities: ["tab-release"] })).toBe(true)
     const reclaimed = () => owners(started.port, first.token).then((targets) =>
-      [300, 301].every((tabId) => targets.some((target) => target.tabId === tabId && target.opencodeBrowserSessionId === "restart-pages")))
+      [300, 301].every((tabId) => targets.some((target) => target.tabId === tabId && target.opencodevilBrowserSessionId === "restart-pages")))
     expect(await waitFor(reclaimed)).toBe(true)
     const released = () => replacement?.commands.some((command) =>
       command.method === "debugger.detach" && command.params?.tabId === 302 && command.params?.release === true) ?? false
@@ -192,7 +192,7 @@ test("a fresh relay reclaims agent pages, releases an unclaimed one, and prunes 
 }, 40_000)
 
 test("deleting a session before the browser reconnects still closes its restored tabs", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-delete-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-delete-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -223,7 +223,7 @@ test("deleting a session before the browser reconnects still closes its restored
 }, 40_000)
 
 test("a non-agent announcement and a toolbar lend never reclaim a persisted agent target", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-lend-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-lend-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -242,7 +242,7 @@ test("a non-agent announcement and a toolbar lend never reclaim a persisted agen
     expect(await waitFor(async () => (await owners(started.port, first.token)).some((target) => target.tabId === 321))).toBe(true)
     const listed = await owners(started.port, first.token)
     for (const tabId of [320, 321]) {
-      expect(listed.find((target) => target.tabId === tabId)?.opencodeBrowserSessionId).toBeUndefined()
+      expect(listed.find((target) => target.tabId === tabId)?.opencodevilBrowserSessionId).toBeUndefined()
     }
     replacement.sendReady()
     expect(await waitFor(() => catalogTargets(home, first.port, "restart-lend").length === 0)).toBe(true)
@@ -258,7 +258,7 @@ test("a non-agent announcement and a toolbar lend never reclaim a persisted agen
 }, 40_000)
 
 test("a reclaimed page must still pass the session's allowlist before it is published", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-allowlist-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-allowlist-"))
   const urls = new Map([[420, "https://blocked.test/"], [421, "https://allowed.test/"]])
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -270,13 +270,13 @@ test("a reclaimed page must still pass the session's allowlist before it is publ
       .on("Target.getTargetInfo", (command) => ({ targetInfo: targetInfo(Number(command.params?.tabId), urls) }))
     expect(await replacement.pair({ attachedTabs: [420, 421], agentTabs: [420, 421], capabilities: ["tab-release"] })).toBe(true)
     const allowed = () => owners(started.port, first.token).then((targets) => targets.some((target) =>
-      target.tabId === 421 && target.opencodeBrowserSessionId === "restart-guarded"))
+      target.tabId === 421 && target.opencodevilBrowserSessionId === "restart-guarded"))
     expect(await waitFor(allowed)).toBe(true)
     expect(await waitFor(() => replacement?.commands.some((command) =>
       command.method === "debugger.sendCommand" && command.params?.tabId === 420 && command.params?.method === "Page.navigate" &&
       (command.params?.params as { url?: string } | undefined)?.url === "about:blank") ?? false)).toBe(true)
     const listed = await owners(started.port, first.token)
-    expect(listed.find((target) => target.tabId === 420)?.opencodeBrowserSessionId).toBeUndefined()
+    expect(listed.find((target) => target.tabId === 420)?.opencodevilBrowserSessionId).toBeUndefined()
     expect(await waitFor(() => catalogTargets(home, first.port, "restart-guarded").every((target) => target.id !== "TARGET-420"))).toBe(true)
   } finally {
     replacement?.close()
@@ -286,7 +286,7 @@ test("a reclaimed page must still pass the session's allowlist before it is publ
 }, 40_000)
 
 test("an unannounced relay default page is pruned from the catalog", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-prune-default-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-prune-default-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -314,7 +314,7 @@ test("an unannounced relay default page is pruned from the catalog", async () =>
 }, 40_000)
 
 test("a deleted session's tombstone is not inherited by a new session reusing its id", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-tombstone-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-tombstone-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined
@@ -360,7 +360,7 @@ test("a deleted session's tombstone is not inherited by a new session reusing it
 }, 40_000)
 
 test("a refused restored page is published blank and released on the same relay reconnect", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-refused-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-refused-"))
   const urls = new Map([[340, "https://blocked.test/"]])
   let socket: WebSocket | undefined
   let first: FakeExtension | undefined
@@ -381,7 +381,7 @@ test("a refused restored page is published blank and released on the same relay 
     })
     expect((await post("/cli/session/new", { id: "guarded-same-relay" })).ok).toBe(true)
     const connected = await connectCdp(
-      `ws://127.0.0.1:${relay.port}/devtools/browser/test?opencodeBrowserSessionId=guarded-same-relay`,
+      `ws://127.0.0.1:${relay.port}/devtools/browser/test?opencodevilBrowserSessionId=guarded-same-relay`,
       { authorization: `Bearer ${relay.token}` },
     )
     if (!(connected instanceof WebSocket)) throw new Error(`CDP connection refused: ${connected}`)
@@ -404,7 +404,7 @@ test("a refused restored page is published blank and released on the same relay 
       const target = await refused()
       return target?.url === "about:blank" && target?.title === ""
     })).toBe(true)
-    expect((await refused())?.opencodeBrowserSessionId).toBeUndefined()
+    expect((await refused())?.opencodevilBrowserSessionId).toBeUndefined()
     replacement.sendReady()
     expect(await waitFor(() => replacement?.commands.some((command) =>
       command.method === "debugger.detach" && command.params?.tabId === 340 && command.params?.release === true) ?? false)).toBe(true)
@@ -421,7 +421,7 @@ test("a refused restored page is published blank and released on the same relay 
 }, 40_000)
 
 test("a real execute default page is reclaimed after restart by an extension without release support", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-legacy-default-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-legacy-default-"))
   const urls = new Map<number, string>()
   let next = 500
   let secondChild: ChildProcess | undefined
@@ -460,7 +460,7 @@ test("a real execute default page is reclaimed after restart by an extension wit
     // No capabilities, no agent flag: this is the pre-target-list extension behaviour.
     expect(await replacement.pair({ attachedTabs: [tabId] })).toBe(true)
     const reclaimed = () => owners(started.port, started.token).then((targets) =>
-      targets.some((target) => target.tabId === tabId && target.opencodeBrowserSessionId === "legacy-default"))
+      targets.some((target) => target.tabId === tabId && target.opencodevilBrowserSessionId === "legacy-default"))
     expect(await waitFor(reclaimed)).toBe(true)
   } finally {
     replacement?.close()
@@ -471,7 +471,7 @@ test("a real execute default page is reclaimed after restart by an extension wit
 }, 40_000)
 
 test("a toolbar lend of a restored default page clears the sandbox so the next execute opens a new page", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-lend-default-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-lend-default-"))
   const urls = new Map<number, string>()
   let next = 510
   let firstChild: ChildProcess | undefined
@@ -536,7 +536,7 @@ test("a toolbar lend of a restored default page clears the sandbox so the next e
 }, 40_000)
 
 test("pruning a dead default page clears the sandbox so the next execute does not hit target-unavailable", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-prune-dead-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-prune-dead-"))
   const urls = new Map<number, string>()
   let next = 520
   let first: FakeExtension | undefined
@@ -589,7 +589,7 @@ test("pruning a dead default page clears the sandbox so the next execute does no
 }, 40_000)
 
 test("an older extension without release support still closes an unclaimed agent tab", async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-legacy-release-"))
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-legacy-release-"))
   const urls = new Map<number, string>()
   let secondChild: ChildProcess | undefined
   let replacement: FakeExtension | undefined

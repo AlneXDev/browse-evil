@@ -9,17 +9,17 @@ import { bundleCli } from "../bundle.ts"
 // Closing stdin is how an MCP client shuts a stdio server down. The server must then exit 0, not SIGINT's 130.
 const temporary = path.join(os.homedir(), ".cache", "oc-tmp")
 fs.mkdirSync(temporary, { recursive: true })
-const home = fs.mkdtempSync(path.join(temporary, "browse-mcp-exit-"))
+const home = fs.mkdtempSync(path.join(temporary, "browsevil-mcp-exit-"))
 const source = path.join(import.meta.dir, "../src/main.ts")
 const children = new Set<ReturnType<typeof spawn>>()
-/** An npm install of this CLI under the test's HOME, so `browse mcp` runs under Node as npm installs do. */
+/** An npm install of this CLI under the test's HOME, so `browsevil mcp` runs under Node as npm installs do. */
 let installed = ""
 beforeAll(async () => {
   const build = path.join(home, "build")
   await bundleCli({ outdir: build, version: "0.0.1" })
-  const root = path.join(home, "lib", "node_modules", "@opencode", "browse")
+  const root = path.join(home, "lib", "node_modules", "@opencodevil", "browsevil")
   fs.cpSync(build, path.join(root, "dist"), { recursive: true })
-  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "@opencode/browse", version: "0.0.1" }))
+  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version: "0.0.1" }))
   fs.symlinkSync(path.join(import.meta.dir, "../node_modules"), path.join(root, "node_modules"), "junction")
   installed = path.join(root, "dist", "cli.mjs")
 }, 30_000)
@@ -59,9 +59,9 @@ type Reply = { result?: Record<string, unknown>; error?: unknown }
 /** A server notification: no id, just a method and params. */
 type Notification = { method: string; params?: Record<string, unknown> }
 
-/** A private executable at the installed path, so `browse mcp` runs the checkout's server from it. */
+/** A private executable at the installed path, so `browsevil mcp` runs the checkout's server from it. */
 function installedBinary() {
-  const binary = path.join(home, "bin", "browse")
+  const binary = path.join(home, "bin", "browsevil")
   fs.mkdirSync(path.dirname(binary), { recursive: true })
   fs.writeFileSync(binary, `#!/usr/bin/env bun
 globalThis.__OPENCODE_BROWSEVIL_COMPILED__ = true
@@ -76,7 +76,7 @@ function cleanup(mcp?: ReturnType<typeof server>) {
   mcp?.child.kill("SIGKILL")
 }
 
-/** Starts `browse mcp` and speaks enough of the protocol to prove the server is serving before stdin closes. */
+/** Starts `browsevil mcp` and speaks enough of the protocol to prove the server is serving before stdin closes. */
 function server(command: readonly string[], extra: NodeJS.ProcessEnv = {}) {
   const child = spawn(command[0]!, command.slice(1), { stdio: ["pipe", "pipe", "pipe"], env: env(extra), windowsHide: true })
   children.add(child)
@@ -137,7 +137,7 @@ function server(command: readonly string[], extra: NodeJS.ProcessEnv = {}) {
   return { child, handshake, waitForNotification, request, exit, stderr: () => stderr, answered: (id: number) => answered.has(id), send }
 }
 
-/** Starts `browse mcp` and opens the change subscription a 2026-07-28 client keeps for the whole connection. */
+/** Starts `browsevil mcp` and opens the change subscription a 2026-07-28 client keeps for the whole connection. */
 async function subscribedServer(command: readonly string[], extra: NodeJS.ProcessEnv = {}) {
   const mcp = server(command, extra)
   try {
@@ -178,7 +178,7 @@ async function blackholeRelay() {
   }
 }
 
-describe("browse mcp shuts down cleanly when its client closes stdin", () => {
+describe("browsevil mcp shuts down cleanly when its client closes stdin", () => {
   test("the server exits 0", async () => {
     const mcp = server([process.execPath, source, "mcp"])
     try {

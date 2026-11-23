@@ -19,7 +19,7 @@ registerMcpTools({
     {
       name: "network",
       description:
-        "Start, inspect, stop, or cancel session-scoped network capture. browse records Playwright exchanges and replaces credential-bearing headers, cookies, query fields and structured body fields with [redacted]. Bodies are embedded with per-body and total memory limits. Actions: start begins a capture; status returns bounded metadata without captured values; stop ends it and returns the redacted exchanges; cancel ends it and discards them.",
+        "Start, inspect, stop, or cancel session-scoped network capture. browsevil records Playwright exchanges and replaces credential-bearing headers, cookies, query fields and structured body fields with [redacted]. Bodies are embedded with per-body and total memory limits. Actions: start begins a capture; status returns bounded metadata without captured values; stop ends it and returns the redacted exchanges; cancel ends it and discards them.",
       inputSchema: objectSchema(
         {
           action: {

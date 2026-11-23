@@ -7,7 +7,7 @@ import path from "node:path"
 import { installedDevExtension, syncDevExtension, unzip } from "../src/setup/dev-extension.ts"
 import { devExtensionFolder, devExtensionUrl, type DevExtension } from "../src/paths.ts"
 
-const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "browse-dev-extension-"))
+const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-dev-extension-"))
 afterAll(() => fs.rmSync(temporary, { recursive: true, force: true }))
 
 /** A dev extension zip like scripts/package.ts writes, and the reference a dev CLI carries for it. */

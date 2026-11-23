@@ -9,7 +9,7 @@ import * as RelayClient from "../src/relay/client.ts"
 import { relayStatePath, writeRelayState } from "../src/relay/port.ts"
 
 // The client reads the relay token from the data folder; keep it away from the real install.
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-client-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-client-"))
 const previousHome = process.env.OPENCODE_BROWSEVIL_HOME
 process.env.OPENCODE_BROWSEVIL_HOME = home
 afterEach(() => {

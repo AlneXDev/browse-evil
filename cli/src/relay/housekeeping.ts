@@ -29,7 +29,7 @@ export type TabBusyDependencies = {
 /** Whether a tab is in use: a handoff waits on it, it is recorded, or its owning session is executing or capturing. */
 export function tabIsBusy(tabId: number, deps: TabBusyDependencies): boolean {
   if (deps.handoffs.pendingForTab(tabId) !== undefined || deps.isTabRecorded(tabId)) return true
-  const sessionId = deps.registry.getRootTargetByTabId(tabId)?.opencodeBrowserSessionId
+  const sessionId = deps.registry.getRootTargetByTabId(tabId)?.opencodevilBrowserSessionId
   if (sessionId === undefined) return false
   const session = deps.sessions.sessions.get(sessionId)
   if (!session) return false
@@ -173,7 +173,7 @@ export function createRelayHousekeeping(options: {
       Effect.runPromise(Effect.gen(function* () {
         if (yield* sessions.networkEnd(id, `its client (process ${pid}) exited`)) relayLog("session.capture.ended", { session: id, reason: "client gone", pid })
         if (!isMcpSession(id) || sessions.isExecuting(id) || sessions.hasPendingWork(id)) return
-        const tabs = registry.listRootTargets().filter((target) => target.opencodeBrowserSessionId === id).map((target) => target.tabId)
+        const tabs = registry.listRootTargets().filter((target) => target.opencodevilBrowserSessionId === id).map((target) => target.tabId)
         if (tabs.some((tabId) => handoffs.pendingForTab(tabId) || isTabRecorded(tabId))) return
         if (activeHandoffTabs.has(id)) return
         relayLog("session.collected", { session: id, reason: "client gone", pid, tabs: tabs.length })

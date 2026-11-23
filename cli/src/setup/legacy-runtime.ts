@@ -1,14 +1,14 @@
-// Taking over the self-managed runtime of releases before 0.0.11 (setup/legacy.ts). Its shim, bin/opencode-browser.mjs,
+// Taking over the self-managed runtime of releases before 0.0.11 (setup/legacy.ts). Its shim, bin/opencodevil-browser.mjs,
 // starts runtime/versions/<current.json version>/node_modules/@opencode/browsevil/dist/cli.mjs, and an agent's running
 // shim swaps its MCP server once current.json names another version and the relay reports that version. A relay
 // started from a current install (the npm global package or the binary) while that runtime is active takes it over, in
 // two steps around binding the relay port:
-//   prepare  (main.ts, before `serve` starts) only for the default home and a port without a browse relay on it: copies
+//   prepare  (main.ts, before `serve` starts) only for the default home and a port without a browsevil relay on it: copies
 //            the old folder's data into the XDG folders, the old files winning, and stops treating the old folder as
 //            OPENCODE_BROWSEVIL_HOME.
 //   commit   (cli/relay.ts, once the relay listens) writes a forwarder for this version that runs the current install,
 //            points current.json at it so running agents follow, then migrates (setup/migrate.ts): agents' entries
-//            become `browse mcp`, and the old folder goes after a grace period.
+//            become `browsevil mcp`, and the old folder goes after a grace period.
 import fs from "node:fs"
 import net from "node:net"
 import os from "node:os"
@@ -16,15 +16,15 @@ import path from "node:path"
 import { compiledBinary, installerBinaryPath } from "../paths.ts"
 import { probeRelayPort, relayPortPinned, resolveRelayPort } from "../relay/port.ts"
 import { channelOf, installedRuntime, type Runtime } from "../update/auto-update.ts"
-import { opencodeBrowserVersion } from "../version.ts"
+import { opencodevilBrowserVersion } from "../version.ts"
 import { insidePath, legacyRuntimeActive, samePath, type LegacyRuntime } from "./legacy.ts"
 
 /** Marks a version folder this module wrote, so it is rewritten rather than mistaken for a real package. */
-const FORWARDER = "// browse: this old runtime folder runs the current install"
+const FORWARDER = "// browsevil: this old runtime folder runs the current install"
 
 /** The CLI file the old shim starts for `version`. */
 export const legacyEntry = (root: string, version: string) =>
-  path.join(root, "runtime", "versions", version, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
+  path.join(root, "runtime", "versions", version, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
 
 /**
  * The install this process runs. A binary is the installer's executable only: under the old shim OPENCODE_BROWSEVIL_HOME
@@ -33,7 +33,7 @@ export const legacyEntry = (root: string, version: string) =>
 export function currentInstall(options: { readonly compiled?: boolean; readonly execPath?: string; readonly home?: string } = {}): Runtime | undefined {
   if (!(options.compiled ?? compiledBinary())) return installedRuntime()
   const binary = installerBinaryPath(options.home)
-  return realpath(binary) === realpath(options.execPath ?? process.execPath) ? { kind: "binary", entry: binary, version: opencodeBrowserVersion } : undefined
+  return realpath(binary) === realpath(options.execPath ?? process.execPath) ? { kind: "binary", entry: binary, version: opencodevilBrowserVersion } : undefined
 }
 
 let pending: { readonly legacy: LegacyRuntime; readonly install: Runtime; readonly home: string } | undefined
@@ -53,15 +53,15 @@ export async function prepareLegacyTakeover(legacy: LegacyRuntime | undefined, o
   // An isolated relay (its own OPENCODE_BROWSEVIL_HOME) leaves the old runtime alone.
   if (env.OPENCODE_BROWSEVIL_HOME && !samePath(env.OPENCODE_BROWSEVIL_HOME, legacy.root)) return false
   // Another relay holds the port: this one won't start, so it mustn't take anything over. Pinned keeps the old rule:
-  // anything listening blocks. Unpinned lets a definite non-browse HTTP reply through, since the relay would then fall
-  // back (relay/port.ts), and takes a free port. A browse relay blocks, and so does a port that is bound but silent or
+  // anything listening blocks. Unpinned lets a definite non-browsevil HTTP reply through, since the relay would then fall
+  // back (relay/port.ts), and takes a free port. A browsevil relay blocks, and so does a port that is bound but silent or
   // times out: a probe that fails to answer is a doubt, not a free port.
   const port = options.relayPort ?? (Number(env.OPENCODE_BROWSEVIL_PORT) || resolveRelayPort())
   if (options.pinned ?? relayPortPinned(env)) {
     if (await portInUse(port)) return false
   } else {
     const owner = await probeRelayPort(port)
-    if (owner === "browse" || (owner === "nobody" && (await portInUse(port)))) return false
+    if (owner === "browsevil" || (owner === "nobody" && (await portInUse(port)))) return false
   }
   const home = options.home ?? os.homedir()
   const { copyLegacyData } = await import("./migrate.ts")

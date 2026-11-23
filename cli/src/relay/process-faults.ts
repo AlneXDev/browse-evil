@@ -73,7 +73,7 @@ export function handleRelayProcessFault(
   }
   // A rejection nobody handled may still be execute code's: a promise created after its call returned, by a helper's
   // fire-and-forget chain, or by full Node execute code in a callback the execute scope no longer covers. Taking the
-  // relay down loses every session and tab, so it is logged and counted; `browse status` reports it.
+  // relay down loses every session and tab, so it is logged and counted; `browsevil status` reports it.
   // Synchronous programming faults (uncaughtException) still stop the relay below.
   if (kind === "unhandledRejection") {
     const description = safeErrorMessage(cause)
@@ -104,11 +104,11 @@ function rethrowProcessFault(cause: unknown): never {
 }
 
 function logProcessFault(kind: RelayProcessFaultKind, cause: unknown, detail: Record<string, unknown>, disposition: string): void {
-  const message = `[browse relay] ${kind}; ${disposition}\n${safeErrorStack(cause) ?? safeErrorMessage(cause)}`
+  const message = `[browsevil relay] ${kind}; ${disposition}\n${safeErrorStack(cause) ?? safeErrorMessage(cause)}`
   console.error(message)
   if (process.env.OPENCODE_BROWSEVIL_MANAGED_RELAY === "1") appendManagedRelayProcessLog(message)
   if (debugEnvironmentEnabled(process.env.OPENCODE_BROWSEVIL_DEBUG)) {
-    console.error(`[browse relay] ${kind} detail`, detail)
+    console.error(`[browsevil relay] ${kind} detail`, detail)
   }
 }
 

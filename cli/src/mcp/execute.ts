@@ -9,7 +9,7 @@ registerMcpTools({
   build: (ctx) => [
     {
       name: "execute",
-      description: `Execute Playwright JavaScript against the browse session. Code runs in a restricted JavaScript realm on the relay without process, require, import(), fs, child_process, http/https or Node fetch; save and read files with the files helper inside the execute file roots (file paths, including Playwright options like screenshot({ path }), must be in folders you own without group/world write access; files.path(name) gives a safe one), and cookie access is limited to the session's pages. Synchronous code stops after about 2 seconds. It is not a security boundary, so treat code as running as the user. The result includes console logs, warnings, a bounded execution-context diagnostic when relevant, and an aftermath summary (URL movement, navigations, error counts, handoffs, and a bot challenge or block page when one appears: hand interactive ones to the user with handoff(), handle them when possible).`,
+      description: `Execute Playwright JavaScript against the browsevil session. Code runs in a restricted JavaScript realm on the relay without process, require, import(), fs, child_process, http/https or Node fetch; save and read files with the files helper inside the execute file roots (file paths, including Playwright options like screenshot({ path }), must be in folders you own without group/world write access; files.path(name) gives a safe one), and cookie access is limited to the session's pages. Synchronous code stops after about 2 seconds. It is not a security boundary, so treat code as running as the user. The result includes console logs, warnings, a bounded execution-context diagnostic when relevant, and an aftermath summary (URL movement, navigations, error counts, handoffs, and a bot challenge or block page when one appears: hand interactive ones to the user with handoff(), handle them when possible).`,
       inputSchema: objectSchema(
         {
           code: {
@@ -20,7 +20,7 @@ registerMcpTools({
           session: {
             type: "string",
             description:
-              "Optional existing browse session id. Explicit ids must already exist; omit this field to use your current session (per agent when the client names it; see `status`), which is created when needed.",
+              "Optional existing browsevil session id. Explicit ids must already exist; omit this field to use your current session (per agent when the client names it; see `status`), which is created when needed.",
           },
           targetUrl: {
             type: "string",

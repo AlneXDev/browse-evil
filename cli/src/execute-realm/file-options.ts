@@ -18,7 +18,7 @@ const allFileOptionKeys = new Set([...fileOptionKeys, ...alwaysFileOptionKeys, .
  * Methods whose top-level `path` option names a file the call writes, unlike addScriptTag's or
  * setInputFiles' input paths. Tracing's `start`/`startChunk` options only name folders or a prefix
  * for intermediate files, so those are not here. `stop` covers both `tracing.stop({ path })` and
- * browse's `network.stop({ outputPath })`; `pageConsole.stop` takes a Page, not an options object.
+ * browsevil's `network.stop({ outputPath })`; `pageConsole.stop` takes a Page, not an options object.
  * `startTracing` is special: it only records the path `stopTracing` writes.
  */
 const fileOutputMethods = new Set(["screenshot", "pdf", "storageState", "stop", "stopChunk", "screenshotWithLabels", "screenshotDiff"])

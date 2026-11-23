@@ -23,7 +23,7 @@ registerMcpTools({
   build: (ctx) => [
     {
       name: "session_new",
-      description: "Create a browse session and make it your current one. Agents the client names keep theirs; otherwise the current session is shared by every agent on this server.",
+      description: "Create a browsevil session and make it your current one. Agents the client names keep theirs; otherwise the current session is shared by every agent on this server.",
       inputSchema: objectSchema({
         browser: ctx.browserProperty,
         id: { type: "string", description: "Optional lowercase session id." },
@@ -102,7 +102,7 @@ registerMcpTools({
     {
       name: "session_list",
       requiresRelayCompatibility: false,
-      description: "List browse sessions.",
+      description: "List browsevil sessions.",
       inputSchema: emptyInputSchema,
       readOnly: true,
       destructive: false,
@@ -113,10 +113,10 @@ registerMcpTools({
     },
     {
       name: "session_use",
-      description: "Make an existing browse session your current one, for calls that don't name a session. Agents the client names keep theirs; otherwise the current session is shared by every agent on this server. Pass `session` explicitly to share one deliberately.",
+      description: "Make an existing browsevil session your current one, for calls that don't name a session. Agents the client names keep theirs; otherwise the current session is shared by every agent on this server. Pass `session` explicitly to share one deliberately.",
       inputSchema: objectSchema(
         {
-          id: { type: "string", description: "Existing browse session id." },
+          id: { type: "string", description: "Existing browsevil session id." },
         },
         ["id"],
       ),
@@ -136,7 +136,7 @@ registerMcpTools({
     },
     {
       name: "session_reset",
-      description: "Reset a browse session's state and page.",
+      description: "Reset a browsevil session's state and page.",
       inputSchema: objectSchema({
         id: sessionSchemaProperty,
         session: sessionAliasSchemaProperty,
@@ -156,7 +156,7 @@ registerMcpTools({
     },
     {
       name: "session_delete",
-      description: "Delete a browse session.",
+      description: "Delete a browsevil session.",
       inputSchema: objectSchema({
         id: sessionSchemaProperty,
         session: sessionAliasSchemaProperty,
@@ -182,12 +182,12 @@ registerMcpTools({
     {
       name: "session_adopt",
       description:
-        "Make an attached tab the browse session's default page for subsequent bare execute calls. Omit targetUrl and targetIndex when only one user-attached tab is available.",
+        "Make an attached tab the browsevil session's default page for subsequent bare execute calls. Omit targetUrl and targetIndex when only one user-attached tab is available.",
       inputSchema: objectSchema({
         session: {
           type: "string",
           description:
-            "Optional existing browse session id. Explicit ids must already exist; omit this field to use your current session, which is created when needed.",
+            "Optional existing browsevil session id. Explicit ids must already exist; omit this field to use your current session, which is created when needed.",
         },
         targetUrl: {
           type: "string",

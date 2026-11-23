@@ -18,7 +18,7 @@ afterEach(() => {
   for (const home of homes.splice(0)) fs.rmSync(home, { recursive: true, force: true })
 })
 // A real build, which the tests install as npm's global package.
-const build = fs.mkdtempSync(path.join(os.tmpdir(), "browse-takeover-build-"))
+const build = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-takeover-build-"))
 beforeAll(() => bundleCli({ outdir: build, version: "0.0.1" }), 30_000)
 afterAll(() => fs.rmSync(build, { recursive: true, force: true }))
 
@@ -26,11 +26,11 @@ afterAll(() => fs.rmSync(build, { recursive: true, force: true }))
 function installBuild(packageDir: string, version: string) {
   fs.rmSync(path.join(packageDir, "dist"), { recursive: true, force: true })
   fs.cpSync(build, path.join(packageDir, "dist"), { recursive: true })
-  fs.writeFileSync(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browse", version }))
+  fs.writeFileSync(path.join(packageDir, "package.json"), JSON.stringify({ name: "@opencode/browsevil", version }))
   if (!fs.existsSync(path.join(packageDir, "node_modules"))) fs.symlinkSync(path.join(import.meta.dir, "../node_modules"), path.join(packageDir, "node_modules"), "junction")
 }
 
-/** The environment of a process an agent starts, without the test runner's browse or XDG settings. */
+/** The environment of a process an agent starts, without the test runner's browsevil or XDG settings. */
 const agentEnv = (home: string, port: number) => ({
   ...Object.fromEntries(Object.entries(process.env).filter(([name]) => !/^(XDG_|OPENCODE_BROWSEVIL_)/.test(name))),
   HOME: home,
@@ -70,13 +70,13 @@ function privateFiles(oldData: string): Record<string, string> {
 /** Each file sits in its XDG folder (pairing codes under state, the rest under data) with its bytes and 0600. */
 function expectPrivateFilesIn(home: string, files: Record<string, string>) {
   for (const [relative, text] of Object.entries(files)) {
-    const file = path.join(home, ".local", relative === "pairing-codes.json" ? "state" : "share", "browse", relative)
+    const file = path.join(home, ".local", relative === "pairing-codes.json" ? "state" : "share", "browsevil", relative)
     expect(fs.readFileSync(file, "utf8"), relative).toBe(text)
     if (process.platform !== "win32") expect(fs.statSync(file).mode & 0o777, relative).toBe(0o600)
   }
 }
 
-/** A free port outside browse's real relay range, so no test here can touch 29698–29706. */
+/** A free port outside browsevil's real relay range, so no test here can touch 29698–29706. */
 async function freePortOutsideBrowseRange(): Promise<number> {
   for (;;) {
     const port = await freePort()
@@ -87,7 +87,7 @@ async function freePortOutsideBrowseRange(): Promise<number> {
 describe("taking over the old self-managed runtime", () => {
   test("once taken over, the old shim starts the current install, and the old folder is no override", () => {
     const { home, oldData, shim, oldEntry, current, runtime } = oldRuntimeHome(homes)
-    // While the old runtime is active, browse shares its folder with the relay the shim started.
+    // While the old runtime is active, browsevil shares its folder with the relay the shim started.
     const env: NodeJS.ProcessEnv = {}
     settleLegacyHome(env, legacyRuntime(home))
     expect(env.OPENCODE_BROWSEVIL_HOME).toBe(oldData)
@@ -104,13 +104,13 @@ describe("taking over the old self-managed runtime", () => {
 
   test("a binary takeover finds the installer's executable, not one under the old folder the shim points at", () => {
     const { home, oldData } = oldRuntimeHome(homes)
-    const executable = path.join(home, ".local", "bin", "browse")
+    const executable = path.join(home, ".local", "bin", "browsevil")
     write(executable, "#!/bin/sh\n", 0o755)
     const previous = process.env.OPENCODE_BROWSEVIL_HOME
     process.env.OPENCODE_BROWSEVIL_HOME = oldData
     try {
       expect(currentInstall({ compiled: true, execPath: executable, home })).toMatchObject({ kind: "binary", entry: executable })
-      expect(currentInstall({ compiled: true, execPath: path.join(home, "Downloads", "browse"), home })).toBeUndefined()
+      expect(currentInstall({ compiled: true, execPath: path.join(home, "Downloads", "browsevil"), home })).toBeUndefined()
     } finally {
       if (previous === undefined) delete process.env.OPENCODE_BROWSEVIL_HOME
       else process.env.OPENCODE_BROWSEVIL_HOME = previous
@@ -118,8 +118,8 @@ describe("taking over the old self-managed runtime", () => {
   })
 
   test("a relay takes over only when it gets the port: the old files win the copy, and current.json moves once it listens", async () => {
-    const { home, oldData, opencode, runtime } = oldRuntimeHome(homes)
-    const token = path.join(home, ".local", "share", "browse", "relay-token")
+    const { home, oldData, opencodevil, runtime } = oldRuntimeHome(homes)
+    const token = path.join(home, ".local", "share", "browsevil", "relay-token")
     write(token, "stale\n", 0o600)
     const before = fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")
     using busy = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response("") })
@@ -135,15 +135,15 @@ describe("taking over the old self-managed runtime", () => {
     expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
     expect(fs.readFileSync(token, "utf8")).toBe(`${relayToken}\n`)
     expect(fs.readFileSync(path.join(oldData, "runtime", "current.json"), "utf8")).toBe(before)
-    expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).not.toEqual(["browse", "mcp"])
+    expect(JSON.parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil.command).not.toEqual(["browsevil", "mcp"])
 
     expect(await withoutHomeOverride(() => commitLegacyTakeover())).toBe(true)
     expect(legacyRuntime(home)).toMatchObject({ version: runtime.version, movedTo: runtime.entry })
-    expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).toEqual(["browse", "mcp"])
+    expect(JSON.parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil.command).toEqual(["browsevil", "mcp"])
   })
 
   test("`serve` from the current install leaves the old runtime alone for help, a taken port or another home, and takes it over once it listens", async () => {
-    const { home, oldData, packageDir, current, opencode } = oldRuntimeHome(homes)
+    const { home, oldData, packageDir, current, opencodevil } = oldRuntimeHome(homes)
     installBuild(packageDir, "0.0.16-dev.130")
     const record = path.join(oldData, "runtime", "current.json")
     const before = fs.readFileSync(record, "utf8")
@@ -165,8 +165,8 @@ describe("taking over the old self-managed runtime", () => {
     try {
       expect(await until(() => legacyRuntime(home)?.movedTo === fs.realpathSync(current))).toBe(true)
       expect(((await (await fetch(`http://127.0.0.1:${port}/version`)).json()) as { pid: number }).pid).toBe(relay.pid!)
-      expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).toEqual(["browse", "mcp"])
-      expect(fs.readFileSync(path.join(home, ".local", "share", "browse", "relay-token"), "utf8")).toBe(`${relayToken}\n`)
+      expect(JSON.parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil.command).toEqual(["browsevil", "mcp"])
+      expect(fs.readFileSync(path.join(home, ".local", "share", "browsevil", "relay-token"), "utf8")).toBe(`${relayToken}\n`)
     } finally {
       relay.kill()
     }
@@ -189,7 +189,7 @@ describe("taking over the old self-managed runtime", () => {
       adoptLegacyRuntime(legacyRuntime(home), runtime)
       expect((await within(15_000, call(), "a tools/call after the takeover")).result).toBeDefined()
       // The current install serves directly: one MCP process runs from the forwarder, with no supervisor above it.
-      const forwarder = path.join(oldData, "runtime", "versions", runtime.version, "node_modules", "@opencode", "browse", "dist", "cli.mjs")
+      const forwarder = path.join(oldData, "runtime", "versions", runtime.version, "node_modules", "@opencodevil", "browsevil", "dist", "cli.mjs")
       expect(await until(() => serversUnder(forwarder).length === 1)).toBe(true)
       const first = serversUnder(forwarder)[0]!
       // A later update replaces the package in place; the running server keeps its old code until the agent restarts it.
@@ -248,12 +248,12 @@ describe("taking over the old self-managed runtime", () => {
     delete files["browser-tokens.json"]
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: port }, home })).toBe(true)
     expect(await withoutHomeOverride(() => commitLegacyTakeover())).toBe(true)
-    expect(fs.existsSync(path.join(home, ".local", "share", "browse", "browser-tokens.json"))).toBe(false)
+    expect(fs.existsSync(path.join(home, ".local", "share", "browsevil", "browser-tokens.json"))).toBe(false)
     expectPrivateFilesIn(home, files)
   })
 
   test("a takeover that stops after publishing current.json finishes the move on the next start", async () => {
-    const { home, oldData, opencode, runtime } = oldRuntimeHome(homes)
+    const { home, oldData, opencodevil, runtime } = oldRuntimeHome(homes)
     const files = privateFiles(oldData)
     const takenOver = Date.now()
     expect(await prepareLegacyTakeover(legacyRuntime(home), { install: runtime, env: { OPENCODE_BROWSEVIL_HOME: oldData, OPENCODE_BROWSEVIL_PORT: String(await freePort()) }, home })).toBe(true)
@@ -265,8 +265,8 @@ describe("taking over the old self-managed runtime", () => {
     expect(next.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
     withoutHomeOverride(() => migrateLegacy(home, takenOver + 60_000))
     expectPrivateFilesIn(home, files)
-    expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).toEqual(["browse", "mcp"])
-    expect(fs.existsSync(path.join(home, ".local", "state", "browse", "legacy-takeover.json"))).toBe(false)
+    expect(JSON.parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil.command).toEqual(["browsevil", "mcp"])
+    expect(fs.existsSync(path.join(home, ".local", "state", "browsevil", "legacy-takeover.json"))).toBe(false)
     // Only what agents' shims still read keeps files there for the grace period, and then it goes too.
     const left = (fs.readdirSync(oldData, { recursive: true, withFileTypes: true }) as fs.Dirent[]).filter((entry) => entry.isFile())
     expect([...new Set(left.map((entry) => path.relative(oldData, entry.parentPath).split(path.sep)[0]))].sort()).toEqual(["bin", "runtime"])
@@ -276,13 +276,13 @@ describe("taking over the old self-managed runtime", () => {
   })
 
   test("migration waits until agents' running shims have had time to follow, then removes the old folder", () => {
-    const { home, oldData, opencode, runtime } = oldRuntimeHome(homes)
+    const { home, oldData, opencodevil, runtime } = oldRuntimeHome(homes)
     const takenOver = Date.parse("2026-11-08T16:00:00Z")
     adoptLegacyRuntime(legacyRuntime(home), runtime, takenOver)
     withoutHomeOverride(() => {
       migrateLegacy(home, takenOver + 60_000)
-      expect(JSON.parse(fs.readFileSync(opencode, "utf8")).mcp.servers.browse.command).toEqual(["browse", "mcp"])
-      expect(fs.readFileSync(path.join(home, ".local", "share", "browse", "relay-token"), "utf8")).toBe(`${relayToken}\n`)
+      expect(JSON.parse(fs.readFileSync(opencodevil, "utf8")).mcp.servers.browsevil.command).toEqual(["browsevil", "mcp"])
+      expect(fs.readFileSync(path.join(home, ".local", "share", "browsevil", "relay-token"), "utf8")).toBe(`${relayToken}\n`)
       expect(fs.existsSync(path.join(oldData, "runtime", "current.json"))).toBe(true)
       expect(migrateLegacy(home, takenOver + 11 * 60_000).removed).toEqual([oldData])
       expect(fs.existsSync(oldData)).toBe(false)
@@ -303,9 +303,9 @@ describe("taking over the old self-managed runtime", () => {
     expect(env.OPENCODE_BROWSEVIL_HOME).toBeUndefined()
   })
 
-  test("an unpinned relay only lets a definite non-browse listener through, never a slow or silent one", async () => {
+  test("an unpinned relay only lets a definite non-browsevil listener through, never a slow or silent one", async () => {
     const { home, oldData, runtime } = oldRuntimeHome(homes)
-    // Playwriter and friends answer HTTP, just not browse's /version: the relay can fall back (relay/port.ts), so a
+    // Playwriter and friends answer HTTP, just not browsevil's /version: the relay can fall back (relay/port.ts), so a
     // takeover must go ahead rather than being blocked by whatever holds the port.
     using other = Bun.serve({ port: 0, hostname: "127.0.0.1", fetch: () => new Response("Not Found", { status: 404 }) })
     const env: NodeJS.ProcessEnv = { OPENCODE_BROWSEVIL_HOME: oldData }

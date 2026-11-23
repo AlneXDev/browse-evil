@@ -24,7 +24,7 @@ function runScript(script: string, cwd: string, args: string[] = []) {
 }
 
 function createTempGitRepo() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browse-code-org-"))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-code-org-"))
   tempDirs.push(dir)
   spawnSync("git", ["init", "-q"], { cwd: dir })
   fs.mkdirSync(path.join(dir, "scripts"), { recursive: true })

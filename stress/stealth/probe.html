@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>browse stealth probe</title>
+<title>browsevil stealth probe</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
 <style>
@@ -13,7 +13,7 @@
 <script src="/snapshot.js"></script>
 </head>
 <body>
-<h1>browse stealth probe</h1>
+<h1>browsevil stealth probe</h1>
 <p>Local page that records CDP-specific tells while an agent moves, clicks and types. Nothing leaves this machine.</p>
 <div><span class="pad" id="pad-a">A</span><span class="pad" id="pad-b">B</span><span class="pad" id="pad-c">C</span></div>
 <p><button id="target">Click target</button> <label>Text <input id="text" autocomplete="off"></label></p>
@@ -190,7 +190,7 @@
   }
 
   // ---- globals and DOM artifacts -------------------------------------------------------------------
-  const knownAutomationGlobals = /^(cdc_|\$cdc_|__playwright|__pw|__pwInitScripts|playwright|__webdriver|_selenium|callSelenium|_Selenium_IDE_Recorder|__nightmare|domAutomation|domAutomationController|__puppeteer|puppeteer|__lastWatirAlert|__driver_evaluate|__webdriver_evaluate|__selenium_evaluate|__fxdriver|_phantom|callPhantom|__stagehand|__browserUse|__opencode)/i
+  const knownAutomationGlobals = /^(cdc_|\$cdc_|__playwright|__pw|__pwInitScripts|playwright|__webdriver|_selenium|callSelenium|_Selenium_IDE_Recorder|__nightmare|domAutomation|domAutomationController|__puppeteer|puppeteer|__lastWatirAlert|__driver_evaluate|__webdriver_evaluate|__selenium_evaluate|__fxdriver|_phantom|callPhantom|__stagehand|__browserUse|__opencodevil)/i
   const globalArtifacts = () => {
     const frame = document.createElement("iframe")
     frame.style.display = "none"

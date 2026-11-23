@@ -4,12 +4,12 @@ set -euo pipefail
 src=$(cd "$(dirname "$0")/.." && pwd)
 cft=$(readlink -f "$1")
 if [[ ! -x $cft ]] || ! /usr/local/bin/node -e 'if (+process.versions.node.split(".")[0]<24) process.exit(1)'; then echo 'Provision the base box (Node 24 + CfT) first' >&2; exit 1; fi
-opt=/opt/browse-canary
+opt=/opt/browsevil-canary
 sudo apt-get install --no-install-recommends -y nftables xauth xvfb xdotool fluxbox
 if ! id canary >/dev/null 2>&1; then sudo useradd --create-home --home-dir /home/canary --shell /usr/sbin/nologin canary; fi
 [[ $(getent passwd canary | cut -d: -f6,7) == /home/canary:/usr/sbin/nologin ]] || { echo 'canary account exists with unexpected home/shell' >&2; exit 1; }
 sudo chmod 700 /home/canary
-if sudo systemctl is-active --quiet browse-canary; then sudo systemctl stop browse-canary; fi
+if sudo systemctl is-active --quiet browsevil-canary; then sudo systemctl stop browsevil-canary; fi
 sudo install -d -m 755 "$opt/stress/exe" "$opt/stress/lib" "$opt/stress/canary" "$opt/chrome-for-testing"
 # Copy harness sources only; not the repo CLI, build, or any pairing files. ws is the fixture/fuzzer dependency.
 sudo install -m 644 "$src"/*.ts "$opt/stress/"
@@ -29,9 +29,9 @@ if [[ ! -x /usr/bin/brave-browser ]]; then
   install_brave || echo 'Brave stable not available: nightly will record the matrix check as skipped' >&2
 fi
 for unit in "$src/canary/units/"*.service; do sudo install -m 644 "$unit" /etc/systemd/system/; done
-sudo install -m 644 "$src/canary/units/env" /etc/browse-canary.env
+sudo install -m 644 "$src/canary/units/env" /etc/browsevil-canary.env
 sudo visudo -c -f "$src/canary/units/sudoers"
-sudo install -m 440 "$src/canary/units/sudoers" /etc/sudoers.d/browse-canary
+sudo install -m 440 "$src/canary/units/sudoers" /etc/sudoers.d/browsevil-canary
 sudo systemctl daemon-reload
-sudo systemctl restart browse-canary-network.service
-sudo systemctl enable --now browse-canary.service
+sudo systemctl restart browsevil-canary-network.service
+sudo systemctl enable --now browsevil-canary.service

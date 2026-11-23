@@ -1,7 +1,7 @@
 // Compiles the CLI (src/main.ts, the entry dist/cli.mjs bundles) into standalone executables with `bun build --compile`,
-// every npm dependency bundled, one per platform the way opencode ships @opencode/cli-<target>:
+// every npm dependency bundled, one per platform the way opencodevil ships @opencode/cli-<target>:
 //   bun script/compile.ts [target...]    e.g. linux-x64 darwin-arm64 windows-x64; no target: every target
-// Output: dist-bin/browse-<target>/bin/browse (browse.exe on Windows) and its package.json (@opencode/browsevil-<target>,
+// Output: dist-bin/browsevil-<target>/bin/browsevil (browsevil.exe on Windows) and its package.json (@opencode/browsevil-<target>,
 // with os/cpu/libc), which script/pack.ts packs for npm. Like build.ts, OPENCODE_BROWSEVIL_STORE_ID bakes in the store
 // item and OPENCODE_BROWSEVIL_EXTENSION_ZIP a dev build's extension zip. Each executable also carries the install script
 // this release ships with (../install, or ../install.ps1 on Windows), which a binary install's updater reruns in place of
@@ -58,8 +58,8 @@ if (import.meta.main) {
   await rm(outdir, { recursive: true, force: true })
   for (const item of selected) {
     const target = targetName(item)
-    const name = `browse-${target}`
-    const binary = path.join(outdir, name, "bin", item.os === "win32" ? "browse.exe" : "browse")
+    const name = `browsevil-${target}`
+    const binary = path.join(outdir, name, "bin", item.os === "win32" ? "browsevil.exe" : "browsevil")
     const executablePath = await bunRuntime(item)
     const installer = await readFile(path.join(here, "..", item.os === "win32" ? "install.ps1" : "install"), "utf8")
     const result = await Bun.build({
@@ -71,7 +71,7 @@ if (import.meta.main) {
       sourcemap: "none",
       splitting: true,
       naming: { entry: "[name].[ext]", chunk: "[name]-[hash].[ext]" },
-      // patchright-core's BiDi-over-CDP bridge (Firefox) requires chromium-bidi lazily; browse only uses connectOverCDP.
+      // patchright-core's BiDi-over-CDP bridge (Firefox) requires chromium-bidi lazily; browsevil only uses connectOverCDP.
       external: ["chromium-bidi/*"],
       plugins: [
         {
@@ -93,7 +93,7 @@ if (import.meta.main) {
         target: `bun-${target}` as Bun.Build.CompileTarget,
         ...(executablePath ? { executablePath } : {}),
         outfile: binary,
-        execArgv: [`--user-agent=browse/${channel}/${version}/cli`, "--use-system-ca", "--"],
+        execArgv: [`--user-agent=browsevil/${channel}/${version}/cli`, "--use-system-ca", "--"],
         windows: {},
       },
       define: {
@@ -115,7 +115,7 @@ if (import.meta.main) {
         {
           name: `@opencode/${name}`,
           version,
-          description: `The browse binary for ${target}.`,
+          description: `The browsevil binary for ${target}.`,
           license: pkg.license,
           repository: pkg.repository,
           os: [item.os],
@@ -133,9 +133,9 @@ if (import.meta.main) {
 
 /**
  * patchright-core reads a few of its own files at run time from a path built on __dirname, which a compiled binary
- * bakes in as the build machine's node_modules (so it only worked where it was built). The ones browse reaches are
+ * bakes in as the build machine's node_modules (so it only worked where it was built). The ones browsevil reaches are
  * written into the bundle instead: package.json and browsers.json (read when the module loads) and the WebP encoder
- * (screenshots). The rest browse never runs and is left as it is: browser downloads and install
+ * (screenshots). The rest browsevil never runs and is left as it is: browser downloads and install
  * (lib/entry/oopBrowserDownload.js, the browsers.json registry), the app icon of launchApp, the dashboard and skills
  * the CLI offers agents (lib/tools, lib/vite/dashboard), the Electron loader, the recorder and the trace viewer
  * (lib/vite/{recorder,traceViewer}, trace-viewer/), its own `run-driver` (cli.js), and xdg-open (utils bundle).

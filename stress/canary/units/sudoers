@@ -1,1 +1,1 @@
-canary ALL=(root) NOPASSWD: /usr/bin/systemctl restart browse-canary-browser@chrome.service, /usr/bin/systemctl start browse-canary-drop.service, /usr/bin/systemctl start browse-canary-browser@brave.service, /usr/bin/systemctl stop browse-canary-browser@brave.service
+canary ALL=(root) NOPASSWD: /usr/bin/systemctl restart browsevil-canary-browser@chrome.service, /usr/bin/systemctl start browsevil-canary-drop.service, /usr/bin/systemctl start browsevil-canary-browser@brave.service, /usr/bin/systemctl stop browsevil-canary-browser@brave.service

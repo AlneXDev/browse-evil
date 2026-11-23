@@ -3,14 +3,14 @@ import { cliUpdateNotice, selfUpdatingInstall, type RelayAutoUpdate } from "../s
 import { relayAutoUpdate } from "../src/background/agent-relay/wire"
 import { cliUpdateText } from "../src/status/describe"
 
-// When the extension tells the user its browse CLI is out of date, and when a normal pending auto-update stays quiet.
+// When the extension tells the user its browsevil CLI is out of date, and when a normal pending auto-update stays quiet.
 
 const NOW = Date.parse("2026-11-14T12:00:00.000Z")
 const iso = (at: number) => new Date(at).toISOString()
 const minutes = (count: number) => count * 60_000
 const base: RelayAutoUpdate = {
   install: "binary",
-  cli: "browse",
+  cli: "browsevil",
   mode: "on",
   effective: "on",
   version: "0.0.16",
@@ -33,7 +33,7 @@ describe("cliUpdateNotice", () => {
 
   test("mentions a self-update that stayed pending for over a day", () => {
     const notice = cliUpdateNotice({ ...base, latestAt: iso(NOW - minutes(25 * 60)) }, NOW)
-    expect(notice).toMatchObject({ current: "0.0.16", latest: "0.0.17", reason: "pending", command: "browse update" })
+    expect(notice).toMatchObject({ current: "0.0.16", latest: "0.0.17", reason: "pending", command: "browsevil update" })
     // Exactly a day is still the normal window.
     expect(cliUpdateNotice({ ...base, latestAt: iso(NOW - 24 * 60 * 60_000) }, NOW)).toBeUndefined()
     // Without a timestamp (an older relay), there is no pending clock to judge.
@@ -55,7 +55,7 @@ describe("cliUpdateNotice", () => {
       reason: "install",
       command: "npx @opencode/browsevil@latest install",
     })
-    expect(cliUpdateNotice({ ...base, install: "other", effective: "off" }, NOW)).toMatchObject({ reason: "install", command: "browse update" })
+    expect(cliUpdateNotice({ ...base, install: "other", effective: "off" }, NOW)).toMatchObject({ reason: "install", command: "browsevil update" })
     expect(cliUpdateNotice({ ...base, install: "other", cli: "node /src/cli.mjs", effective: "off" }, NOW)).toMatchObject({
       command: "node /src/cli.mjs update",
     })
@@ -84,9 +84,9 @@ describe("cliUpdateNotice", () => {
   })
 
   test("uses the relay's command for a binary install and names the version plainly", () => {
-    const notice = cliUpdateNotice({ ...base, cli: "/opt/browse/bin/browse", mode: "notify", effective: "notify" }, NOW)!
-    expect(notice.command).toBe("/opt/browse/bin/browse update")
-    expect(cliUpdateText(notice)).toBe("browse 0.0.16 is out of date (0.0.17 is out). Run `/opt/browse/bin/browse update`.")
+    const notice = cliUpdateNotice({ ...base, cli: "/opt/browsevil/bin/browsevil", mode: "notify", effective: "notify" }, NOW)!
+    expect(notice.command).toBe("/opt/browsevil/bin/browsevil update")
+    expect(cliUpdateText(notice)).toBe("browsevil 0.0.16 is out of date (0.0.17 is out). Run `/opt/browsevil/bin/browsevil update`.")
   })
 })
 

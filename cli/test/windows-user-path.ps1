@@ -7,18 +7,18 @@ $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
 function ReadRaw { $key.GetValue('Path', $null, 'DoNotExpandEnvironmentNames') }
 $before = ReadRaw
 $kind = if ($null -ne $before) { $key.GetValueKind('Path') }
-$backup = Join-Path $env:TEMP 'browse-user-path-backup.xml'
+$backup = Join-Path $env:TEMP 'browsevil-user-path-backup.xml'
 if (Test-Path $backup) { throw "An earlier backup exists at $backup; check it before testing." }
 @{ Value = $before; Kind = $kind } | Export-Clixml $backup
 $work = Join-Path $env:TEMP ([Guid]::NewGuid().ToString('N'))
 Push-Location (Join-Path $PSScriptRoot '..')
 try {
-  $raw = "$before;%USERPROFILE%\browse-fixture;;"
+  $raw = "$before;%USERPROFILE%\browsevil-fixture;;"
   $env:GITHUB_ACTIONS = 'false'
   foreach ($name in 'plain', "Jane O'Neil") {
     $key.SetValue('Path', $raw, 'ExpandString')
     $dir = (New-Item -ItemType Directory -Force (Join-Path $work $name)).FullName
-    $env:BROWSE_TEST_EXE = Join-Path $dir 'browse.exe'
+    $env:BROWSE_TEST_EXE = Join-Path $dir 'browsevil.exe'
     $setup = "import { addToPath, removeBinaryInstall } from './src/setup/binary.ts'; Object.defineProperty(process,'execPath',{value:process.env.BROWSE_TEST_EXE});"
     & $Bun -e "$setup addToPath()"
     if ($LASTEXITCODE -or (ReadRaw) -cne "$raw;$dir" -or $key.GetValueKind('Path') -ne 'ExpandString') { throw "Adding $name changed the raw entries/type or missed the directory" }

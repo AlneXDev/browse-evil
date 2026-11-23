@@ -21,7 +21,7 @@ const recordingStart = Command.make(
     outputPath: Argument.String("output-path").pipe(
       Argument.withDescription("Path to write the video: .webm or .mp4"),
     ),
-    session: sessionFlag("Record the page for this browse or CDP session id"),
+    session: sessionFlag("Record the page for this browsevil or CDP session id"),
     tabId: tabIdFlag("Record this attached Chrome tab id"),
     frameRate: Flag.Int("frame-rate").pipe(
       Flag.optional,

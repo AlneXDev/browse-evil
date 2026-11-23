@@ -1,11 +1,11 @@
-// Packs the npm packages of the Rust browse (rust/):
+// Packs the npm packages of the Rust browsevil (rust/):
 //   bun scripts/npm-package.ts main --out <dir>
-//       @opencode/browsevil: opencode-browse-<version>.tgz, the launcher (rust/npm/browse.mjs as dist/cli.mjs, the bin the
+//       @opencode/browsevil: opencodevil-browsevil-<version>.tgz, the launcher (rust/npm/browsevil.mjs as dist/cli.mjs, the bin the
 //       TypeScript package had) with an optional dependency on each platform package, which npm installs by os, cpu and
 //       libc
 //   bun scripts/npm-package.ts platforms --binaries <dir> --out <dir>
-//       @opencode/browsevil-<target>: opencode-browse-<target>-<version>.tgz for every install script target, from
-//       <dir>/<build>/browse[.exe] (rust/script/release.sh's layout). package/bin/browse, package.json and LICENSE,
+//       @opencode/browsevil-<target>: opencodevil-browsevil-<target>-<version>.tgz for every install script target, from
+//       <dir>/<build>/browsevil[.exe] (rust/script/release.sh's layout). package/bin/browsevil, package.json and LICENSE,
 //       which the install script (../install) and npm both read. The -baseline targets carry the same binary as their
 //       base target: Rust's x86-64 target doesn't use AVX2.
 // The version is cli/package.json's (scripts/version.ts), like the extension zip's.
@@ -65,7 +65,7 @@ async function npmPack(directory: string, out: string) {
 }
 
 async function staging<T>(use: (directory: string) => Promise<T>) {
-  const directory = await mkdtemp(path.join(os.tmpdir(), "browse-npm-"))
+  const directory = await mkdtemp(path.join(os.tmpdir(), "browsevil-npm-"))
   try {
     return await use(directory)
   } finally {
@@ -86,7 +86,7 @@ export async function packMain(version: string, out: string) {
   }
   return staging(async (directory) => {
     await mkdir(path.join(directory, "dist"))
-    await cp(path.join(root, "rust", "npm", "browse.mjs"), path.join(directory, "dist", "cli.mjs"))
+    await cp(path.join(root, "rust", "npm", "browsevil.mjs"), path.join(directory, "dist", "cli.mjs"))
     await chmod(path.join(directory, "dist", "cli.mjs"), 0o755)
     await cp(path.join(root, "LICENSE"), path.join(directory, "LICENSE"))
     await Bun.write(path.join(directory, "package.json"), JSON.stringify(pkg, null, 2) + "\n")
@@ -133,7 +133,7 @@ export async function packPlatforms(binaries: string, version: string, out: stri
   const problems: string[] = []
   const tarballs: string[] = []
   for (const item of TARGETS.filter((entry) => !only || only.includes(entry.name))) {
-    const executable = item.os === "win32" ? "browse.exe" : "browse"
+    const executable = item.os === "win32" ? "browsevil.exe" : "browsevil"
     const source = path.join(binaries, item.build, executable)
     const bytes = new Uint8Array(await readFile(source).catch(() => Buffer.alloc(0)))
     if (!bytes.length) {
@@ -149,14 +149,14 @@ export async function packPlatforms(binaries: string, version: string, out: stri
       await mkdir(path.join(directory, "bin"))
       const binary = path.join(directory, "bin", executable)
       await cp(source, binary)
-      // GitHub artifact downloads lose execute bits, and the install script runs package/bin/browse straight from the tarball.
+      // GitHub artifact downloads lose execute bits, and the install script runs package/bin/browsevil straight from the tarball.
       await chmod(binary, 0o755)
       await utimes(binary, epoch, epoch)
       await cp(path.join(root, "LICENSE"), path.join(directory, "LICENSE"))
       const pkg = {
         name: `@opencode/browsevil-${item.name}`,
         version,
-        description: `The browse binary for ${item.name}.`,
+        description: `The browsevil binary for ${item.name}.`,
         license: "MIT",
         repository: { type: "git", url: "git+https://github.com/anomalyco/browse.git", directory: "rust" },
         os: [item.os],

@@ -26,15 +26,15 @@ type Scenario = {
 }
 
 function workspace() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browse-publish-cws-"))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-publish-cws-"))
   tempDirs.push(dir)
   const build = path.join(dir, "build")
   fs.mkdirSync(build)
   fs.writeFileSync(
     path.join(build, "manifest.json"),
-    JSON.stringify({ manifest_version: 3, name: "browse", version: "0.1.1", description: "test" }),
+    JSON.stringify({ manifest_version: 3, name: "browsevil", version: "0.1.1", description: "test" }),
   )
-  const zipped = spawnSync("zip", ["-q", "browse-extension-0.1.1.zip", "manifest.json"], { cwd: build, encoding: "utf8" })
+  const zipped = spawnSync("zip", ["-q", "browsevil-extension-0.1.1.zip", "manifest.json"], { cwd: build, encoding: "utf8" })
   if (zipped.status !== 0) throw new Error(`zip failed: ${zipped.stderr}`)
 
   const bin = path.join(dir, "bin")
@@ -96,7 +96,7 @@ async function run(scenario: Scenario) {
     CWS_REFRESH_TOKEN: "refresh",
     CWS_PUBLISHER_ID: "pub",
     CWS_ITEM_ID: "item",
-    GITHUB_REPOSITORY: "anomalyco/browse",
+    GITHUB_REPOSITORY: "anomalyco/browsevil",
     GITHUB_ACTIONS: "",
     GITHUB_STEP_SUMMARY: "",
     BROWSE_VERSION: "0.1.1",

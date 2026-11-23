@@ -2,16 +2,16 @@
 set -euo pipefail
 uid=$(id -u canary)
 if [[ ${1:-} == drop ]]; then
-  /usr/sbin/nft add element inet browse_canary offline "{ $uid timeout 15s }"
+  /usr/sbin/nft add element inet browsevil_canary offline "{ $uid timeout 15s }"
   sleep 15
   exit 0
 fi
 # Replace only our own table, atomically. Never drop traffic for other users. The initial extension's default
 # connection is refused by the kernel before its profile is configured for :19770. This survives service pauses.
 {
-  if /usr/sbin/nft list table inet browse_canary >/dev/null 2>&1; then echo 'delete table inet browse_canary'; fi
+  if /usr/sbin/nft list table inet browsevil_canary >/dev/null 2>&1; then echo 'delete table inet browsevil_canary'; fi
   cat <<EOF
-table inet browse_canary {
+table inet browsevil_canary {
   set offline { type uid; flags timeout; }
   chain output {
     type filter hook output priority filter; policy accept;

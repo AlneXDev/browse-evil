@@ -18,7 +18,7 @@ type AnnouncedTarget = {
 type CdpClientState = {
   readonly aliases: Map<string, ClientCdpSessionAlias>
   readonly announcements: Map<string, AnnouncedTarget>
-  readonly opencodeBrowserSessionId?: string
+  readonly opencodevilBrowserSessionId?: string
   readonly kind: "raw" | "sandbox"
   autoAttachParams?: JsonObject
 }
@@ -38,13 +38,13 @@ export class CdpClientPool<Client extends object> implements Iterable<Client> {
     private readonly onInterceptionEmpty: (tabId: number) => void = () => {},
   ) {}
 
-  register(client: Client, opencodeBrowserSessionId?: string, kind: "raw" | "sandbox" = "raw"): void {
+  register(client: Client, opencodevilBrowserSessionId?: string, kind: "raw" | "sandbox" = "raw"): void {
     if (this.states.has(client)) throw new Error("CDP client is already registered")
     this.states.set(client, {
       aliases: new Map(),
       announcements: new Map(),
-      kind: opencodeBrowserSessionId ? kind : "raw",
-      ...(opencodeBrowserSessionId ? { opencodeBrowserSessionId } : {}),
+      kind: opencodevilBrowserSessionId ? kind : "raw",
+      ...(opencodevilBrowserSessionId ? { opencodevilBrowserSessionId } : {}),
     })
     this.connectionGeneration += 1
   }
@@ -106,7 +106,7 @@ export class CdpClientPool<Client extends object> implements Iterable<Client> {
   }
 
   sessionId(client: Client): string | undefined {
-    return this.states.get(client)?.opencodeBrowserSessionId
+    return this.states.get(client)?.opencodevilBrowserSessionId
   }
 
   isSandbox(client: Client): boolean {

@@ -57,7 +57,7 @@ async function unpairedPresence(port: number) {
 test.skipIf(process.platform === "win32" || !node || !existsSync(built))(
   "a non-TTY install gives a code to a browser that contacted the relay unpaired",
   async () => {
-    const home = mkdtempSync(path.join(os.tmpdir(), "browse-install-unpaired-"))
+    const home = mkdtempSync(path.join(os.tmpdir(), "browsevil-install-unpaired-"))
     const entry = runtime(home)
     const port = await freePort()
     const relay = await startRelay(entry, home, port)
@@ -70,7 +70,7 @@ test.skipIf(process.platform === "win32" || !node || !existsSync(built))(
         timeout: 60_000,
       })
       expect(install.status, install.stderr).toBe(0)
-      expect(install.stdout).toContain("browse is installed in a browser but isn't paired with this relay yet.")
+      expect(install.stdout).toContain("browsevil is installed in a browser but isn't paired with this relay yet.")
       // The extension is installed: sending the user back to the store is the bug.
       expect(install.stdout).not.toContain("Chrome Web Store")
       expect(install.stdout).toContain("click Connect.")

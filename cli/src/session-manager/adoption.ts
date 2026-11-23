@@ -185,7 +185,7 @@ function cleanupSettledAdoption(
 export function sessionRelayTargetIds(hooks: SessionHooks, session: OpenCodeBrowserSession): Set<string> {
   const ids = new Set(hooks.relayTargetIdsForSession?.(session.id) ?? [])
   for (const target of hooks.getTargets?.() ?? []) {
-    if (target.owner === "relay" && target.opencodeBrowserSessionId === session.id) {
+    if (target.owner === "relay" && target.opencodevilBrowserSessionId === session.id) {
       ids.add(target.targetInfo.targetId)
     }
   }

@@ -12,7 +12,7 @@ const serve = Command.make(
     const [{ startRelay }, { parseAdditionalExtensionOrigins }] = yield* Effect.promise(() =>
       Promise.all([import("../relay.ts"), import("../relay/helpers.ts")]),
     )
-    // Unset, the relay falls back from 29698 to a free browse port (relay/port.ts); an explicit port pins it.
+    // Unset, the relay falls back from 29698 to a free browsevil port (relay/port.ts); an explicit port pins it.
     const port = process.env.OPENCODE_BROWSEVIL_PORT === undefined ? undefined : yield* RelayClient.portConfig
     const additionalExtensionOrigins = parseAdditionalExtensionOrigins(yield* RelayClient.extensionOriginsConfig)
     yield* Effect.scoped(
@@ -21,15 +21,15 @@ const serve = Command.make(
         // Taking over the old self-managed runtime (setup/legacy-runtime.ts) is published only now that this relay
         // owns the port.
         yield* Effect.promise(() => import("../setup/legacy-runtime.ts").then((module) => module.commitLegacyTakeover()))
-        yield* Console.log(`browse relay listening at ${relay.url}`)
+        yield* Console.log(`browsevil relay listening at ${relay.url}`)
         yield* Console.log(
-          `browse connects automatically while the browser runs. Run \`${cliCommand("status")}\` to check.`,
+          `browsevil connects automatically while the browser runs. Run \`${cliCommand("status")}\` to check.`,
         )
         yield* Effect.never
       }),
     )
   }),
-).pipe(Command.withDescription("Start the local browse relay"))
+).pipe(Command.withDescription("Start the local browsevil relay"))
 
 const relayRestart = Command.make(
   "restart",
@@ -46,7 +46,7 @@ const relayRestart = Command.make(
     yield* Console.error("Restarting the relay leaves browser tabs open but resets in-memory JavaScript state.")
     const readiness = yield* RelayLifecycle.restartRelay({ relay, clientKind: "cli", force })
     yield* Console.log(
-      `${readiness.started ? "Started" : "Reused concurrent replacement"} browse relay at ${relay.endpoint} (${readiness.version.buildId})`,
+      `${readiness.started ? "Started" : "Reused concurrent replacement"} browsevil relay at ${relay.endpoint} (${readiness.version.buildId})`,
     )
   }),
 ).pipe(Command.withDescription("Explicitly drain and restart the managed relay using this installation"))

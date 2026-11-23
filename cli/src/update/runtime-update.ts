@@ -82,7 +82,7 @@ function installedOnly(command: string) {
   return undefined
 }
 
-/** `browse update [--check] [--force]` for an installed binary or npm global install. false when this isn't one. */
+/** `browsevil update [--check] [--force]` for an installed binary or npm global install. false when this isn't one. */
 export async function runInstalledUpdate(args: readonly string[], runtime = installedRuntime()) {
   if (!runtime) return false
   if (runtime.kind === "npx") {
@@ -94,7 +94,7 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
   if (runtime.kind === "binary") {
     const target = runningServiceTarget()
     if (!target) {
-      log("✗ This executable isn't a released browse build, so it has no release channel to follow.")
+      log("✗ This executable isn't a released browsevil build, so it has no release channel to follow.")
       process.exitCode = 1
       return true
     }
@@ -106,7 +106,7 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
       return true
     }
     if (answer.status === "missing") {
-      log(`✗ There is no ${serviceChannel} release of browse yet.`)
+      log(`✗ There is no ${serviceChannel} release of browsevil yet.`)
       process.exitCode = 1
       return true
     }

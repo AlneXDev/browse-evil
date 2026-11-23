@@ -11,7 +11,7 @@ function isolatedEnv(home: string): NodeJS.ProcessEnv {
     PATH: process.env.PATH,
     HOME: home,
     USERPROFILE: home,
-    OPENCODE_BROWSEVIL_HOME: path.join(home, "browse"),
+    OPENCODE_BROWSEVIL_HOME: path.join(home, "browsevil"),
     OPENCODE_BROWSEVIL_PORT: "29988",
     OPENCODE_BROWSEVIL_AUTO_UPDATE: "off",
     OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
@@ -23,7 +23,7 @@ function isolatedEnv(home: string): NodeJS.ProcessEnv {
 test.skipIf(process.platform === "win32")(
   "setup output ends quietly when its reader closes the pipe",
   async () => {
-    const home = mkdtempSync(path.join(tmpdir(), "browse-setup-epipe-"))
+    const home = mkdtempSync(path.join(tmpdir(), "browsevil-setup-epipe-"))
     try {
       const result = await new Promise<{ status: number | null; stderr: string }>((resolve, reject) => {
         const child = spawn(process.execPath, [writer], { env: isolatedEnv(home), stdio: ["ignore", "pipe", "pipe"] })

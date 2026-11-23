@@ -1,4 +1,4 @@
-// Builds the extension and zips it as release/browse-extension-<version>.zip, on either channel:
+// Builds the extension and zips it as release/browsevil-extension-<version>.zip, on either channel:
 //   stable  the store build, for the Chrome Web Store. The store assigns its own ID and rejects the `key` field, which
 //           only pins the ID of unpacked builds.
 //   dev     the unpacked extension the release workflow publishes to the release service; dev installs download it and
@@ -27,7 +27,7 @@ applyManifestVersion(manifest, version)
 await Bun.write(path.join(staging, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n")
 await rm(path.join(staging, "build.json"), { force: true })
 if (dev) await Bun.write(path.join(staging, "build.json"), JSON.stringify({ build }) + "\n")
-const zip = path.join(root, "release", `browse-extension-${version}.zip`)
+const zip = path.join(root, "release", `browsevil-extension-${version}.zip`)
 await rm(zip, { force: true })
 // install writes this checkout's pairing code into public/ (and so dist/); it is private to this machine.
 await rm(path.join(staging, "relay-pairing.json"), { force: true })

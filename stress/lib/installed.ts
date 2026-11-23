@@ -1,4 +1,4 @@
-// Drives browse the way a user has it: an installed binary (curl installer or npm) in its own $HOME, a headed Chrome
+// Drives browsevil the way a user has it: an installed binary (curl installer or npm) in its own $HOME, a headed Chrome
 // for Testing with the store-equivalent extension (the release zip, with the store's manifest key so its id is the
 // store id), paired through install's link (welcome.html#code=…). Nothing here touches the repo build.
 import { spawn, spawnSync, type ChildProcess } from "node:child_process"
@@ -34,17 +34,17 @@ export function user(name: string, options: { port?: number; debugPort?: number;
   if (!/^[\w-]+$/.test(name)) throw new Error(`Invalid test user: ${name}`)
   const root = options.root ?? path.join(os.homedir(), "u")
   const home = path.join(root, `home-${name}`)
-  const binary = path.join(home, ".local/bin/browse")
+  const binary = path.join(home, ".local/bin/browsevil")
   return {
     name,
     home,
     port: options.port ?? 29698,
     debugPort: options.debugPort ?? 9222,
     binary: options.binary ?? binary,
-    configDir: path.join(home, ".config/browse"),
-    dataDir: path.join(home, ".local/share/browse"),
-    stateDir: path.join(home, ".local/state/browse"),
-    cacheDir: path.join(home, ".cache/browse"),
+    configDir: path.join(home, ".config/browsevil"),
+    dataDir: path.join(home, ".local/share/browsevil"),
+    stateDir: path.join(home, ".local/state/browsevil"),
+    cacheDir: path.join(home, ".cache/browsevil"),
     profile: path.join(home, "chrome-profile"),
   }
 }
@@ -69,7 +69,7 @@ export function userEnv(u: User, extra: NodeJS.ProcessEnv = {}): NodeJS.ProcessE
 
 export type CliResult = { status: number | null; stdout: string; stderr: string; ms: number; signal?: string }
 
-/** Runs the user's installed CLI (`browse <args>`), as a shell would. */
+/** Runs the user's installed CLI (`browsevil <args>`), as a shell would. */
 export function cli(u: User, args: string[], options: { timeoutMs?: number; env?: NodeJS.ProcessEnv; binary?: string; input?: string } = {}): CliResult {
   const t = Date.now()
   const entry = options.binary ?? u.binary
@@ -153,7 +153,7 @@ export function mcp(u: User, env: NodeJS.ProcessEnv = {}, binary = u.binary): Mc
   return new McpClient(command, userEnv(u, env))
 }
 
-/** `browse pair` prints a one-time code; the command keeps waiting for the browser, so it runs detached. */
+/** `browsevil pair` prints a one-time code; the command keeps waiting for the browser, so it runs detached. */
 export function pairingCode(u: User, options: { binary?: string } = {}): string {
   const result = cli(u, ["pair", "--wait-seconds", "1"], { timeoutMs: 30_000, ...options })
   const match = /Pairing code: ([0-9A-Z]{4}-[0-9A-Z]{4})/.exec(result.stdout)
@@ -269,13 +269,13 @@ function developerMode(profile: string) {
   fs.renameSync(`${file}.tmp`, file)
 }
 
-/** Opens install's pairing link in a new tab, exactly what `browse install` does on the user's computer. */
+/** Opens install's pairing link in a new tab, exactly what `browsevil install` does on the user's computer. */
 export async function pairViaLink(cdp: BrowserCdp, code: string): Promise<string> {
   const { targetId } = await cdp.send("Target.createTarget", { url: `chrome-extension://${cdp.extensionId}/welcome.html#code=${code}` })
   return targetId as string
 }
 
-/** Types the code into the settings page's form and submits it, like a person following `browse pair`'s instructions. */
+/** Types the code into the settings page's form and submits it, like a person following `browsevil pair`'s instructions. */
 export async function pairViaSettings(cdp: BrowserCdp, code: string, address?: string): Promise<string> {
   const { targetId } = await cdp.send("Target.createTarget", { url: `chrome-extension://${cdp.extensionId}/settings.html` })
   const { sessionId } = await cdp.send("Target.attachToTarget", { targetId, flatten: true })

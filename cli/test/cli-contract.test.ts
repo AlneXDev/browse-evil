@@ -9,7 +9,7 @@ import { promisify } from "node:util"
 import { agentDefaultSessionId, exitCodeForError, hoistJsonFlag } from "../src/cli.ts"
 import { ExitCode, failure } from "../src/cli/output.ts"
 import { RelayUnreachable } from "../src/relay/client.ts"
-import { opencodeBrowserBuildId, opencodeBrowserVersion } from "../src/version.ts"
+import { opencodevilBrowserBuildId, opencodevilBrowserVersion } from "../src/version.ts"
 import { freePort as unusedPort } from "./support/ports.ts"
 
 const execFileAsync = promisify(execFile)
@@ -37,7 +37,7 @@ describe("CLI contract helpers", () => {
   test("exitCodeForError maps relay/extension unavailability to ExitCode.host (4)", () => {
     expect(exitCodeForError(new RelayUnreachable({ message: "down", endpoint: "http://127.0.0.1:29698", path: "/version", cause: null }))).toBe(ExitCode.host)
     expect(exitCodeForError(new Error("boom"))).toBe(ExitCode.failure)
-    expect(failure("browse status", "relay_unavailable", "down", { exitCode: ExitCode.host }).error.exitCode).toBe(4)
+    expect(failure("browsevil status", "relay_unavailable", "down", { exitCode: ExitCode.host }).error.exitCode).toBe(4)
   })
 })
 
@@ -45,7 +45,7 @@ describe("CLI process exit codes and session defaults", () => {
   const cliEntry = path.resolve(import.meta.dirname, "../src/main.ts")
 
   test("pair reports a running relay build mismatch, not a startup failure", async () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-pair-mismatch-"))
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-pair-mismatch-"))
     const relay = Bun.serve({ hostname: "127.0.0.1", port: await unusedPort(), fetch: () =>
       Response.json({ version: "0.0.1", buildId: "2026-01-01T00:00:00Z", instanceId: "older-build" }) })
     try {
@@ -60,7 +60,7 @@ describe("CLI process exit codes and session defaults", () => {
   })
 
   test("a silent listener fails status and session list without trying to start another relay", async () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-silent-"))
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-silent-"))
     const server = http.createServer(() => { /* accept the request but never send even the headers */ })
     await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve))
     const port = (server.address() as net.AddressInfo).port
@@ -81,7 +81,7 @@ describe("CLI process exit codes and session defaults", () => {
 
   test("--json before status exits 4 with pure JSON stdout and stderr line when relay is stopped", async () => {
     const port = await unusedPort()
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cli-contract-"))
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-cli-contract-"))
     try {
       const run = spawnSync(process.execPath, [cliEntry, "--json", "status"], {
         env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_PORT: String(port), OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
@@ -90,14 +90,14 @@ describe("CLI process exit codes and session defaults", () => {
       expect(run.status).toBe(ExitCode.host)
       const parsed = JSON.parse(run.stdout) as { relay: { running: boolean } }
       expect(parsed.relay.running).toBe(false)
-      expect(run.stderr).toContain("browse:")
+      expect(run.stderr).toContain("browsevil:")
     } finally {
       fs.rmSync(home, { recursive: true, force: true })
     }
   })
 
   test("invalid CLI flags exit 2 with a JSON failure envelope in --json mode", async () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cli-usage-"))
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-cli-usage-"))
     try {
       const run = spawnSync(process.execPath, [cliEntry, "--json", "status", "--not-a-real-flag"], {
         env: { ...process.env, OPENCODE_BROWSEVIL_HOME: home, OPENCODE_BROWSEVIL_UPDATE_CHECK: "0" },
@@ -113,7 +113,7 @@ describe("CLI process exit codes and session defaults", () => {
   })
 
   test("execute defaults to oc-$OPENCODE_SESSION_ID (lowercased) and supports --rm and --timeout-ms", async () => {
-    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-cli-exec-"))
+    const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-cli-exec-"))
     fs.writeFileSync(path.join(home, "relay-token"), "test-token", { mode: 0o600 })
     const bodies: Array<Record<string, unknown>> = []
     const session = {
@@ -130,11 +130,11 @@ describe("CLI process exit codes and session defaults", () => {
       req.on("end", () => {
         res.setHeader("content-type", "application/json")
         if (req.url === "/version") {
-          res.end(JSON.stringify({ version: opencodeBrowserVersion, buildId: opencodeBrowserBuildId, instanceId: "contract-relay" }))
+          res.end(JSON.stringify({ version: opencodevilBrowserVersion, buildId: opencodevilBrowserBuildId, instanceId: "contract-relay" }))
           return
         }
         if (req.url === "/extension/status") {
-          res.end(JSON.stringify({ connected: true, version: opencodeBrowserVersion, activeTargets: 0 }))
+          res.end(JSON.stringify({ connected: true, version: opencodevilBrowserVersion, activeTargets: 0 }))
           return
         }
         if (req.url === "/cli/execute") {

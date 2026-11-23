@@ -6,7 +6,7 @@ const target = (tabId: number, sessionId: string): ConnectedTarget => ({
   tabId,
   sessionId: `cdp-${tabId}`,
   owner: "relay",
-  opencodeBrowserSessionId: sessionId,
+  opencodevilBrowserSessionId: sessionId,
   targetInfo: { targetId: `target-${tabId}`, type: "page", title: "", url: "about:blank", attached: true, canAccessOpener: false },
 })
 

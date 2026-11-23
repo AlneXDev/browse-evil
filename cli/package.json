@@ -1,13 +1,13 @@
 {
   "name": "@opencode/browsevil",
   "version": "0.1.5",
-  "description": "browse: connect the extension to opencode, and drive your browser from any agent (CLI, MCP, Playwright).",
+  "description": "browsevil: connect the extension to opencodevil, and drive your browser from any agent (CLI, MCP, Playwright).",
   "type": "module",
   "license": "MIT",
   "bin": {
-    "browse": "dist/cli.mjs",
-    "opencode-browser": "dist/cli.mjs",
-    "opencode-browser-cli": "dist/cli.mjs"
+    "browsevil": "dist/cli.mjs",
+    "opencodevil-browser": "dist/cli.mjs",
+    "opencodevil-browser-cli": "dist/cli.mjs"
   },
   "files": [
     "dist"

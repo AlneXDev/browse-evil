@@ -47,11 +47,11 @@ export function createRelaySettingsSync(options: {
     Effect.gen(function* () {
       if (!browsers.connected) {
         const rejected = handshake.rejectedProtocol()
-        return yield* Effect.fail(new Error(rejected ? handshake.mismatchAdvice(rejected.version) : "The browse extension isn't connected, so its settings can't be read or changed. Ask the user to open the browser with the extension; its options page shows whether it's connected."))
+        return yield* Effect.fail(new Error(rejected ? handshake.mismatchAdvice(rejected.version) : "The browsevil extension isn't connected, so its settings can't be read or changed. Ask the user to open the browser with the extension; its options page shows whether it's connected."))
       }
       const result = yield* sendToExtension({ method, ...(values ? { params: { values } } : {}) }).pipe(
         Effect.mapError((error) => /Invalid extension command|Unknown setting/.test(error.message)
-          ? new Error(`The connected browse extension is too old to read or change settings from here. Update browse (\`${installCommand()}\`) and reload the extension, or change them on its options page.`)
+          ? new Error(`The connected browsevil extension is too old to read or change settings from here. Update browsevil (\`${installCommand()}\`) and reload the extension, or change them on its options page.`)
           : error),
       )
       return settingsFromExtension(result)

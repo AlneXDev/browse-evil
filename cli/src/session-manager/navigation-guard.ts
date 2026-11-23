@@ -22,7 +22,7 @@ import { createTargetUrl, getObject, getString } from "../relay/helpers.ts"
 export type NavigationGuardTarget = {
   readonly tabId: number
   readonly owner?: "relay" | "user"
-  readonly opencodeBrowserSessionId?: string
+  readonly opencodevilBrowserSessionId?: string
   readonly targetInfo: { readonly targetId: string; readonly url: string }
 }
 
@@ -88,7 +88,7 @@ export class SessionNavigationGuard {
     const decision = await checkNavigationUrl(url, rules)
     if (decision.allowed) return undefined
     this.dependencies.log("allowlist.refused", { session: options.sessionId, method: options.method, reason: decision.reason })
-    return `browse blocked ${options.method}: session ${options.sessionId} has a domain allowlist and ${decision.reason}. Ask the user before widening it (session_allowlist / \`session allow\`).`
+    return `browsevil blocked ${options.method}: session ${options.sessionId} has a domain allowlist and ${decision.reason}. Ask the user before widening it (session_allowlist / \`session allow\`).`
   }
 
   /** Apply the session's allowlist to a popup the relay just attached; false when it was closed or blanked. */
@@ -121,7 +121,7 @@ export class SessionNavigationGuard {
   observeEvent(target: NavigationGuardTarget, method: string, params: JsonObject | undefined): void {
     if (method !== "Page.frameNavigated" && method !== "Page.frameRequestedNavigation" && method !== "Page.frameStartedNavigating" && method !== "Network.responseReceived") return
     if (!this.enforced(target)) return
-    const sessionId = target.opencodeBrowserSessionId!
+    const sessionId = target.opencodevilBrowserSessionId!
     const rules = this.rules(sessionId)!
     const mainFrameId = this.dependencies.mainFrameId(target.tabId) ?? target.targetInfo.targetId
     if (method === "Page.frameNavigated") {
@@ -147,18 +147,18 @@ export class SessionNavigationGuard {
     const decision = checkUrl(url, rules)
     if (decision.allowed) return
     this.dependencies.send(target.tabId, "Page.stopLoading", {}).catch(() => {})
-    this.addWarning(sessionId, `Domain allowlist: a tab of session ${sessionId} started to navigate to ${shortUrl(url)}, but ${decision.reason}; browse stopped it. Ask the user before widening the allowlist.`)
+    this.addWarning(sessionId, `Domain allowlist: a tab of session ${sessionId} started to navigate to ${shortUrl(url)}, but ${decision.reason}; browsevil stopped it. Ask the user before widening the allowlist.`)
     this.dependencies.log("allowlist.stopped", { tabId: target.tabId, session: sessionId, method, reason: decision.reason })
   }
 
   private enforced(target: NavigationGuardTarget): boolean {
-    const sessionId = target.opencodeBrowserSessionId
+    const sessionId = target.opencodevilBrowserSessionId
     if (!sessionId || !this.rules(sessionId)) return false
     return target.owner !== "user" || this.dependencies.isExecuting(sessionId)
   }
 
   private observeCommittedUrl(target: NavigationGuardTarget, url: string): boolean {
-    const rules = this.rules(target.opencodeBrowserSessionId)
+    const rules = this.rules(target.opencodevilBrowserSessionId)
     if (!rules) return true
     const decision = checkUrl(url, rules)
     if (decision.allowed) {
@@ -170,11 +170,11 @@ export class SessionNavigationGuard {
   }
 
   private violation(target: NavigationGuardTarget, url: string, reason: string, _stage: "commit"): void {
-    const sessionId = target.opencodeBrowserSessionId!
+    const sessionId = target.opencodevilBrowserSessionId!
     const shownUrl = shortUrl(url)
     const popup = this.freshPopups.has(target.tabId) && target.owner === "relay"
     const action = popup ? "closed the popup" : "sent the tab back to about:blank"
-    this.addWarning(sessionId, `Domain allowlist: a tab of session ${sessionId} went to ${shownUrl}, but ${reason}; browse ${action}. Ask the user before widening the allowlist.`)
+    this.addWarning(sessionId, `Domain allowlist: a tab of session ${sessionId} went to ${shownUrl}, but ${reason}; browsevil ${action}. Ask the user before widening the allowlist.`)
     this.dependencies.log("allowlist.violation", { tabId: target.tabId, session: sessionId, url: shownUrl, popup })
     if (popup) {
       this.freshPopups.delete(target.tabId)

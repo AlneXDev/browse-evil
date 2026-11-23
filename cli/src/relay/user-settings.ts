@@ -1,4 +1,4 @@
-// The user's browse settings: the same ones as the extension's options page (where agent tabs open, how
+// The user's browsevil settings: the same ones as the extension's options page (where agent tabs open, how
 // they're grouped, when idle ones close, whether their tabs are muted, human-like input, handoff notifications). The
 // extension owns them (chrome.storage.local); the relay reads and writes them through it (`settings.get`, `settings.set`)
 // for the `settings` MCP tool and CLI command, so the options page updates live and the relay hears of input changes
@@ -20,7 +20,7 @@ export type SettingOverrides = Partial<Record<SettingKey, { readonly variable: s
 export const settingSpecs: Record<SettingKey, { readonly label: string; readonly values: readonly SettingValue[]; readonly variable?: string }> = {
   window: { label: "Where agents open their tabs (current: the user's window; separate: an unfocused window of their own)", values: ["current", "separate"], variable: "OPENCODE_BROWSEVIL_AGENT_WINDOW" },
   grouping: { label: "How agent tabs are grouped (one shared group, one group per session, or none)", values: ["shared", "session", "none"] },
-  groupCollapse: { label: "Whether browse collapses agent groups by itself (auto: fold them away unless the user is on one; off: leave each group as the user set it)", values: ["auto", "off"] },
+  groupCollapse: { label: "Whether browsevil collapses agent groups by itself (auto: fold them away unless the user is on one; off: leave each group as the user set it)", values: ["auto", "off"] },
   idleMinutes: { label: "Close agent tabs untouched for this many minutes", values: [10, 30, 60, "never"] },
   humanInput: { label: "Human-like input (off is faster, but easier for sites to flag)", values: ["on", "off"], variable: "OPENCODE_BROWSEVIL_HUMAN_INPUT" },
   muteTabs: { label: "Mute the tabs agents open (on keeps them quiet)", values: ["on", "off"] },
@@ -147,7 +147,7 @@ export function describeChanges(options: { readonly before: Settings; readonly a
     lines.push(`Changed ${changed.map((item) => `${item.key} from ${item.from} to ${item.to}`).join(", ")}. Tell the user what you changed; they can change it back on the extension's options page.`)
   if (unchanged.length) lines.push(`Already set: ${unchanged.map((key) => `${key} is ${options.after[key]}`).join(", ")}.`)
   for (const item of overridden)
-    lines.push(`Not changed: ${item.key} is fixed to ${item.effective} by ${item.variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit ${item.variable} where opencode starts, then run \`${cliCommand("relay restart")}\`.`)
+    lines.push(`Not changed: ${item.key} is fixed to ${item.effective} by ${item.variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit ${item.variable} where opencodevil starts, then run \`${cliCommand("relay restart")}\`.`)
   return { changed, unchanged, overridden, settings: report(options.after, options.overrides), message: lines.join(" ") }
 }
 

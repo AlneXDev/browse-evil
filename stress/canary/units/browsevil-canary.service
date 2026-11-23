@@ -1,0 +1,20 @@
+[Unit]
+Description=browsevil released-dev canary schedule
+After=browsevil-canary-browser@chrome.service browsevil-canary-install.service browsevil-canary-network.service
+Requires=browsevil-canary-network.service
+Wants=browsevil-canary-browser@chrome.service browsevil-canary-install.service
+
+[Service]
+User=canary
+EnvironmentFile=/etc/browsevil-canary.env
+EnvironmentFile=-/etc/browsevil-canary-alerts.env
+UnsetEnvironment=OPENCODE_BROWSEVIL_HOME
+WorkingDirectory=/home/canary
+UMask=0077
+ExecStart=/usr/local/bin/node /opt/browsevil-canary/stress/canary/run.ts
+Restart=on-failure
+RestartSec=30
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

@@ -92,7 +92,7 @@ export function createRelayTransportServers(deps: TransportServerDeps): {
     }
     if (!isReady()) {
       response.writeHead(503, { "content-type": "application/json; charset=utf-8", "retry-after": "1" })
-      response.end(JSON.stringify({ error: "browse relay is starting", code: "relay-starting" }))
+      response.end(JSON.stringify({ error: "browsevil relay is starting", code: "relay-starting" }))
       return
     }
     const started = performance.now()
@@ -114,7 +114,7 @@ export function createRelayTransportServers(deps: TransportServerDeps): {
 
   httpServer.on("upgrade", (request, socket, head) => {
     if (!isReady()) {
-      sendUpgradeError({ socket, status: 404, message: "browse relay is starting" })
+      sendUpgradeError({ socket, status: 404, message: "browsevil relay is starting" })
       return
     }
     const requestUrl = new URL(request.url ?? "/", endpointUrl)
@@ -145,12 +145,12 @@ export function createRelayTransportServers(deps: TransportServerDeps): {
       return
     }
     if (!hasRelayToken(request, authToken) && !secretsEqual(authToken, requestUrl.searchParams.get(relayTokenQueryParam) ?? undefined)) {
-      sendUpgradeError({ socket, status: 401, message: "Missing or invalid browse relay token" })
+      sendUpgradeError({ socket, status: 401, message: "Missing or invalid browsevil relay token" })
       return
     }
     if (requestUrl.pathname.startsWith("/devtools/browser/")) {
-      const sessionId = requestUrl.searchParams.get("opencodeBrowserSessionId") ?? headerValue(request.headers["opencode-browser-session-id"])
-      if (!shutdownControl.accepting && (headerValue(request.headers["opencode-browser-client-kind"]) !== "sandbox" || !sessionId || !sessions.hasPendingWork(sessionId))) {
+      const sessionId = requestUrl.searchParams.get("opencodevilBrowserSessionId") ?? headerValue(request.headers["opencodevil-browser-session-id"])
+      if (!shutdownControl.accepting && (headerValue(request.headers["opencodevil-browser-client-kind"]) !== "sandbox" || !sessionId || !sessions.hasPendingWork(sessionId))) {
         sendUpgradeError({ socket, status: 503, message: "Relay is draining for an explicit restart" })
         return
       }
@@ -175,9 +175,9 @@ export function createRelayTransportServers(deps: TransportServerDeps): {
       })
       return
     }
-    const opencodeBrowserSessionId = requestUrl.searchParams.get("opencodeBrowserSessionId") ?? headerValue(request.headers["opencode-browser-session-id"])
-    cdpClients.register(socket, opencodeBrowserSessionId, headerValue(request.headers["opencode-browser-client-kind"]) === "sandbox" ? "sandbox" : "raw")
-    debugLog?.(`client+ ${opencodeBrowserSessionId ?? "raw"} total=${cdpClients.size}`)
+    const opencodevilBrowserSessionId = requestUrl.searchParams.get("opencodevilBrowserSessionId") ?? headerValue(request.headers["opencodevil-browser-session-id"])
+    cdpClients.register(socket, opencodevilBrowserSessionId, headerValue(request.headers["opencodevil-browser-client-kind"]) === "sandbox" ? "sandbox" : "raw")
+    debugLog?.(`client+ ${opencodevilBrowserSessionId ?? "raw"} total=${cdpClients.size}`)
     socket.on("message", (data) => {
       Effect.runPromise(shutdownControl.trackTransport(handleCdpMessage(socket, data.toString()))).catch((error: unknown) => {
         sendCdpResponse(socket, {

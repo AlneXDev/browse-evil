@@ -65,7 +65,7 @@ export function hoistJsonFlag(args: ReadonlyArray<string>): {
 // Written directly so the line survives --json mode, where Console.log is silenced.
 export const stderrLine = (message: string) =>
   Effect.sync(() => {
-    process.stderr.write(`browse: ${message.split("\n")[0]!.slice(0, 300)}\n`)
+    process.stderr.write(`browsevil: ${message.split("\n")[0]!.slice(0, 300)}\n`)
   })
 export const emitJson = (value: unknown) => Effect.sync(() => printJson(value))
 export const printOr = (json: boolean, value: unknown, text: string) => (json ? emitJson(value) : Console.log(text))
@@ -106,7 +106,7 @@ export const ensureCliRelay = Effect.fnUntraced(function* () {
   const relay = yield* RelayClient.Service
   const readiness = yield* RelayLifecycle.ensureRelay({ relay })
   if (readiness.started) {
-    yield* Console.error(`Started browse relay at ${relay.endpoint}`)
+    yield* Console.error(`Started browsevil relay at ${relay.endpoint}`)
   }
   if (readiness.buildProblem) {
     return yield* Effect.fail(new Error(readiness.buildProblem))
@@ -122,7 +122,7 @@ export const ensureCliRelayAndExtension = Effect.fnUntraced(function* (sessionId
     sessionId,
     waitForReconnect: RelayLifecycle.shouldWaitForExtensionReconnect(readiness),
     onWait: Console.error(
-      `Waiting up to ${RelayLifecycle.extensionReconnectWaitMs / 1_000}s for the browse extension to reconnect`,
+      `Waiting up to ${RelayLifecycle.extensionReconnectWaitMs / 1_000}s for the browsevil extension to reconnect`,
     ),
   })
 })
@@ -131,7 +131,7 @@ export const resolveSelectedSessionId = Effect.fnUntraced(function* (explicitSes
   const store = yield* SessionStore.Service
   const sessionId = explicitSessionId ?? (yield* store.read)
   if (!sessionId) {
-    return yield* Effect.fail(new Error("No session provided and no current browse session exists"))
+    return yield* Effect.fail(new Error("No session provided and no current browsevil session exists"))
   }
   return sessionId
 })

@@ -9,7 +9,7 @@ import { cdpCall, connectCdp, FakeExtension, startRelay, stopRelay } from "./rel
 // A relay of its own: these tests pair a browser and create sessions, which changes the pairing state shared suites
 // inspect at startup.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-readonly-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-readonly-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -35,7 +35,7 @@ const post = (route: string, body: unknown) => fetch(`${base}${route}`, {
 })
 
 async function sessionSocket(sessionId: string): Promise<WebSocket> {
-  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${sessionId}`, { authorization: `Bearer ${token}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${sessionId}`, { authorization: `Bearer ${token}` })
   if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
   return socket
 }
@@ -107,7 +107,7 @@ test("a read-only session refuses navigation, input and cookie writes; permissio
         [3, "Browser.resetPermissions"],
       ] as const) {
         const answer = await cdpCall(writable, id, method, { origin: "https://example.com", permissions: ["geolocation"] })
-        expect(answer.error?.message).toContain(`browse blocked ${method}`)
+        expect(answer.error?.message).toContain(`browsevil blocked ${method}`)
       }
     } finally {
       writable.close()

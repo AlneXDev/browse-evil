@@ -33,7 +33,7 @@ export function createExtensionCommands(options: {
     const tabId = getNumber(command.params, "tabId")
     if (tabId !== undefined) {
       const owner = browsers.browserTab(tabId)
-      if (!owner) return Effect.fail(new Error("browse extension is not connected"))
+      if (!owner) return Effect.fail(new Error("browsevil extension is not connected"))
       return sendToBrowser(owner.link, { ...command, params: { ...command.params, tabId: owner.tabId } }).pipe(
         Effect.tapError((error) => Effect.sync(() => {
           if (isMissingTabError(error)) options.onTabGone?.(tabId, getString(command.params, "method") ?? command.method)
@@ -41,7 +41,7 @@ export function createExtensionCommands(options: {
       )
     }
     const target = link ?? browsers.defaultLink()
-    return target ? sendToBrowser(target, command) : Effect.fail(new Error("browse extension is not connected"))
+    return target ? sendToBrowser(target, command) : Effect.fail(new Error("browsevil extension is not connected"))
   }
   const sendExtensionBestEffort = (command: ExtensionCommandInput, link?: BrowserLink): void => {
     Effect.runPromise(Effect.ignore(sendToExtension(command, link))).catch(() => {})
@@ -52,12 +52,12 @@ export function createExtensionCommands(options: {
   /** Sends to every connected browser (`command` may differ per browser) and answers with the first success. */
   const sendToEach = (command: ExtensionCommandInput | ((link: BrowserLink) => ExtensionCommandInput)): Effect.Effect<JsonObject, Error> => Effect.gen(function* () {
     const links = browsers.list().filter((link) => link.rpc.connected)
-    if (links.length === 0) return yield* Effect.fail(new Error("browse extension is not connected"))
+    if (links.length === 0) return yield* Effect.fail(new Error("browsevil extension is not connected"))
     const results = yield* Effect.forEach(links, (link) => Effect.result(sendToBrowser(link, typeof command === "function" ? command(link) : command)), { concurrency: "unbounded" })
     const succeeded = results.find(Result.isSuccess)
     if (succeeded) return succeeded.success
     const failed = results.find(Result.isFailure)
-    return yield* Effect.fail(failed?.failure ?? new Error("browse extension is not connected"))
+    return yield* Effect.fail(failed?.failure ?? new Error("browsevil extension is not connected"))
   })
   /**
    * Closes idle agent tabs in every browser. With `sessionIds` (one agent's sessions), `idleMinutes` covers only their
@@ -69,7 +69,7 @@ export function createExtensionCommands(options: {
     if (!sessionIds) return sendToEach({ method: "tabs.cleanup", ...(idleMinutes === undefined ? {} : { params: minutes }) })
     const owners = new Set(sessionIds)
     const own = options.registry.listRootTargets()
-      .filter((target) => target.opencodeBrowserSessionId !== undefined && owners.has(target.opencodeBrowserSessionId))
+      .filter((target) => target.opencodevilBrowserSessionId !== undefined && owners.has(target.opencodevilBrowserSessionId))
       .flatMap((target) => browsers.browserTab(target.tabId) ?? [])
     return sendToEach((link) => ({
       method: "tabs.cleanup",

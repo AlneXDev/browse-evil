@@ -38,7 +38,7 @@ test("no update is shown until the relay reports one", () => {
 })
 
 test("the relay's notice reaches the status page's state", async () => {
-  const notice = { summary: "3 new commits on origin/main", command: "node /src/browse/cli/dist/cli.mjs update" }
+  const notice = { summary: "3 new commits on origin/main", command: "node /src/browsevil/cli/dist/cli.mjs update" }
   expect((await command("update.notice", notice)).error).toBeUndefined()
   expect(relay.state().update).toEqual(notice)
   expect(states.at(-1)?.update).toEqual(notice)

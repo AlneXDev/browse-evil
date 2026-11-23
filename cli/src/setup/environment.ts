@@ -10,7 +10,7 @@ import { formatPairingCode } from "../relay/browser-pairing.ts"
 import { defaultPort } from "../relay/helpers.ts"
 import {
   cacheRoot,
-  configRoot as browseConfigRoot,
+  configRoot as browsevilConfigRoot,
   dataRoot,
   devExtension,
   devExtensionFolder,
@@ -22,7 +22,7 @@ import {
 
 /**
  * The Chrome Web Store item install points users at: the one this package was released with (paths.ts storeConfig), or
- * browse's public item for a checkout and a package built without one. Install hands a pairing code to the extension
+ * browsevil's public item for a checkout and a package built without one. Install hands a pairing code to the extension
  * with this ID, so it must be ours.
  */
 const storeId = storeConfig().id ?? PUBLIC_STORE_ID
@@ -31,18 +31,18 @@ export const STORE_IDS = [storeId]
 export const STORE_URL = storeUrl(storeId)
 export const PACKAGE = "@opencode/browsevil"
 export const MCP_NAME = "browsevil"
-/** The MCP server's name before it was renamed to `browse`. */
-export const LEGACY_MCP_NAME = "opencode-browser"
-export const LEGACY_HOST_NAME = "ai.opencode.browser"
+/** The MCP server's name before it was renamed to `browsevil`. */
+export const LEGACY_MCP_NAME = "opencodevil-browser"
+export const LEGACY_HOST_NAME = "ai.opencodevil.browser"
 export const LEGACY_REGISTRY_ROOTS = ["HKCU\\Software\\Google\\Chrome", "HKCU\\Software\\Microsoft\\Edge"]
 export const windows = process.platform === "win32"
 
 export const home = homedir()
 export const root = dataRoot()
 export const configRoot = process.env.XDG_CONFIG_HOME ?? path.join(home, ".config")
-/** browse's own XDG folders (paths.ts): uninstall removes them, status shows them. */
+/** browsevil's own XDG folders (paths.ts): uninstall removes them, status shows them. */
 export const paths = {
-  config: browseConfigRoot(),
+  config: browsevilConfigRoot(),
   data: dataRoot(),
   state: stateRoot(),
   cache: cacheRoot(),
@@ -62,7 +62,7 @@ export const legacyFiles = [
   path.join(root, "state.json"),
   path.join(root, "logs", "host.log"),
   path.join(root, "cli.mjs"),
-  path.join(configRoot, "opencode", "plugins", "opencode-browser.ts"),
+  path.join(configRoot, "opencodevil", "plugins", "opencodevil-browser.ts"),
 ]
 
 const here = path.dirname(fileURLToPath(import.meta.url))
@@ -84,11 +84,11 @@ export const dev = fromSource ? undefined : devExtension()
 export const unpackedFolder = (): string | undefined => checkoutExtensionDirs[1] ?? (dev ? devExtensionFolder(paths.cache) : undefined)
 
 export type Settings = {
-  opencode?: string
+  opencodevil?: string
   entry?: string
   version?: string
   agents?: AgentReceipt[]
-  opencodeConfigs?: string[]
+  opencodevilConfigs?: string[]
   selectedAgents?: AgentName[]
   declinedAgents?: AgentName[]
 }
@@ -96,9 +96,9 @@ export type Settings = {
 // In a terminal the outro says what to do next.
 export const connectedMessage = "✓ Connected to your browser. Ask your agent to open a page."
 export const pairedOfflineMessage =
-  "! Not connected yet. Open the browser profile already paired with browse and make sure the extension is enabled. It reconnects automatically."
+  "! Not connected yet. Open the browser profile already paired with browsevil and make sure the extension is enabled. It reconnects automatically."
 export const manualPair = (code: string, port = defaultPort, address?: string) =>
-  `Open the Extensions menu → browse → Options, expand advanced (or click Pair with a code), enter ${formatPairingCode(code)} as the pairing code${address ? ` and ${address} as the relay address` : port === defaultPort ? "" : ` and localhost:${port} as the relay address`}, then click Connect.`
+  `Open the Extensions menu → browsevil → Options, expand advanced (or click Pair with a code), enter ${formatPairingCode(code)} as the pairing code${address ? ` and ${address} as the relay address` : port === defaultPort ? "" : ` and localhost:${port} as the relay address`}, then click Connect.`
 
 export function flag(args: string[], name: string) {
   const index = args.indexOf(name)
@@ -110,11 +110,11 @@ export function findOnPath(name: string) {
   return found.status === 0 ? found.stdout.split(/\r?\n/)[0]?.trim() || undefined : undefined
 }
 
-/** The opencode binary (recorded for status): --opencode, $OPENCODE_BIN, or `opencode` on PATH. */
+/** The opencodevil binary (recorded for status): --opencodevil, $OPENCODE_BIN, or `opencodevil` on PATH. */
 export function findOpencode(args: string[]) {
-  const explicit = flag(args, "--opencode") ?? process.env.OPENCODE_BIN
+  const explicit = flag(args, "--opencodevil") ?? process.env.OPENCODE_BIN
   if (explicit) return path.resolve(explicit)
-  return findOnPath("opencode")
+  return findOnPath("opencodevil")
 }
 
 export function readJson<T>(file: string): T | undefined {
@@ -161,7 +161,7 @@ export function fail(message: string): never {
   if (rail.active) {
     rail.waiting?.error("Stopped")
     clack.log.error(message)
-    clack.outro("browse isn't set up yet.")
+    clack.outro("browsevil isn't set up yet.")
   } else process.stderr.write(message + "\n")
   process.exit(1)
 }

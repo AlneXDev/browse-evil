@@ -23,7 +23,7 @@ import { parseHostname, readRelayConfig, writeRelayConfig } from "../relay/confi
 import { defaultPort } from "../relay/helpers.ts"
 import { configuredRelayPort, endpointForPort, liveRelayPort, processAlive, probeRelayPort, readRelayState, resolveRelayPort, verifiedRelay, verifiedRelayEndpoint } from "../relay/port.ts"
 import { relayAuthorization } from "../relay/secrets.ts"
-import { opencodeBrowserBuildId } from "../version.ts"
+import { opencodevilBrowserBuildId } from "../version.ts"
 import { isInstallerBinary, removeBinaryInstall, samePath } from "./binary.ts"
 import { revealFolder } from "./browsers.ts"
 import {
@@ -70,7 +70,7 @@ const relayHeaders = (): Record<string, string> => {
 }
 
 /**
- * A setup request that may carry the relay token, sent only to an endpoint whose open /version proved it is a browse
+ * A setup request that may carry the relay token, sent only to an endpoint whose open /version proved it is a browsevil
  * relay (and, when relay.json is trusted, the same instance). Undefined otherwise: another program holding the port
  * never receives the token, and callers treat it as "no relay".
  */
@@ -103,7 +103,7 @@ function startRelay(entry: string) {
 }
 
 function relayFailure(started: ReturnType<typeof startRelay>): string {
-  return started.stderr?.trim() || `Couldn't reach the browse relay: ${started.error?.message || `run ${cliCommand("status")}`}`
+  return started.stderr?.trim() || `Couldn't reach the browsevil relay: ${started.error?.message || `run ${cliCommand("status")}`}`
 }
 
 export function ensureRelay(entry: string) {
@@ -119,7 +119,7 @@ export function ensureRelayQuietly(entry: string): string | undefined {
 
 export const extensionStatus = async (installWaiting = false) => {
   const response = await relayRequest("/extension/status", {
-    headers: installWaiting ? { "x-browse-install": "waiting" } : {},
+    headers: installWaiting ? { "x-browsevil-install": "waiting" } : {},
     timeoutMs: 3_000,
   })
   if (!response?.ok) return undefined
@@ -204,9 +204,9 @@ export async function extension() {
   if (!folder) {
     if (!STORE_URL)
       fail(
-        "This package doesn't know its Chrome Web Store item. Install a released version (`npx @opencode/browsevil install`), or set up browse from a checkout.",
+        "The evil extension isn't on the Chrome Web Store. Download the release zip, extract it and load it unpacked: https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip",
       )
-    log(`Install browse from the Chrome Web Store: ${STORE_URL}`)
+    log(`Add the evil extension: download ${"https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"}, extract it, open chrome://extensions, turn on Developer mode and click Load unpacked.`)
     log(`Then run \`${cliCommand("install")}\` again to pair it.`)
     return
   }
@@ -349,7 +349,7 @@ export async function set(args: string[]) {
   }
   writeRelayConfig({ ...readRelayConfig(), hostname })
   log(`✓ hostname is ${hostname}`)
-  const running = (await probeRelayPort(resolveRelayPort(), 2_000)) === "browse"
+  const running = (await probeRelayPort(resolveRelayPort(), 2_000)) === "browsevil"
   if (running) {
     const [file, ...prefix] = entrySpawnCommand(runningEntry())
     const restarted = spawnSync(file!, [...prefix, "relay", "restart"], { stdio: "inherit" })
@@ -367,14 +367,14 @@ export async function set(args: string[]) {
     ?.address
   log("")
   log(
-    "In the browser on the other computer, open browse's options (right-click its toolbar button, then Options),",
+    "In the browser on the other computer, open browsevil's options (right-click its toolbar button, then Options),",
   )
   log("and under advanced enter:")
   log(`  Relay         ${(tailscale ?? "this computer's address") + (port === defaultPort ? "" : `:${port}`)}`)
   log(
     `  Pairing code  ${formatPairingCode(mintPairingCode())}  (works once, within ${pairingCodeTtlMs / 60_000} minutes; \`${cliCommand("pair")}\` prints another)`,
   )
-  log("The connection isn't encrypted by browse: use it over Tailscale or a LAN you trust, not the open internet.")
+  log("The connection isn't encrypted by browsevil: use it over Tailscale or a LAN you trust, not the open internet.")
 }
 
 /** Stop only a managed instance that recorded its identity in this install. Never start a relay during uninstall. */
@@ -388,7 +388,7 @@ async function stopInstalledRelay() {
       return response.ok ? await response.json() as { managed?: boolean; instanceId?: string; shutdownProtocol?: number } : undefined
     } catch (error) {
       const e = error as { code?: string; cause?: { code?: string } }
-      if (error instanceof SyntaxError) return undefined // Another HTTP server, not a browse version response.
+      if (error instanceof SyntaxError) return undefined // Another HTTP server, not a browsevil version response.
       if (["ECONNREFUSED", "ConnectionRefused"].includes(e.cause?.code ?? e.code ?? "")) return undefined
       throw error
     }
@@ -402,7 +402,7 @@ async function stopInstalledRelay() {
   if (!ours) return
   if (relay.shutdownProtocol !== 2) throw new Error("Stop the legacy relay manually, then run uninstall again.")
   // relay.json still names this relay while it writes its last lines as it stops (relay.ts cleanup): it is the marker
-  // that everything is on disk, so uninstall waits for it to go before deleting browse's folders.
+  // that everything is on disk, so uninstall waits for it to go before deleting browsevil's folders.
   const stillRecorded = () => {
     const state = readRelayState()
     return state !== undefined && state.instanceId === relay.instanceId && processAlive(state.pid)
@@ -414,7 +414,7 @@ async function stopInstalledRelay() {
   const response = await fetch(`${verified.endpoint}/shutdown`, {
     method: "POST", redirect: "error", headers: { ...relayHeaders(), "content-type": "application/json" }, signal: AbortSignal.timeout(15_000),
     body: JSON.stringify({ instanceId: relay.instanceId, requestId: randomUUID(), reason: "explicit-restart", force: true,
-      client: { kind: "cli", instanceId: randomUUID(), buildId: opencodeBrowserBuildId } }),
+      client: { kind: "cli", instanceId: randomUUID(), buildId: opencodevilBrowserBuildId } }),
   })
   if (!response.ok || !(await response.json() as { stopping?: boolean }).stopping) throw new Error("The running relay refused shutdown. Stop it manually, then run uninstall again.")
   for (let n = 0; n < 100; n++) {
@@ -439,7 +439,7 @@ export async function uninstall() {
   await stopInstalledRelay()
   const host = removeLegacyHost()
   const settings = readJson<Settings>(files.settings)
-  const mcp = (settings?.opencodeConfigs ?? [configFile()]).flatMap((file) =>
+  const mcp = (settings?.opencodevilConfigs ?? [configFile()]).flatMap((file) =>
     [MCP_NAME, LEGACY_MCP_NAME].filter((name) => removeMcp(name, settings?.entry, file)),
   )
   for (const receipt of settings?.agents ?? []) {
@@ -447,11 +447,11 @@ export async function uninstall() {
       const result = editAgentConfig(receipt, true)
       log(
         result === "conflict"
-          ? `! ${receipt.file} has a changed browse server; left unchanged.`
+          ? `! ${receipt.file} has a changed browsevil server; left unchanged.`
           : `✓ ${receipt.name}: ${result}`,
       )
     } catch {
-      fail(`Couldn't safely remove browse from ${receipt.file}. Check its syntax and permissions, then re-run uninstall.`)
+      fail(`Couldn't safely remove browsevil from ${receipt.file}. Check its syntax and permissions, then re-run uninstall.`)
     }
   }
   const binary = installedBinaryPath()
@@ -466,13 +466,13 @@ export async function uninstall() {
           log(`! Couldn't remove ${installer} while it's running; delete it after uninstall exits.`)
         }
       } else {
-        log(`! Left ${installer}; delete it if you no longer use browse there.`)
+        log(`! Left ${installer}; delete it if you no longer use browsevil there.`)
       }
     }
   }
   if (existsSync(binary)) {
     const left = removeBinaryInstall(binary)
-    log(left ? `! Couldn't remove ${left}. After uninstall exits, close any browse agents using the file(s) and delete them.` : `✓ Removed ${binary}`)
+    log(left ? `! Couldn't remove ${left}. After uninstall exits, close any browsevil agents using the file(s) and delete them.` : `✓ Removed ${binary}`)
   }
   for (const directory of [paths.data, paths.config, paths.state, paths.cache]) {
     try {
@@ -480,7 +480,7 @@ export async function uninstall() {
       log(`✓ Removed ${directory}`)
     } catch (error) {
       if (process.platform !== "win32" || !["EBUSY", "EPERM", "EACCES"].includes((error as NodeJS.ErrnoException).code ?? "")) throw error
-      log(`! Couldn't remove all of ${directory}; close running browse agents and remove the remaining files.`)
+      log(`! Couldn't remove all of ${directory}; close running browsevil agents and remove the remaining files.`)
     }
   }
   if (!compiledBinary() && !fromSource) {

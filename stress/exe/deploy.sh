@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
 # Copies this working tree (committed or not) to the box and rebuilds there, for testing fixes without pushing.
-#   stress/exe/deploy.sh [host]        # default host: browse-stress.exe.xyz, reached with `wssh`
+#   stress/exe/deploy.sh [host]        # default host: browsevil-stress.exe.xyz, reached with `wssh`
 # Leaves the box's .git, node_modules, builds and pairing code alone, restarts the relay on the new build and reloads
 # the extension. The extension is built with the harness's test hooks (OPENCODE_BROWSEVIL_TEST_HOOKS=1).
 set -euo pipefail
-HOST="${1:-browse-stress.exe.xyz}"
+HOST="${1:-browsevil-stress.exe.xyz}"
 SSH="${BROWSE_STRESS_SSH:-wssh}"
 cd "$(dirname "$0")/../.."
 rsync -az --delete -e "$SSH" \
   --exclude .git --exclude node_modules --exclude dist --exclude cli/dist --exclude cli/extension \
   --exclude release --exclude relay-pairing.json --exclude stress-results \
-  ./ "$HOST:browse/"
+  ./ "$HOST:browsevil/"
 "$SSH" "$HOST" 'bash -se' <<'REMOTE'
 set -uo pipefail
 export PATH=/usr/local/bin:$HOME/.bun/bin:$PATH OPENCODE_BROWSEVIL_UPDATE_CHECK=0
-cd ~/browse
+cd ~/browsevil
 (cd cli && OPENCODE_BROWSEVIL_TEST_HOOKS=1 bun build.ts)
 # Restart first: `pair` runs `session list`, which refuses a relay of another build (lifecycle.ts relayBuildProblem).
 node cli/dist/cli.mjs relay restart --force   # a stress box: nothing a fuzz run left is worth keeping
 # Feed the unpacked extension a real one-time code without running install (which edits the user's MCP config).
 umask 077
 (node cli/dist/cli.mjs pair --wait-seconds 1 || true) | jq -Rse '{code: capture("Pairing code: (?<code>[0-9A-Z]{4}-[0-9A-Z]{4})").code}' > dist/relay-pairing.json
-sudo -n systemctl restart browse-chrome
+sudo -n systemctl restart browsevil-chrome
 # Restarting Chrome alone can restore the previous unpacked service worker from the profile's cache.
 node --input-type=module <<'JS'
 import { BrowserCdp } from './stress/lib/cdp.ts'

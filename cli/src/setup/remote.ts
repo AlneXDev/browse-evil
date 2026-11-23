@@ -34,7 +34,7 @@ export function remoteRelayAddresses(
   return [...new Set(hosts)].map((host) => host + port)
 }
 
-/** What to enter in browse on the other computer: the relay address (and alternatives), the code and how long it lasts. */
+/** What to enter in browsevil on the other computer: the relay address (and alternatives), the code and how long it lasts. */
 export function remoteRelayLines(addresses: string[], code: string, ttlMs = pairingCodeTtlMs) {
   return [
     `Relay address  ${addresses[0] ?? "this computer's IP address"}`,
@@ -57,14 +57,14 @@ function magicDnsName() {
 
 /**
  * The rest of `install --remote`, after the agents here are set up: opens the relay to other computers (as `set
- * hostname 0.0.0.0` does), starts it, and prints the address and a one-time pairing code to enter in browse on the
+ * hostname 0.0.0.0` does), starts it, and prints the address and a one-time pairing code to enter in browsevil on the
  * other computer. No browser here is looked for, opened or paired.
  */
 export async function installRemote(entry: string, tty: boolean) {
   const config = readRelayConfig()
   if (config.hostname !== "0.0.0.0") {
     writeRelayConfig({ ...config, hostname: "0.0.0.0" })
-    const running = (await probeRelayPort(resolveRelayPort(), 2_000)) === "browse"
+    const running = (await probeRelayPort(resolveRelayPort(), 2_000)) === "browsevil"
     const [file, ...prefix] = entrySpawnCommand(entry)
     const restarted =
       running && spawnSync(file!, [...prefix, "relay", "restart"], { encoding: "utf8", timeout: 60_000 }).status === 0
@@ -81,8 +81,8 @@ export async function installRemote(entry: string, tty: boolean) {
     .some((address) => address?.family === "IPv4" && tailnetIPv4.test(address.address))
   const addresses = remoteRelayAddresses(interfaces, { port, magicDns: onTailnet ? magicDnsName() : undefined })
   const lines = remoteRelayLines(addresses, mintPairingCode())
-  const where = 'In Chrome on the other computer, open browse, choose "Connect an agent on another computer" and enter:'
-  if (rail.active) clack.note(lines.join("\n"), "Enter this in browse on the other computer")
+  const where = 'In Chrome on the other computer, open browsevil, choose "Connect an agent on another computer" and enter:'
+  if (rail.active) clack.note(lines.join("\n"), "Enter this in browsevil on the other computer")
   else {
     log("")
     log(where)
@@ -90,10 +90,10 @@ export async function installRemote(entry: string, tty: boolean) {
     log("")
   }
   if (!onTailnet)
-    log("! browse doesn't encrypt this connection: use it on a network you trust, or over Tailscale, not the open internet.")
+    log("! browsevil doesn't encrypt this connection: use it on a network you trust, or over Tailscale, not the open internet.")
   if (!tty)
     log(
-      "Agent: give the user the relay address and pairing code above to enter in browse in their browser. The code works once and expires; if it does, run `" +
+      "Agent: give the user the relay address and pairing code above to enter in browsevil in their browser. The code works once and expires; if it does, run `" +
         cliCommand("pair") +
         "` for a new one.",
     )

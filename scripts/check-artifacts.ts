@@ -6,8 +6,8 @@
 //   npm tarball    @opencode/browsevil at the release version: the launcher dist/cli.mjs and package metadata, an optional
 //                  dependency on each platform package, no install scripts; with --platform-tarball, it installs with
 //                  npm next to that platform package and starts its relay and MCP server
-//   bun scripts/check-artifacts.ts --version 0.1.0 --zip release/browse-extension-0.1.0.zip --tarball release/opencode-browse-0.1.0.tgz \
-//     [--platform-tarball opencode-browse-linux-x64-0.1.0.tgz]
+//   bun scripts/check-artifacts.ts --version 0.1.0 --zip release/browsevil-extension-0.1.0.zip --tarball release/opencodevil-browsevil-0.1.0.tgz \
+//     [--platform-tarball opencodevil-browsevil-linux-x64-0.1.0.tgz]
 import { $ } from "bun"
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import net from "node:net"
@@ -30,7 +30,7 @@ const TEST_ONLY_MARKERS = [
   "__OPENCODE_BROWSEVIL_TEST",
   "BROWSE_TEST_",
   // The stress harness's hooks (vite.config.ts OPENCODE_BROWSEVIL_TEST_HOOKS).
-  "__opencodeBrowserTest",
+  "__opencodevilBrowserTest",
 ]
 const STORE_FILE_TYPES = /\.(js|css|html|json|png|svg)$/
 
@@ -134,7 +134,7 @@ export async function checkStoreZip(zip: string, version: string, allowlist?: Al
   // Symbolic links, found in the archive listing (unzip would follow or refuse them).
   const links = (await $`unzip -Z ${zip}`.quiet().text()).split("\n").filter((line) => /^l[rwx-]{9}/.test(line)).map((line) => line.split(/\s+/).pop())
   if (links.length) return links.map((name) => `${label}: ${name} is a symbolic link`)
-  return extracted("browse-zip-", async (directory) => void (await $`unzip -q ${zip} -d ${directory}`.quiet()), async (directory) => {
+  return extracted("browsevil-zip-", async (directory) => void (await $`unzip -q ${zip} -d ${directory}`.quiet()), async (directory) => {
     const structure = await structureProblems(directory, label)
     if (structure.length) return structure
     const { names, problems } = await extensionContentProblems(directory, label)
@@ -160,7 +160,7 @@ export async function checkStoreZip(zip: string, version: string, allowlist?: Al
  */
 export async function checkPackageTarball(tarball: string, version: string): Promise<string[]> {
   const label = path.basename(tarball)
-  return extracted("browse-tgz-", async (directory) => void (await $`tar -xzf ${tarball} -C ${directory}`.quiet()), async (directory) => {
+  return extracted("browsevil-tgz-", async (directory) => void (await $`tar -xzf ${tarball} -C ${directory}`.quiet()), async (directory) => {
     const packageDir = path.join(directory, "package")
     const structure = await structureProblems(directory, label)
     if (structure.length) return structure
@@ -182,7 +182,7 @@ export async function checkPackageTarball(tarball: string, version: string): Pro
     if (pkg.scripts && Object.keys(pkg.scripts).length) problems.push(`${label}: has scripts; installs must not run code`)
     if (pkg.dependencies && Object.keys(pkg.dependencies).length) problems.push(`${label}: has dependencies; the launcher needs only Node`)
     if (Object.keys(pkg.publishConfig ?? {}).some((key) => key !== "access")) problems.push(`${label}: sets publishConfig beyond access`)
-    for (const bin of ["browse", "opencode-browser", "opencode-browser-cli"]) if (pkg.bin?.[bin] !== "dist/cli.mjs") problems.push(`${label}: bin ${bin} should be dist/cli.mjs`)
+    for (const bin of ["browsevil", "opencodevil-browser", "opencodevil-browser-cli"]) if (pkg.bin?.[bin] !== "dist/cli.mjs") problems.push(`${label}: bin ${bin} should be dist/cli.mjs`)
     const { LAUNCHER_TARGETS } = await import("./npm-package.ts")
     const expected = Object.fromEntries(LAUNCHER_TARGETS.map((item) => [`@opencode/browsevil-${item.name}`, version]))
     if (JSON.stringify(pkg.optionalDependencies ?? {}) !== JSON.stringify(expected))
@@ -205,7 +205,7 @@ export async function checkPackageTarball(tarball: string, version: string): Pro
 export async function checkPackageInstall(tarball: string, version: string, platformTarball: string): Promise<string[]> {
   const file = path.resolve(tarball)
   const label = path.basename(file)
-  const directory = await mkdtemp(path.join(os.tmpdir(), "browse-install-"))
+  const directory = await mkdtemp(path.join(os.tmpdir(), "browsevil-install-"))
   try {
     await writeFile(path.join(directory, "package.json"), JSON.stringify({ private: true }))
     // npm resolves every optional dependency, and the other platforms' packages of an unreleased version aren't on npm
@@ -222,7 +222,7 @@ export async function checkPackageInstall(tarball: string, version: string, plat
       TMPDIR: directory,
     }
     const reported = await $`node ${cli} --version`.cwd(directory).env(env).quiet().nothrow()
-    if (reported.exitCode !== 0) return [`${label}: \`browse --version\` through the launcher failed:\n${tail(reported.stderr.toString())}`]
+    if (reported.exitCode !== 0) return [`${label}: \`browsevil --version\` through the launcher failed:\n${tail(reported.stderr.toString())}`]
     if (reported.stdout.toString().trim() !== version) return [`${label}: the launcher's binary reports version ${reported.stdout.toString().trim()}, expected ${version}`]
     const relay = Bun.spawn(["node", cli, "serve"], { cwd: directory, env, stdout: "ignore", stderr: "pipe" })
     const relayErrors = new Response(relay.stderr).text()
@@ -230,11 +230,11 @@ export async function checkPackageInstall(tarball: string, version: string, plat
       const running = await relayVersion(port, relay)
       if (running === undefined) {
         relay.kill("SIGTERM")
-        return [`${label}: after npm install, \`browse serve\` didn't start:\n${tail(await relayErrors)}`]
+        return [`${label}: after npm install, \`browsevil serve\` didn't start:\n${tail(await relayErrors)}`]
       }
       if (running !== version) return [`${label}: the installed relay reports version ${running}, expected ${version}`]
       const tools = await mcpTools(cli, directory, env)
-      return typeof tools === "number" && tools > 0 ? [] : [`${label}: after npm install, \`browse mcp\` listed no tools:\n${tail(String(tools))}`]
+      return typeof tools === "number" && tools > 0 ? [] : [`${label}: after npm install, \`browsevil mcp\` listed no tools:\n${tail(String(tools))}`]
     } finally {
       relay.kill("SIGTERM")
       await relay.exited
@@ -314,14 +314,14 @@ function freePort() {
 
 /**
  * A platform package (scripts/npm-package.ts): @opencode/browsevil-<target> at the release version with exactly
- * package/bin/browse (browse.exe on Windows, mode 755), package.json and LICENSE, the os/cpu/libc npm installs by, and
- * no install scripts. The install script (../install) downloads it from npm and runs package/bin/browse.
+ * package/bin/browsevil (browsevil.exe on Windows, mode 755), package.json and LICENSE, the os/cpu/libc npm installs by, and
+ * no install scripts. The install script (../install) downloads it from npm and runs package/bin/browsevil.
  */
 export async function checkBinaryTarball(tarball: string, version: string, target: string): Promise<string[]> {
   const label = path.basename(tarball)
   const [os, arch, ...rest] = target.split("-")
   const musl = rest.includes("musl")
-  const executable = `package/bin/${os === "windows" ? "browse.exe" : "browse"}`
+  const executable = `package/bin/${os === "windows" ? "browsevil.exe" : "browsevil"}`
   const problems: string[] = []
   const listing = (await $`tar -tvzf ${tarball}`.quiet().text()).split("\n").filter(Boolean)
   const entries = new Map(listing.map((line) => [line.split(/\s+/).pop()!, line.slice(0, 10)]))

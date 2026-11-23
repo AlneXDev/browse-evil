@@ -41,7 +41,7 @@ export {
 } from "./session-manager/types.ts"
 
 /**
- * Session ids an MCP server picks for itself (`browse mcp` uses eight hex characters).
+ * Session ids an MCP server picks for itself (`browsevil mcp` uses eight hex characters).
  * Shared with the relay's orphan collector so both agree on which sessions nobody named.
  */
 const mcpSessionPattern = /^mcp-[0-9a-f]{8}$/i
@@ -50,7 +50,7 @@ export function isMcpSession(id: string): boolean {
   return mcpSessionPattern.test(id)
 }
 
-/** Sessions browse names itself (an MCP server's implicit session, a generated id, or an opencode session). */
+/** Sessions browsevil names itself (an MCP server's implicit session, a generated id, or an opencodevil session). */
 export function isAutoNamedSession(id: string): boolean {
   return isMcpSession(id) || /^[a-z]+-[a-z]+-\d{3}$/.test(id) || id.startsWith("oc-")
 }
@@ -188,7 +188,7 @@ export class OpenCodeBrowserSessions {
     } catch {
       // The fallback line below is better than a failed startup.
     }
-    console.error(`browse session restore: ${message}`)
+    console.error(`browsevil session restore: ${message}`)
   }
 
   persistedTargetOwner(
@@ -829,7 +829,7 @@ export class OpenCodeBrowserSessions {
   /** Called once after startup inventory; unknown/user-owned tabs are never inferred. */
   sweepOrphanedRelayTargets(): Effect.Effect<void> {
     return Effect.forEach(this.hooks.getTargets?.() ?? [], (target) =>
-      target.owner === "relay" && target.opencodeBrowserSessionId && !this.sessions.has(target.opencodeBrowserSessionId)
+      target.owner === "relay" && target.opencodevilBrowserSessionId && !this.sessions.has(target.opencodevilBrowserSessionId)
         ? this.closeRelayTarget(target.targetInfo.targetId).pipe(Effect.ignore)
         : Effect.void, { discard: true })
   }

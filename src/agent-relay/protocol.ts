@@ -1,5 +1,5 @@
-// The extension side of the browse relay's protocol (version 2). The relay (cli/src/relay.ts)
-// runs agent sessions for the browse MCP server and the browse CLI, and drives tabs through this extension.
+// The extension side of the browsevil relay's protocol (version 2). The relay (cli/src/relay.ts)
+// runs agent sessions for the browsevil MCP server and the browsevil CLI, and drives tabs through this extension.
 // Keep it in step with cli/src/protocol.ts.
 
 type JsonPrimitive = string | number | boolean | null
@@ -15,10 +15,10 @@ export const defaultRelayPort = 29698
  */
 export const relayFallbackPorts = [29699, 29700, 29701, 29702, 29703, 29704, 29705, 29706] as const
 
-/** Every port a browse relay can listen on, in the order the extension dials and scans them. */
+/** Every port a browsevil relay can listen on, in the order the extension dials and scans them. */
 export const relayPorts: readonly number[] = [defaultRelayPort, ...relayFallbackPorts]
 
-/** A port that can be a browse relay's: the default or a fallback. Anything else is ignored as a pairing hint. */
+/** A port that can be a browsevil relay's: the default or a fallback. Anything else is ignored as a pairing hint. */
 export const relayPortHint = (value: unknown): number | undefined =>
   typeof value === "number" && relayPorts.includes(value) ? value : undefined
 

@@ -151,7 +151,7 @@ export function extensionsPage(browser: Pick<Browser, "name">) {
   return `${scheme ?? "chrome"}://extensions`
 }
 
-/** Every browser with user data here, and the profiles that have browse. */
+/** Every browser with user data here, and the profiles that have browsevil. */
 export function detectBrowsers() {
   return browsers().flatMap((browser): Detection[] => {
     const state = readLocked(path.join(browser.userData, "Local State"))

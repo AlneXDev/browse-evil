@@ -1,0 +1,8 @@
+[Unit]
+Description=Isolate browsevil canary traffic from the checkout relay
+Before=browsevil-canary-install.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash /opt/browsevil-canary/stress/canary/network.sh

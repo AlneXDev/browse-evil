@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// A port only a scan found can answer /version like browse and then fail the handshake. That reply is not proof: the
+// A port only a scan found can answer /version like browsevil and then fail the handshake. That reply is not proof: the
 // close must stay eligible for a scan, and the scan prefers 29698 or a port this browser holds a token for, so a fake
 // listener can't keep the extension on itself. Run by ../isolated.test.ts in its own process.
 

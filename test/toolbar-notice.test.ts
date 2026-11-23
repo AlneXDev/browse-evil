@@ -8,7 +8,7 @@ const stub = installChrome()
 const { ToolbarNotice } = await import("../src/background/toolbar-notice")
 
 const tab = async (url: string) => (await stub.chrome.windows.create({ url })).tabs[0]!.id
-const notification = (tabId: number) => stub.state.notifications.get(`opencode-browser-toolbar:${tabId}`) as { message: string } | undefined
+const notification = (tabId: number) => stub.state.notifications.get(`opencodevil-browser-toolbar:${tabId}`) as { message: string } | undefined
 
 beforeEach(() => {
   stub.state.permissionLevel = "granted"
@@ -35,7 +35,7 @@ describe("ToolbarNotice", () => {
     for (const url of ["chrome://extensions", "https://chromewebstore.google.com/detail/browse/abc"]) {
       const tabId = await tab(url)
       expect(await ToolbarNotice.unavailable(tabId)).toBe("page")
-      expect(notification(tabId)?.message).toContain("browse can't use this page")
+      expect(notification(tabId)?.message).toContain("browsevil can't use this page")
     }
   })
 
@@ -44,7 +44,7 @@ describe("ToolbarNotice", () => {
     expect(await ToolbarNotice.unavailable(tabId)).toBeUndefined()
   })
 
-  test("browse's own pages aren't called unusable", async () => {
+  test("browsevil's own pages aren't called unusable", async () => {
     const tabId = await tab("chrome-extension://stubextensionid/settings.html")
     expect(await ToolbarNotice.unavailable(tabId)).toBeUndefined()
     expect(stub.state.notifications.size).toBe(0)
@@ -82,7 +82,7 @@ describe("ToolbarNotice", () => {
     ToolbarNotice.expect(tabId)
     expect(ToolbarNotice.take(tabId)).toBe(true)
     await ToolbarNotice.failed(tabId, new Error("Could not attach to this tab: The extensions gallery cannot be scripted."))
-    expect(notification(tabId)?.message).toBe("browse couldn't use this tab: The extensions gallery cannot be scripted.")
+    expect(notification(tabId)?.message).toBe("browsevil couldn't use this tab: The extensions gallery cannot be scripted.")
   })
 
   test("another debugger gets advice instead of its agent-facing wording", async () => {

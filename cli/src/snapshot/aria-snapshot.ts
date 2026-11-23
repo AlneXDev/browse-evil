@@ -2,7 +2,7 @@ import type { BrowserContext, Frame, Locator, Page } from "patchright-core"
 import { runtimeFailureKind } from "../update/runtime-diagnostics.ts"
 import { frameCaptureTimeoutMs, frameFailureNote, frameSkipNote, maxSnapshotFrameDepth, maxSnapshotFrames } from "./frames.ts"
 
-const redactionCleanupErrorMessage = "browse could not confirm ARIA snapshot value-redaction cleanup"
+const redactionCleanupErrorMessage = "browsevil could not confirm ARIA snapshot value-redaction cleanup"
 
 /** A document that may still carry redaction patches; `captureFailed` says its content was never captured. */
 export class AriaSnapshotRedactionError extends AggregateError {
@@ -20,7 +20,7 @@ const redactionSelectorSource = `({
     const separator = body.indexOf("_")
     const action = body.slice(0, separator)
     const token = body.slice(separator + 1)
-    const stateKey = "__opencodeBrowserAriaRedactionState__"
+    const stateKey = "__opencodevilBrowserAriaRedactionState__"
     let state = globalThis[stateKey]
 
     if (action === "on") {

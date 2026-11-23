@@ -65,7 +65,7 @@ function Settings() {
     // The background reconnects on the change, and the relay names the browser afresh.
     void (next ? chrome.storage.local.set({ [BROWSER_NAME_KEY]: next }) : chrome.storage.local.remove(BROWSER_NAME_KEY)).then(() => {
       setName(undefined)
-      showToast({ title: next ? "Name saved" : "Name reset", description: "browse reconnects so agents see it.", variant: "success" })
+      showToast({ title: next ? "Name saved" : "Name reset", description: "browsevil reconnects so agents see it.", variant: "success" })
     })
   }
 
@@ -136,7 +136,7 @@ function Settings() {
         <Show when={state()?.update}>
           {(update) => (
             <Section title="update available">
-              <p class="row-desc">{capitalized(update().summary)}. Run this in a terminal, or ask your agent to update browse:</p>
+              <p class="row-desc">{capitalized(update().summary)}. Run this in a terminal, or ask your agent to update browsevil:</p>
               <CopyBox text={update().command} />
             </Section>
           )}
@@ -293,7 +293,7 @@ function Settings() {
             </Show>
             <RelayForm relay={relay} />
             <p class="row-desc">
-              <Rich text="The relay runs on this computer unless your agent runs on another one: run `browse set hostname 0.0.0.0` there, then enter that computer's Tailscale IP or name. A pairing code is only needed for a new relay, or after this browser was unpaired: run `browse pair` on the relay's computer. It works once, within 10 minutes." />
+              <Rich text="The relay runs on this computer unless your agent runs on another one: run `browsevil set hostname 0.0.0.0` there, then enter that computer's Tailscale IP or name. A pairing code is only needed for a new relay, or after this browser was unpaired: run `browsevil pair` on the relay's computer. It works once, within 10 minutes." />
             </p>
             <div class="actions">
               <Button variant="neutral" icon="refresh" onClick={reconnect}>
@@ -320,8 +320,8 @@ function Settings() {
       </section>
 
       <footer class="settings-foot">
-        Agents open their own tabs. To share one of yours, click the browse button on it. The debugging bar's button
-        (Cancel or OK) disconnects browse from every tab; click the browse button on a tab to lend it again.
+        Agents open their own tabs. To share one of yours, click the browsevil button on it. The debugging bar's button
+        (Cancel or OK) disconnects browsevil from every tab; click the browsevil button on a tab to lend it again.
       </footer>
       <Toast.Region />
     </main>
@@ -391,16 +391,16 @@ function statusDetail(state: AgentRelayState | undefined) {
       return state.browser ? `\`${state.browser.id}\` is how agents call this browser.` : "No agent is using a tab yet."
     case "offline":
       return remote
-        ? "It starts the first time an agent there uses the browse tools."
-        : "The relay starts the first time an agent uses the browse tools."
+        ? "It starts the first time an agent there uses the browsevil tools."
+        : "The relay starts the first time an agent uses the browsevil tools."
     case "conflict":
-      return "Close browse in the other browser or profile, then reconnect."
+      return "Close browsevil in the other browser or profile, then reconnect."
     case "incompatible":
-      return "Update this extension and the browse CLI on this computer."
+      return "Update this extension and the browsevil CLI on this computer."
     case "unpaired":
       return "Until it's paired, no agent can use this browser."
     case "untrusted":
-      return "Enter a new code from `browse pair` on the relay's computer."
+      return "Enter a new code from `browsevil pair` on the relay's computer."
     default:
       return undefined
   }

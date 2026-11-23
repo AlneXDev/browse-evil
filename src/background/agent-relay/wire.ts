@@ -46,9 +46,9 @@ export const TOKENS_KEY = "agentRelayTokens"
 export const SPENT_KEY = "agentRelaySpentCodes"
 /** Written next to the manifest by `install` for unpacked builds: a one-time code (cli/src/browser-pairing.ts). */
 export const PAIRING_FILE = "relay-pairing.json"
-export const ALARM = "opencode-browser-relay"
+export const ALARM = "opencodevil-browser-relay"
 // Relay tab groups end with this marker, which Chrome renders without width: they read like the session
-// groups ("opencode", or the agent session's name) but stay distinguishable for cleanup. The shared group (the
+// groups ("opencodevil", or the agent session's name) but stay distinguishable for cleanup. The shared group (the
 // "One shared group for all agents" setting) ends with it twice.
 export const GROUP_MARKER = "\u2063"
 export const SHARED_MARKER = GROUP_MARKER + GROUP_MARKER
@@ -77,7 +77,7 @@ export const SLOW_CDP = 2_000
 // Another extension's frame in the page (1Password, LastPass, Bitwarden) makes Chrome refuse commands or
 // drop the debugger; evicting the frame and re-attaching recovers.
 export const FOREIGN_FRAME = /Cannot access a chrome-extension:\/\/ URL|Debugger is not attached to the tab/i
-export const ATTACHED_TITLE = "browse · Agents can use this tab. Click to stop."
+export const ATTACHED_TITLE = "browsevil · Agents can use this tab. Click to stop."
 
 export const CLOSE_CODES: Record<number, string> = {
   1000: "normal",

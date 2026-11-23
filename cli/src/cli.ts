@@ -23,7 +23,7 @@ import "./cli/relay.ts"
 import "./cli/session.ts"
 import * as RelayClient from "./relay/client.ts"
 import * as SessionStore from "./session-manager/store.ts"
-import { opencodeBrowserVersion } from "./version.ts"
+import { opencodevilBrowserVersion } from "./version.ts"
 
 export {
   agentDefaultSessionId,
@@ -33,8 +33,8 @@ export {
 
 const packageRoot = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 
-export const opencodeBrowser = Command.make("browse").pipe(
-  Command.withDescription("Control the user's existing browser through the browse extension"),
+export const opencodevilBrowser = Command.make("browsevil").pipe(
+  Command.withDescription("Control the user's existing browser through the browsevil extension"),
   Command.withSubcommands(buildRegisteredCliCommands({ packageRoot })),
 )
 
@@ -47,7 +47,7 @@ const mainLayer = Layer.mergeAll(RelayClient.layerFetch, SessionStore.layer).pip
 export function runCli(rawArgs: ReadonlyArray<string> = process.argv.slice(2)): void {
   const cliArgs = hoistJsonFlag(rawArgs)
   const subcommand = cliArgs.argv.find((arg) => !arg.startsWith("-"))
-  const commandName = subcommand ? `browse ${subcommand}` : "browse"
+  const commandName = subcommand ? `browsevil ${subcommand}` : "browsevil"
 
   // Effect CLI parse errors exit 2 and, in --json mode, print a structured failure envelope.
   const reportUsageError = (error: CliError.CliError) =>
@@ -82,7 +82,7 @@ export function runCli(rawArgs: ReadonlyArray<string> = process.argv.slice(2)): 
   const askedForHelp = cliArgs.argv.some((arg) => arg === "--help" || arg === "-h")
   const quietJson = cliArgs.json && !askedForHelp
 
-  Command.runWith(opencodeBrowser, { version: opencodeBrowserVersion, renderErrors: !quietJson })(
+  Command.runWith(opencodevilBrowser, { version: opencodevilBrowserVersion, renderErrors: !quietJson })(
     cliArgs.argv,
   ).pipe(
     quietJson ? Effect.provideService(Console.Console, { ...globalThis.console, log: silent }) : (effect) => effect,

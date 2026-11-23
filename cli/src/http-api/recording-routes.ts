@@ -72,7 +72,7 @@ function readRecordingStatus<A>(registry: TargetRegistry, read: () => A | Promis
       if (!(cause instanceof AmbiguousRecordingTargetError)) return cause instanceof Error ? cause : new Error(String(cause))
       const choices = cause.tabIds.map((tabId) => {
         const target = registry.getRootTargetByTabId(tabId)
-        const sessionId = target?.opencodeBrowserSessionId ?? target?.sessionId
+        const sessionId = target?.opencodevilBrowserSessionId ?? target?.sessionId
         return sessionId ? `sessionId=${sessionId} (tabId=${tabId})` : `tabId=${tabId}`
       })
       return new HttpRouteError({ status: 409, code: "target-ambiguous", message: `${cause.message}: ${choices.join(", ")}` })

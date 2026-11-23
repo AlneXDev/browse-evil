@@ -11,7 +11,7 @@ import { dataRoot } from "../paths.ts"
 
 export const relayTokenHeader = "authorization"
 /** Query parameter that carries the token on CDP WebSocket URLs, for clients that can't set headers. */
-export const relayTokenQueryParam = "opencodeBrowserToken"
+export const relayTokenQueryParam = "opencodevilBrowserToken"
 const tokenPattern = /^[A-Za-z0-9_-]{43}$/
 
 export function relayTokenPath(root = dataRoot()): string {

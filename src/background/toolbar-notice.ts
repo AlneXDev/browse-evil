@@ -6,7 +6,7 @@ export * as ToolbarNotice from "./toolbar-notice"
 // tab as an agent's after Chrome dropped its debugger (a navigation to chrome://, say) and the button must stay a kill
 // switch; a failed attach is classified then. Only a click that would queue offline is screened before it is queued.
 
-const PREFIX = "opencode-browser-toolbar:"
+const PREFIX = "opencodevil-browser-toolbar:"
 /** How long a click's attach may take to answer (the relay gives it 10 s) before the mark is dropped. */
 const CLICK_TTL_MS = 15_000
 /** Clicked tabs whose attach hasn't answered, so its failure can be shown rather than only returned to the relay. */
@@ -14,14 +14,14 @@ const clicked = new Map<number, ReturnType<typeof setTimeout>>()
 
 type Blocked = "file" | "page"
 const MESSAGES: Record<Blocked, string> = {
-  file: "browse can't use this file. Turn on “Allow access to file URLs” for browse on its details page in chrome://extensions, then click the toolbar button again.",
-  page: "browse can't use this page. Chrome doesn't let extensions control browser pages or the Chrome Web Store.",
+  file: "browsevil can't use this file. Turn on “Allow access to file URLs” for browsevil on its details page in chrome://extensions, then click the toolbar button again.",
+  page: "browsevil can't use this page. Chrome doesn't let extensions control browser pages or the Chrome Web Store.",
 }
 
 /** Documents `chrome.debugger` refuses: browser internals, other extensions, and the Chrome Web Store. */
 const INTERNAL = /^(?:chrome|chrome-untrusted|chrome-extension|chrome-search|devtools|edge|brave|opera|vivaldi):/i
 const STORE = /^https:\/\/(?:chromewebstore\.google\.com|chrome\.google\.com\/webstore)(?:[/?#]|$)/i
-/** browse's own pages aren't a page an agent could use, but "browse can't use this page" would be confusing there. */
+/** browsevil's own pages aren't a page an agent could use, but "browsevil can't use this page" would be confusing there. */
 const OWN = chrome.runtime.getURL("")
 
 /** Whether a click can't lend this tab; when it can't, the user is told why and the reason is returned. */
@@ -32,7 +32,7 @@ export async function unavailable(tabId: number): Promise<Blocked | undefined> {
   return blocked
 }
 
-/** Why Chrome won't let browse use this page, when it's a kind with advice of its own. */
+/** Why Chrome won't let browsevil use this page, when it's a kind with advice of its own. */
 async function classify(url: string | undefined): Promise<Blocked | undefined> {
   if (!url || url.startsWith(OWN)) return undefined
   if (url.startsWith("file://")) {
@@ -73,9 +73,9 @@ export async function failed(tabId: number, error: unknown) {
   if (blocked) return show(tabId, MESSAGES[blocked])
   const text = error instanceof Error ? error.message : String(error)
   if (/another debugger/i.test(text))
-    return show(tabId, "browse couldn't use this tab: another debugger (DevTools or another extension) is attached to it. Close that, then click the toolbar button again.")
+    return show(tabId, "browsevil couldn't use this tab: another debugger (DevTools or another extension) is attached to it. Close that, then click the toolbar button again.")
   const reason = text.replace(/^Could not attach to this tab:\s*/i, "").trim()
-  await show(tabId, `browse couldn't use this tab: ${/[.!?]$/.test(reason) ? reason : `${reason}.`}`)
+  await show(tabId, `browsevil couldn't use this tab: ${/[.!?]$/.test(reason) ? reason : `${reason}.`}`)
 }
 
 /** Drops a click's mark and its notification: the tab attached, or it went away. */
@@ -96,7 +96,7 @@ async function show(tabId: number, message: string) {
     .create(PREFIX + tabId, {
       type: "basic",
       iconUrl: chrome.runtime.getURL("icons/icon-128.png"),
-      title: "browse",
+      title: "browsevil",
       message,
       requireInteraction: true,
       priority: 2,

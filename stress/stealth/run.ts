@@ -1,7 +1,7 @@
-// Stealth check for browse on a real browser (a Mac with Chrome or Helium), never in CI: it opens public detector
-// sites. Drives browse the way an agent does, through the MCP server (session_new + execute):
+// Stealth check for browsevil on a real browser (a Mac with Chrome or Helium), never in CI: it opens public detector
+// sites. Drives browsevil the way an agent does, through the MCP server (session_new + execute):
 //
-// 1. The local probe (probe.html, served on 127.0.0.1) records CDP-specific tells while browse moves the mouse,
+// 1. The local probe (probe.html, served on 127.0.0.1) records CDP-specific tells while browsevil moves the mouse,
 //    clicks and types: screenX/screenY vs clientX/clientY, empty coalesced/predicted events, event timing, document
 //    vs subresource nextHopProtocol, window vs worker navigator values, window sizes and focus, non-native
 //    Function.prototype.toString, automation globals and DOM artifacts, foreign main-world call stacks.
@@ -13,7 +13,7 @@
 //
 // Results go to <out>/ (default ~/stress-results/<time>-stealth/): results.json, summary.md, probe.json and PNGs.
 // The CLI is this checkout's cli/dist/cli.mjs (or $BROWSE_REPO's); OPENCODE_BROWSEVIL_HOME / OPENCODE_BROWSEVIL_PORT pick
-// the relay, as for every browse command. Run it on a dedicated browser profile when you can (see stress/README.md).
+// the relay, as for every browsevil command. Run it on a dedicated browser profile when you can (see stress/README.md).
 import fs from "node:fs"
 import http from "node:http"
 import net from "node:net"
@@ -153,7 +153,7 @@ const { values: args } = parseArgs({
 const here = import.meta.dirname
 const repo = process.env.BROWSE_REPO ?? path.resolve(here, "../..")
 const cli = path.join(repo, "cli/dist/cli.mjs")
-if (!fs.existsSync(cli)) throw new Error(`No browse CLI at ${cli}: build it (cd cli && bun build.ts) or set BROWSE_REPO`)
+if (!fs.existsSync(cli)) throw new Error(`No browsevil CLI at ${cli}: build it (cd cli && bun build.ts) or set BROWSE_REPO`)
 const stamp = new Date().toISOString().replace(/[:.]/g, "-")
 const out = path.resolve(args.out ?? path.join(process.env.BROWSE_STRESS_RESULTS ?? path.join(os.homedir(), "stress-results"), `${stamp}-stealth`))
 fs.mkdirSync(out, { recursive: true })
@@ -198,7 +198,7 @@ async function startProbeServer(): Promise<{ readonly url: string; readonly clos
   return { url: `http://127.0.0.1:${port}/probe.html`, close: () => new Promise((resolve) => server.close(() => resolve())) }
 }
 
-// ---- browse through MCP -------------------------------------------------------------------------------
+// ---- browsevil through MCP -------------------------------------------------------------------------------
 
 const client = new McpClient([process.execPath, cli, "mcp"])
 
@@ -219,7 +219,7 @@ async function runProbe(): Promise<Record<string, unknown>> {
   const server = await startProbeServer()
   try {
     await execute(`await page.goto(${JSON.stringify(server.url)}, { waitUntil: "load" }); await page.locator('#ready[data-ready="1"]').waitFor()`)
-    // Human-shaped activity through browse's normal input path: moves, hovers, clicks, typing, a scroll.
+    // Human-shaped activity through browsevil's normal input path: moves, hovers, clicks, typing, a scroll.
     await execute(`
       const box = async (selector) => (await page.locator(selector).boundingBox())
       for (const selector of ['#pad-a', '#pad-c', '#pad-b', '#target']) {
@@ -315,7 +315,7 @@ try {
   results.finishedAt = new Date().toISOString()
   fs.writeFileSync(path.join(out, "results.json"), `${JSON.stringify(results, null, 2)}\n`)
   const summary = [
-    `# browse stealth run ${results.startedAt}`,
+    `# browsevil stealth run ${results.startedAt}`,
     "",
     `Session \`${session}\`, CLI \`${cli}\`, ${results.platform}.`,
     "",

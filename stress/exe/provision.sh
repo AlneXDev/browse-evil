@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Provisions an Ubuntu 24.04 box (exe.dev browse-stress) for stress-testing browse. Idempotent: re-run it any time.
+# Provisions an Ubuntu 24.04 box (exe.dev browsevil-stress) for stress-testing browsevil. Idempotent: re-run it any time.
 #   bash stress/exe/provision.sh            # from a clone, or
 #   curl -fsSL .../provision.sh | bash      # before the clone exists
 # Installs Node 24, Bun (the packageManager version), Xvfb + fluxbox, fonts, ffmpeg, x11vnc + noVNC and Chrome for
-# Testing; clones browse into ~/browse (unless BROWSE_SKIP_CLONE=1, e.g. after an rsync), runs `bun run setup`, and
+# Testing; clones browsevil into ~/browsevil (unless BROWSE_SKIP_CLONE=1, e.g. after an rsync), runs `bun run setup`, and
 # installs the systemd units that keep Xvfb :99, Chrome (headed, with the extension) and noVNC running.
 set -euo pipefail
 
 USER_NAME="$(id -un)"
 HOME_DIR="$HOME"
-REPO="${BROWSE_REPO:-$HOME_DIR/browse}"
+REPO="${BROWSE_REPO:-$HOME_DIR/browsevil}"
 NODE_MAJOR=24
 CFT_DIR="$HOME_DIR/chrome-for-testing"
 NOVNC_PORT="${BROWSE_NOVNC_PORT:-8000}"
@@ -59,13 +59,13 @@ if ! command -v bun >/dev/null || [[ "$(bun --version)" != "$BUN_VERSION" ]]; th
 fi
 bun --version
 
-log "browse checkout"
+log "browsevil checkout"
 if [[ ! -d "$REPO/.git" && "${BROWSE_SKIP_CLONE:-0}" != 1 ]]; then
   git clone https://github.com/anomalyco/browse.git "$REPO"
 fi
 cd "$REPO"
 # `setup` builds the extension and CLI, writes the pairing file into dist/, and adds the MCP server to the box's own
-# opencode config. Over SSH it doesn't wait for a browser.
+# opencodevil config. Over SSH it doesn't wait for a browser.
 OPENCODE_BROWSEVIL_UPDATE_CHECK=0 bun run setup </dev/null
 
 log "Chrome for Testing (stable)"
@@ -85,8 +85,8 @@ for unit in "$UNITS_SRC"/*.service; do
     "$unit" | sudo tee "/etc/systemd/system/$name" >/dev/null
 done
 sudo systemctl daemon-reload
-sudo systemctl enable --now browse-xvfb browse-wm browse-chrome browse-vnc browse-novnc >/dev/null
-sudo systemctl restart browse-chrome browse-novnc
+sudo systemctl enable --now browsevil-xvfb browsevil-wm browsevil-chrome browsevil-vnc browsevil-novnc >/dev/null
+sudo systemctl restart browsevil-chrome browsevil-novnc
 
 log "relay + extension"
 # Any relay-backed command starts the relay; the extension connects once it's up.

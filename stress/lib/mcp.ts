@@ -1,4 +1,4 @@
-// A minimal MCP client over stdio (newline-delimited JSON-RPC), the way opencode talks to `cli.mjs mcp`.
+// A minimal MCP client over stdio (newline-delimited JSON-RPC), the way opencodevil talks to `cli.mjs mcp`.
 import { spawn, type ChildProcess } from "node:child_process"
 import { cli } from "./env.ts"
 
@@ -75,7 +75,7 @@ export class McpClient {
     const result = await this.request("initialize", {
       protocolVersion: "2025-06-18",
       capabilities: {},
-      clientInfo: { name: "browse-stress", version: "0.0.0" },
+      clientInfo: { name: "browsevil-stress", version: "0.0.0" },
     }, 30_000)
     this.notify("notifications/initialized")
     return result

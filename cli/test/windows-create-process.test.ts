@@ -13,8 +13,8 @@ import {
 
 describe("windows relay command line", () => {
   test("quotes arguments the way CommandLineToArgvW parses them back", () => {
-    expect(quoteWindowsArgument("browse.exe")).toBe('"browse.exe"')
-    expect(quoteWindowsArgument("C:\\Program Files\\browse.exe")).toBe('"C:\\Program Files\\browse.exe"')
+    expect(quoteWindowsArgument("browsevil.exe")).toBe('"browsevil.exe"')
+    expect(quoteWindowsArgument("C:\\Program Files\\browsevil.exe")).toBe('"C:\\Program Files\\browsevil.exe"')
     expect(quoteWindowsArgument("")).toBe('""')
     expect(quoteWindowsArgument("a b")).toBe('"a b"')
     expect(quoteWindowsArgument("a\\b")).toBe('"a\\b"')
@@ -26,14 +26,14 @@ describe("windows relay command line", () => {
   })
 
   test("puts the executable first and joins it with the arguments", () => {
-    expect(windowsCommandLine("C:\\browse\\browse.exe", ["serve"])).toBe('"C:\\browse\\browse.exe" "serve"')
+    expect(windowsCommandLine("C:\\browsevil\\browsevil.exe", ["serve"])).toBe('"C:\\browsevil\\browsevil.exe" "serve"')
     expect(windowsCommandLine("bun.exe", ["C:\\a b\\main.ts", "serve"])).toBe('"bun.exe" "C:\\a b\\main.ts" "serve"')
   })
 })
 
 describe("windows relay executable resolution", () => {
   const files = new Set([
-    "C:\\bin\\browse.exe",
+    "C:\\bin\\browsevil.exe",
     "C:\\bin\\tool.com",
     "C:\\Program Files\\bun\\bun.exe",
     "D:\\tools\\bun.exe",
@@ -41,13 +41,13 @@ describe("windows relay executable resolution", () => {
   const exists = (candidate: string) => files.has(candidate)
 
   test("keeps a fully qualified path, including UNC", () => {
-    expect(resolveWindowsExecutable("C:\\bin\\browse.exe", {}, () => false)).toBe("C:\\bin\\browse.exe")
-    expect(resolveWindowsExecutable("C:/bin/browse.exe", {}, () => false)).toBe("C:/bin/browse.exe")
-    expect(resolveWindowsExecutable("\\\\server\\share\\browse.exe", {}, () => false)).toBe("\\\\server\\share\\browse.exe")
+    expect(resolveWindowsExecutable("C:\\bin\\browsevil.exe", {}, () => false)).toBe("C:\\bin\\browsevil.exe")
+    expect(resolveWindowsExecutable("C:/bin/browsevil.exe", {}, () => false)).toBe("C:/bin/browsevil.exe")
+    expect(resolveWindowsExecutable("\\\\server\\share\\browsevil.exe", {}, () => false)).toBe("\\\\server\\share\\browsevil.exe")
   })
 
   test("resolves a bare name only through the absolute directories in PATH", () => {
-    expect(resolveWindowsExecutable("browse", { Path: "relative;D:\\tools;C:\\bin" }, exists)).toBe("C:\\bin\\browse.exe")
+    expect(resolveWindowsExecutable("browsevil", { Path: "relative;D:\\tools;C:\\bin" }, exists)).toBe("C:\\bin\\browsevil.exe")
     expect(resolveWindowsExecutable("tool", { PATH: "C:\\bin" }, exists)).toBe("C:\\bin\\tool.com")
     expect(resolveWindowsExecutable("bun", { PATH: "D:\\tools" }, exists)).toBe("D:\\tools\\bun.exe")
   })
@@ -62,19 +62,19 @@ describe("windows relay executable resolution", () => {
 
   test("does not append .exe to a name that already has an extension", () => {
     const seen: string[] = []
-    resolveWindowsExecutable("browse.exe", { PATH: "C:\\bin" }, (candidate) => {
+    resolveWindowsExecutable("browsevil.exe", { PATH: "C:\\bin" }, (candidate) => {
       seen.push(candidate)
       return true
     })
-    expect(seen).toEqual(["C:\\bin\\browse.exe"])
+    expect(seen).toEqual(["C:\\bin\\browsevil.exe"])
   })
 
   test("rejects relative paths, drive-relative paths and names missing from PATH", () => {
-    expect(resolveWindowsExecutable(".\\browse.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
-    expect(resolveWindowsExecutable("bin\\browse.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
-    expect(resolveWindowsExecutable("C:browse.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
-    expect(resolveWindowsExecutable("browse", { PATH: "relative" }, () => true)).toBeUndefined()
-    expect(resolveWindowsExecutable("browse", {}, () => true)).toBeUndefined()
+    expect(resolveWindowsExecutable(".\\browsevil.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
+    expect(resolveWindowsExecutable("bin\\browsevil.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
+    expect(resolveWindowsExecutable("C:browsevil.exe", { PATH: "C:\\bin" }, () => true)).toBeUndefined()
+    expect(resolveWindowsExecutable("browsevil", { PATH: "relative" }, () => true)).toBeUndefined()
+    expect(resolveWindowsExecutable("browsevil", {}, () => true)).toBeUndefined()
   })
 })
 
@@ -93,7 +93,7 @@ describe("windows relay environment block", () => {
   })
 
   test("keeps the last value for names that differ only by case", () => {
-    expect(windowsEnvironmentBlock({ opencode_browsevil_managed_relay: "0", PATH: "C:\\bin", OPENCODE_BROWSEVIL_MANAGED_RELAY: "1" }))
+    expect(windowsEnvironmentBlock({ opencodevil_browsevil_managed_relay: "0", PATH: "C:\\bin", OPENCODE_BROWSEVIL_MANAGED_RELAY: "1" }))
       .toBe("OPENCODE_BROWSEVIL_MANAGED_RELAY=1\0PATH=C:\\bin\0\0")
   })
 
@@ -104,17 +104,17 @@ describe("windows relay environment block", () => {
 
 describe("windows relay launch validation", () => {
   test("accepts a clean launch", () => {
-    expect(windowsLaunchProblem({ executable: "C:\\bin\\browse.exe", args: ["serve"] }, { PATH: "C:\\bin" })).toBeUndefined()
+    expect(windowsLaunchProblem({ executable: "C:\\bin\\browsevil.exe", args: ["serve"] }, { PATH: "C:\\bin" })).toBeUndefined()
   })
 
   test("rejects NUL in the executable, an argument or an environment value", () => {
-    expect(windowsLaunchProblem({ executable: "C:\\bin\0browse.exe", args: [] }, {})).toMatch(/NUL/)
-    expect(windowsLaunchProblem({ executable: "C:\\bin\\browse.exe", args: ["a\0b"] }, {})).toMatch(/NUL/)
-    expect(windowsLaunchProblem({ executable: "C:\\bin\\browse.exe", args: [] }, { PATH: "C:\\bin", BAD: "a\0b" })).toMatch(/NUL/)
+    expect(windowsLaunchProblem({ executable: "C:\\bin\0browsevil.exe", args: [] }, {})).toMatch(/NUL/)
+    expect(windowsLaunchProblem({ executable: "C:\\bin\\browsevil.exe", args: ["a\0b"] }, {})).toMatch(/NUL/)
+    expect(windowsLaunchProblem({ executable: "C:\\bin\\browsevil.exe", args: [] }, { PATH: "C:\\bin", BAD: "a\0b" })).toMatch(/NUL/)
   })
 
   test("does not reject environment names that the block skips", () => {
-    expect(windowsLaunchProblem({ executable: "C:\\bin\\browse.exe", args: [] }, { "": "empty", "A=B": "equals", "BAD\0NAME": "nul" }))
+    expect(windowsLaunchProblem({ executable: "C:\\bin\\browsevil.exe", args: [] }, { "": "empty", "A=B": "equals", "BAD\0NAME": "nul" }))
       .toBeUndefined()
   })
 })
@@ -126,7 +126,7 @@ const inlineMarkerScript = (marker: string) =>
 
 // The launch integration test only proves some launcher worked; these call the CreateProcessW path directly.
 test.skipIf(process.platform !== "win32")("launches a process with CreateProcessW, its environment and its arguments", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "browse-create-process-"))
+  const dir = mkdtempSync(path.join(os.tmpdir(), "browsevil-create-process-"))
   const leaked = "BROWSE_TEST_LEAKED_VALUE"
   const previous = process.env[leaked]
   process.env[leaked] = `only in the test process ${Date.now()}`
@@ -151,7 +151,7 @@ test.skipIf(process.platform !== "win32")("launches a process with CreateProcess
 }, 15_000)
 
 test.skipIf(process.platform !== "win32")("resolves a bare executable name through the launch environment's PATH", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "browse-create-process-path-"))
+  const dir = mkdtempSync(path.join(os.tmpdir(), "browsevil-create-process-path-"))
   try {
     const marker = path.join(dir, "marker.json")
     const value = `resolved bun ${Date.now()}`

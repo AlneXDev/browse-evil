@@ -9,7 +9,7 @@ import { mcpStdio } from "./support/mcp-stdio.ts"
 import { freePort } from "./support/ports.ts"
 
 // The real MCP server over stdio, answering a pre-2026 client (initialize) and a 2026-07-28 client (request metadata).
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-mcp-protocol-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-mcp-protocol-"))
 afterAll(() => fs.rmSync(home, { recursive: true, force: true }))
 
 const modernMeta = {
@@ -133,7 +133,7 @@ describe("MCP protocol versions", () => {
       const first = await mcp.request("tools/call", { name: "status", arguments: {}, _meta: modernMeta })
       const second = await mcp.request("tools/call", { name: "status", arguments: {}, _meta: modernMeta })
       expect(first.result?.isError).toBe(false)
-      // Without protocol sessions, the server's implicit browse session still lasts for the connection.
+      // Without protocol sessions, the server's implicit browsevil session still lasts for the connection.
       const currentSession = (first.result?.structuredContent as { currentSession?: string }).currentSession
       expect(currentSession).toMatch(/^mcp-/)
       expect((second.result?.structuredContent as { currentSession?: string }).currentSession).toBe(currentSession)

@@ -13,7 +13,7 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 const temporaryRoot = path.join(os.homedir(), ".cache", "oc-tmp")
 fs.mkdirSync(temporaryRoot, { recursive: true })
 // The harness gives the relay its own HOME/OPENCODE_BROWSEVIL_HOME and a free port (never 29698).
-const home = fs.mkdtempSync(path.join(temporaryRoot, "browse-page-close-"))
+const home = fs.mkdtempSync(path.join(temporaryRoot, "browsevil-page-close-"))
 let relay: ChildProcess | undefined
 let port = 0
 let token = ""
@@ -41,7 +41,7 @@ const info = (tabId: number) => ({
 
 async function openClient(session: string) {
   const socket = await connectCdp(
-    `ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${session}`,
+    `ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${session}`,
     { authorization: `Bearer ${token}` },
   )
   if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")

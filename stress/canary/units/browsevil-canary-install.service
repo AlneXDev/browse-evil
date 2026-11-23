@@ -1,0 +1,17 @@
+[Unit]
+Description=browsevil canary dev-channel user install
+Requires=browsevil-canary-network.service
+After=browsevil-canary-network.service network-online.target
+Wants=network-online.target
+PartOf=browsevil-canary.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=canary
+EnvironmentFile=/etc/browsevil-canary.env
+UnsetEnvironment=OPENCODE_BROWSEVIL_HOME
+UMask=0077
+WorkingDirectory=/home/canary
+ExecStart=/bin/bash /opt/browsevil-canary/stress/canary/bootstrap.sh
+TimeoutStartSec=5min

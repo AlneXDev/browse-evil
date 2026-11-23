@@ -1,4 +1,4 @@
-// The relay's own config, config.json in the config root, changed with `browse set <key> <value>`. It's the relay's
+// The relay's own config, config.json in the config root, changed with `browsevil set <key> <value>`. It's the relay's
 // alone: not a setting of the extension's options page, and not something the agents' `settings` tool can change.
 //   hostname  where the relay listens: 127.0.0.1 (default, this computer only) or 0.0.0.0 (every network, for
 //             browsers on other computers). Connections from other computers only ever reach the extension's

@@ -30,7 +30,7 @@ const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
 const PORT = 19907
 const ADDRESS = `127.0.0.1:${PORT}`
-const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-exchange-"))
+const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-exchange-"))
 afterAll(() => fs.rmSync(root, { recursive: true, force: true }))
 type Message = { id?: number; method?: string; params?: Record<string, any> }
 

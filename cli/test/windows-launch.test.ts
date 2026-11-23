@@ -7,7 +7,7 @@ import { freePort } from "./support/ports.ts"
 // Capture the *outer* shell's output. Waiting for the CLI's exit alone misses a relay holding a copy of its pipe.
 for (const shell of ["cmd", "powershell", "closed console"]) {
   test.skipIf(process.platform !== "win32")(`managed relay outlives ${shell} without holding its output open`, async () => {
-    const home = mkdtempSync(path.join(tmpdir(), "browse-launch-"))
+    const home = mkdtempSync(path.join(tmpdir(), "browsevil-launch-"))
     const port = Number(process.env.BROWSE_TEST_LAUNCH_PORT) || await freePort()
     const url = `http://127.0.0.1:${port}/version`
     const version = () => fetch(url, { signal: AbortSignal.timeout(1000) }).then(r => r.json()) as Promise<{ pid: number; managed: boolean; instanceId: string }>

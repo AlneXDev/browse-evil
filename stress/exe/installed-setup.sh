@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs browse the way users do, each into a throwaway $HOME under ~/u, for stress/installed.ts:
+# Installs browsevil the way users do, each into a throwaway $HOME under ~/u, for stress/installed.ts:
 #   installed-setup.sh curl [version]   # curl -fsSL https://opencode.ai/browse/install | bash  (optionally --version X)
 #   installed-setup.sh npm              # npx @opencode/browsevil@latest install
 #   installed-setup.sh extensions       # the release zips with the store's manifest key (so their id is the store id)
@@ -23,7 +23,7 @@ case "$kind" in
     else
       curl -fsSL https://opencode.ai/browse/install | bash -s -- --no-wait
     fi
-    "$home/.local/bin/browse" --version
+    "$home/.local/bin/browsevil" --version
     ;;
   npm)
     home="$root/home-npm"
@@ -34,7 +34,7 @@ case "$kind" in
     export npm_config_prefix="$home/.local"
     cd "$home"
     npx -y @opencode/browsevil@latest install --no-wait
-    ls "$home/.local/share/browse"
+    ls "$home/.local/share/browsevil"
     ;;
   extensions)
     # From a Mac: fetch the release zips, add the store key (from the store's CRX header) and rsync ~/u/ext-* here.

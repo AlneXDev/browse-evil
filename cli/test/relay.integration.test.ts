@@ -29,7 +29,7 @@ import {
 // A relay from source on a free port with its own data root, and a fake extension that pairs with it and answers
 // its commands. No browser.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-relay-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-relay-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -50,7 +50,7 @@ afterAll(async () => {
 
 describe("relay", () => {
   test("HTTP API needs the token; the version probe does not", async () => {
-    const compatibility = { extensionProtocol: { min: 3, version: 3 }, pairing: "opencode-browser-pairing-v3" }
+    const compatibility = { extensionProtocol: { min: 3, version: 3 }, pairing: "opencodevil-browser-pairing-v3" }
     expect(await (await fetch(`${base}/version`)).json()).toMatchObject(compatibility)
     const probe = await fetch(`${base}/version`, { headers: { "sec-fetch-site": "cross-site" } })
     expect(probe.status).toBe(403)
@@ -62,8 +62,8 @@ describe("relay", () => {
     // A browser page on another site can't reach it even with a token it doesn't have.
     expect((await fetch(`${base}/extension/status`, { headers: { "sec-fetch-site": "cross-site", authorization: `Bearer ${token}` } })).status).toBe(403)
     expect((await fetch(`${base}/version`, { headers: { host: `evil.test:${port}` } })).status).toBe(403)
-    const waiting = { "x-browse-install": "waiting" }
-    const hint = async () => (await fetch(`${base}/version`, { headers: { "sec-fetch-site": "cross-site", "x-browse-install": "probe" } })).json()
+    const waiting = { "x-browsevil-install": "waiting" }
+    const hint = async () => (await fetch(`${base}/version`, { headers: { "sec-fetch-site": "cross-site", "x-browsevil-install": "probe" } })).json()
     await fetch(`${base}/extension/status`, { headers: waiting })
     expect(await hint()).not.toHaveProperty("installWaiting")
     await fetch(`${base}/extension/status`, { headers: { ...waiting, authorization: `Bearer ${token}` } })
@@ -73,9 +73,9 @@ describe("relay", () => {
   test("CDP WebSocket needs the token in a header or the URL", async () => {
     const url = `ws://127.0.0.1:${port}/devtools/browser/test`
     expect(await connectCdp(url)).toBe(401)
-    expect(await connectCdp(`${url}?opencodeBrowserToken=wrong`)).toBe(401)
+    expect(await connectCdp(`${url}?opencodevilBrowserToken=wrong`)).toBe(401)
     const byHeader = await connectCdp(url, { authorization: `Bearer ${token}` })
-    const byQuery = await connectCdp(`${url}?opencodeBrowserToken=${token}`)
+    const byQuery = await connectCdp(`${url}?opencodevilBrowserToken=${token}`)
     expect(byHeader).toBeInstanceOf(WebSocket)
     expect(byQuery).toBeInstanceOf(WebSocket)
     for (const socket of [byHeader, byQuery]) if (socket instanceof WebSocket) socket.close()
@@ -304,7 +304,7 @@ describe("relay", () => {
       .on("tabs.create", () => ({ tabId: 61 }))
       .on("Target.getTargetInfo", (command) => ({ targetInfo: targetInfo(Number(command.params?.tabId)) }))
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=popups`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=popups`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
     const events = collect(socket)
     expect((await cdpCall(socket, 1, "Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: true, flatten: true })).error).toBeUndefined()
@@ -334,7 +334,7 @@ describe("relay", () => {
     expect(targets.map((target) => target.targetId).sort()).toEqual(["TARGET-61", "TARGET-62"])
 
     // Another session's client doesn't see it.
-    const other = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=someone-else`, { authorization: `Bearer ${token}` })
+    const other = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=someone-else`, { authorization: `Bearer ${token}` })
     if (!(other instanceof WebSocket)) throw new Error("CDP connection refused")
     const otherTargets = (await cdpCall(other, 1, "Target.getTargets")).result?.targetInfos as Array<{ targetId: string }>
     expect(otherTargets.some((target) => target.targetId === "TARGET-62")).toBe(false)
@@ -364,7 +364,7 @@ describe("relay", () => {
         return {}
       })
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=popup-race`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=popup-race`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
     const events = collect(socket)
     expect((await cdpCall(socket, 1, "Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: true, flatten: true })).error).toBeUndefined()
@@ -397,7 +397,7 @@ describe("relay", () => {
         return { frameId: "TARGET-71", loaderId: "BLANK-1" }
       })
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=data`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=data`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
     await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/" })
     const sessionId = String((await cdpCall(socket, 2, "Target.attachToTarget", { targetId: "TARGET-71", flatten: true })).result?.sessionId)
@@ -458,12 +458,12 @@ describe("relay", () => {
     expect(await first.pair()).toBe(true)
     const post = (route: string, body: unknown) => fetch(`${base}${route}`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body) })
     expect((await post("/cli/session/new", { id: "keeps-pages" })).ok).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=keeps-pages`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=keeps-pages`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
     expect((await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/101" })).result?.targetId).toBe("TARGET-101")
     expect((await cdpCall(socket, 2, "Target.createTarget", { url: "https://example.com/102" })).result?.targetId).toBe("TARGET-102")
     first.close()
-    const owners = async () => (await (await fetch(`${base}/json/list`, { headers: { authorization: `Bearer ${token}` } })).json() as Array<{ tabId: number; opencodeBrowserSessionId?: string }>)
+    const owners = async () => (await (await fetch(`${base}/json/list`, { headers: { authorization: `Bearer ${token}` } })).json() as Array<{ tabId: number; opencodevilBrowserSessionId?: string }>)
       .filter((target) => target.tabId === 101 || target.tabId === 102)
     for (let i = 0; i < 50 && (await owners()).length > 0; i++) await Bun.sleep(50)
 
@@ -471,10 +471,10 @@ describe("relay", () => {
       .on("Target.getTargetInfo", (command) => ({ targetInfo: info(Number(command.params?.tabId)) }))
     expect(await second.pair({ attachedTabs: [101, 102] })).toBe(true)
     for (let i = 0; i < 50 && (await owners()).length < 2; i++) await Bun.sleep(50)
-    expect((await owners()).map((target) => [target.tabId, target.opencodeBrowserSessionId]).sort()).toEqual([[101, "keeps-pages"], [102, "keeps-pages"]])
+    expect((await owners()).map((target) => [target.tabId, target.opencodevilBrowserSessionId]).sort()).toEqual([[101, "keeps-pages"], [102, "keeps-pages"]])
     // Only the session sees them; before, the page that wasn't the session's default came back as a user's tab, which
     // every session saw.
-    const other = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=someone-else`, { authorization: `Bearer ${token}` })
+    const other = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=someone-else`, { authorization: `Bearer ${token}` })
     if (!(other instanceof WebSocket)) throw new Error("CDP connection refused")
     const seen = (await cdpCall(other, 1, "Target.getTargets")).result?.targetInfos as Array<{ targetId: string }>
     expect(seen.some((target) => target.targetId === "TARGET-101" || target.targetId === "TARGET-102")).toBe(false)
@@ -538,7 +538,7 @@ describe("relay", () => {
       const stopped = await running
       expect(stopped.isError).toBe(true)
       expect(stopped.text).toContain("dismissed the browser's debugging bar")
-      expect(stopped.text).toContain("disconnects browse from every tab")
+      expect(stopped.text).toContain("disconnects browsevil from every tab")
 
       // An agent-opened tab keeps its group (an ungroup here would close it in the extension); a tab the user lent
       // is still ungrouped.
@@ -567,7 +567,7 @@ describe("relay", () => {
       .on("tabs.create", () => ({ tabId: 75 }))
       .on("Target.getTargetInfo", () => ({ targetInfo }))
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=pdf`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=pdf`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
     const events = collect(socket)
     await cdpCall(socket, 1, "Target.setAutoAttach", { autoAttach: true, waitForDebuggerOnStart: true, flatten: true })
@@ -590,7 +590,7 @@ describe("relay", () => {
       .on("tabs.create", () => ({ tabId: 77 }))
       .on("Target.getTargetInfo", () => ({ targetInfo }))
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=no-recording`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=no-recording`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
     await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/" })
     const post = (route: string) => fetch(`${base}${route}`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify({ tabId: 77 }) })
@@ -627,7 +627,7 @@ describe("relay", () => {
         return new Promise((resolve) => { pending = (image) => resolve({ data: image }) })
       })
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=shot-${index}`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=shot-${index}`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
     await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/" })
     const sessionId = String((await cdpCall(socket, 2, "Target.attachToTarget", { targetId: `TARGET-${tabId}`, flatten: true })).result?.sessionId)
@@ -651,7 +651,7 @@ describe("relay", () => {
       .on("tabs.create", () => ({ tabId: 81 }))
       .on("Target.getTargetInfo", () => ({ targetInfo }))
     expect(await extension.pair()).toBe(true)
-    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=bfcache`, { authorization: `Bearer ${token}` })
+    const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=bfcache`, { authorization: `Bearer ${token}` })
     if (!(socket instanceof WebSocket)) throw new Error("CDP connection refused")
     const messages = collect(socket)
     await cdpCall(socket, 1, "Target.createTarget", { url: "https://example.com/b" })

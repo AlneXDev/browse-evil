@@ -278,7 +278,7 @@ export const TargetSummary = Schema.Struct({
   url: Schema.String,
   tabId: Schema.optionalKey(Schema.Number),
   sessionId: Schema.optionalKey(Schema.String),
-  opencodeBrowserSessionId: Schema.optionalKey(Schema.String),
+  opencodevilBrowserSessionId: Schema.optionalKey(Schema.String),
   owner: Schema.optionalKey(Schema.Literals(["relay", "user"])),
   crashed: Schema.optionalKey(Schema.Boolean),
   /** Chrome is rejecting debugger commands while another extension's UI is open in the tab. */

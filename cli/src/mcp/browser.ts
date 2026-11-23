@@ -52,7 +52,7 @@ registerMcpTools({
     {
       name: "tabs_cleanup",
       description:
-        "Close tabs agents opened that nobody has used for a while (no agent command and not visited by the user). Tabs the user shared or pinned, the active tab, tabs playing audio, recording, or waiting for a handoff stay open. `idleMinutes` applies to the sessions the calling agent made current; when the client doesn't name agents, that is every session made current over this server, so agents sharing one should not use `idleMinutes: 0` unless the user asks. Every other agent tab closes only once idle for the user's setting too. To finish your own work, `session_reset` or `session_delete` is more direct. browse also does this automatically after the user's idle setting (10 minutes unless they changed it).",
+        "Close tabs agents opened that nobody has used for a while (no agent command and not visited by the user). Tabs the user shared or pinned, the active tab, tabs playing audio, recording, or waiting for a handoff stay open. `idleMinutes` applies to the sessions the calling agent made current; when the client doesn't name agents, that is every session made current over this server, so agents sharing one should not use `idleMinutes: 0` unless the user asks. Every other agent tab closes only once idle for the user's setting too. To finish your own work, `session_reset` or `session_delete` is more direct. browsevil also does this automatically after the user's idle setting (10 minutes unless they changed it).",
       inputSchema: objectSchema({
         idleMinutes: {
           type: "integer",
@@ -76,7 +76,7 @@ registerMcpTools({
     },
     {
       name: "settings",
-      description: `Read or change the user's browse settings from the extension's options page: where agent tabs open (window), how they're grouped (grouping), whether browse collapses their groups by itself (groupCollapse), when untouched agent tabs close (idleMinutes), whether their tabs are muted (muteTabs), human-like input (humanInput) and handoff notifications (handoffNotifications). Update behaviour is not available here: only the user changes it, with \`browse settings\` or the extension's options page, and \`status\` reports its current value. Use this tool only when the user asks to change how browse behaves, when you decide it helps. Without \`set\` it returns each setting's stored value, the value in effect, and the relay environment variable that overrides it, if any. With \`set\` it validates every value strictly, applies the change at once (the options page updates live) and returns what changed: tell the user what you changed. A setting an environment variable fixes is not changed, and the result says so. Security switches (${securityVariables.join(", ")}) are environment-only and can never be read or changed here.`,
+      description: `Read or change the user's browsevil settings from the extension's options page: where agent tabs open (window), how they're grouped (grouping), whether browsevil collapses their groups by itself (groupCollapse), when untouched agent tabs close (idleMinutes), whether their tabs are muted (muteTabs), human-like input (humanInput) and handoff notifications (handoffNotifications). Update behaviour is not available here: only the user changes it, with \`browsevil settings\` or the extension's options page, and \`status\` reports its current value. Use this tool only when the user asks to change how browsevil behaves, when you decide it helps. Without \`set\` it returns each setting's stored value, the value in effect, and the relay environment variable that overrides it, if any. With \`set\` it validates every value strictly, applies the change at once (the options page updates live) and returns what changed: tell the user what you changed. A setting an environment variable fixes is not changed, and the result says so. Security switches (${securityVariables.join(", ")}) are environment-only and can never be read or changed here.`,
       inputSchema: objectSchema({
         set: {
           type: "object",
@@ -103,7 +103,7 @@ registerMcpTools({
         }
         if ("autoUpdate" in changes) {
           return Effect.fail(new Error(
-            "autoUpdate can't be read or changed from MCP. The user can change it with `browse settings set autoUpdate=...` or the extension's options page; `status` reports the current value.",
+            "autoUpdate can't be read or changed from MCP. The user can change it with `browsevil settings set autoUpdate=...` or the extension's options page; `status` reports the current value.",
           ))
         }
         return ctx.relay.settingsSet(changes).pipe(Effect.map((result) => ({ ...result, settings: agentSettings(result.settings) })))

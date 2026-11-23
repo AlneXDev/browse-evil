@@ -1,0 +1,19 @@
+[Unit]
+Description=browsevil stress: Chrome for Testing (headed on :99) with the browsevil extension
+After=browsevil-wm.service
+Wants=browsevil-wm.service
+BindsTo=browsevil-xvfb.service
+StartLimitIntervalSec=0
+
+[Service]
+User=@USER@
+Environment=DISPLAY=:99
+Environment=HOME=@HOME@
+ExecStart=@REPO@/stress/exe/chrome.sh
+Restart=always
+RestartSec=2
+KillMode=mixed
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

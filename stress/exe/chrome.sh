@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Starts Chrome for Testing headed on $DISPLAY with the browse extension (run by browse-chrome.service).
+# Starts Chrome for Testing headed on $DISPLAY with the browsevil extension (run by browsevil-chrome.service).
 # Flags:
 #   --load-extension                      Chrome for Testing still honours it (branded Chrome 137+ doesn't).
 #   --no-first-run, --no-default-browser-check, --password-store=basic
@@ -7,19 +7,19 @@
 #   --disable-dev-shm-usage               harmless here, avoids /dev/shm exhaustion under heavy load.
 #   --remote-debugging-port=9222 (127.0.0.1)
 #                                         HARNESS ONLY: the stress runners use it to click like a person (handoffs),
-#                                         stop the extension's service worker and count debugger attachments. browse
+#                                         stop the extension's service worker and count debugger attachments. browsevil
 #                                         itself never uses it. It is loopback-only; exe.dev only proxies 3000-9999 on
 #                                         the VM's network address, never 127.0.0.1.
 # The sandbox stays on (unprivileged user namespaces work on this kernel) and GPU flags are left at defaults (Chrome
 # falls back to SwiftShader on Xvfb).
 set -euo pipefail
 PROFILE="${BROWSE_STRESS_PROFILE:-$HOME/stress-profile}"
-EXT="${BROWSE_STRESS_EXTENSION:-$HOME/browse/dist}"
+EXT="${BROWSE_STRESS_EXTENSION:-$HOME/browsevil/dist}"
 CHROME="${BROWSE_STRESS_CHROME:-$HOME/chrome-for-testing/current}"
 mkdir -p "$PROFILE"
 # A killed Chrome leaves a "restore pages?" bubble and a stale singleton lock; neither should block the restart.
 rm -f "$PROFILE/SingletonLock" "$PROFILE/SingletonSocket" "$PROFILE/SingletonCookie"
-# Developer mode stays on: browse's `update`/`install` reload the extension (chrome.runtime.reload), which re-adds a
+# Developer mode stays on: browsevil's `update`/`install` reload the extension (chrome.runtime.reload), which re-adds a
 # --load-extension extension as an ordinary unpacked one, and Chrome disables unpacked extensions while developer mode
 # is off (disable reason 1<<24). Real installs are loaded with developer mode on, so this matches them.
 mkdir -p "$PROFILE/Default"

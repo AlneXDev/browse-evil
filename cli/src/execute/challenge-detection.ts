@@ -240,5 +240,5 @@ export function challengeWarning(outcome: ChallengeOutcome): string | undefined 
   if (outcome.recommendation === "handoff") {
     return `Blocked by a ${outcome.vendor} ${outcome.kind} challenge on ${where} (${outcome.signal}${outcome.waitedMs > 0 ? `, still there after ${Math.round(outcome.waitedMs / 1000)} s` : ""}). Continue when possible: call handoff("Solve the security check on ${where}, then click Continue") so the user does it, or stop.`
   }
-  return `Blocked: ${where} refused the visit (${outcome.vendor}, ${outcome.signal}). Don't retry or reload in a loop, which makes the block worse for the user's IP and account: stop, or tell the user.`
+  return `Blocked: ${where} refused the visit (${outcome.vendor}, ${outcome.signal}). Continue when possible; if a step needs the user, use handoff.`
 }

@@ -14,9 +14,9 @@ import { command, readJson, record, root, saveJson, type Evidence, type Metrics,
 const { values } = parseArgs({ options: { once: { type: "boolean" }, "soak-minutes": { type: "string" } } })
 const once = !!values.once, short = Number(values["soak-minutes"] ?? 2), minute = 60_000
 const binary = binaryPath, stress = path.resolve(import.meta.dirname, "..")
-assert(!process.env.OPENCODE_BROWSEVIL_HOME && process.env.BROWSE_STRESS_BINARY === binary && dataDir === path.join(os.homedir(), ".local/share/browse"), "requires the canary install's XDG paths without OPENCODE_BROWSEVIL_HOME")
+assert(!process.env.OPENCODE_BROWSEVIL_HOME && process.env.BROWSE_STRESS_BINARY === binary && dataDir === path.join(os.homedir(), ".local/share/browsevil"), "requires the canary install's XDG paths without OPENCODE_BROWSEVIL_HOME")
 assert([relayPort, chromeDebugPort, fixturePort].every(p => Number.isInteger(p) && p >= 19700 && p <= 19799) && new Set([relayPort, chromeDebugPort, fixturePort]).size === 3, "dedicated canary ports required")
-assert(once ? fs.realpathSync(os.homedir()).startsWith(path.join(fs.realpathSync(os.tmpdir()), "opencode/browse-canary.")) : os.userInfo().username === "canary", "--once requires a temp opencode/browse-canary.* HOME; service requires user canary")
+assert(once ? fs.realpathSync(os.homedir()).startsWith(path.join(fs.realpathSync(os.tmpdir()), "opencodevil/browsevil-canary.")) : os.userInfo().username === "canary", "--once requires a temp opencodevil/browsevil-canary.* HOME; service requires user canary")
 assert(!once || (Number.isFinite(short) && short > 0 && short <= 30))
 assert(process.env.OPENCODE_BROWSEVIL_AUTO_UPDATE === undefined && process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK === "1", "the stored mode must control auto-update, including after MCP respawns the relay")
 process.umask(0o077)
@@ -85,7 +85,7 @@ async function poll(s: Awaited<ReturnType<typeof snapshot>>) {
   if (Date.now() < nextPoll) return
   nextPoll = Date.now() + 5 * minute
   await check("dev-tag", async () => {
-    const res = await fetch("https://registry.npmjs.org/@opencode%2fbrowse/dev", { signal: AbortSignal.timeout(15_000) })
+    const res = await fetch("https://registry.npmjs.org/@opencodevil%2fbrowse/dev", { signal: AbortSignal.timeout(15_000) })
     assert(res.ok, `registry HTTP ${res.status}`)
     const pkg = await res.json() as { version: string; gitHead?: string }
     assert(/^\d+\.\d+\.\d+-dev\.\d+(\.\d+)?$/.test(pkg.version), "invalid dev dist-tag")
@@ -96,7 +96,7 @@ async function poll(s: Awaited<ReturnType<typeof snapshot>>) {
       // the checkout from which this particular harness was deployed. Leave it unknown if neither is available.
       let head = pkg.gitHead ?? ""
       if (!head) try {
-        const doc = await fetch(`https://registry.npmjs.org/-/npm/v1/attestations/@opencode%2fbrowse@${pkg.version}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
+        const doc = await fetch(`https://registry.npmjs.org/-/npm/v1/attestations/@opencodevil%2fbrowse@${pkg.version}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
         const payload = doc.attestations.find((a: { predicateType: string }) => a.predicateType === "https://slsa.dev/provenance/v1").bundle.dsseEnvelope.payload
         const dep = JSON.parse(Buffer.from(payload, "base64").toString()).predicate.buildDefinition.resolvedDependencies.find((d: { uri: string }) => d.uri === "git+https://github.com/anomalyco/browse@refs/heads/dev")
         if (/^[0-9a-f]{40}$/.test(dep?.digest.gitCommit)) head = dep.digest.gitCommit
@@ -135,7 +135,7 @@ async function health(ok: boolean, since: number) {
         process.kill(pid, "SIGKILL"); fs.appendFileSync(path.join(dir, "run.log"), `killed canary relay ${pid}\n`)
       }
       const relay = await command(dir, [binary, "session", "list", "--json"], 2)
-      const browser = await command(dir, ["sudo", "-n", "systemctl", "restart", "browse-canary-browser@chrome.service"], 2)
+      const browser = await command(dir, ["sudo", "-n", "systemctl", "restart", "browsevil-canary-browser@chrome.service"], 2)
       return browser.status === "fail" ? browser : relay
     }, { incident: "30 min recovery bound exceeded; attempted hard restart" })
   }
@@ -240,10 +240,10 @@ async function suite(kind: "release" | "nightly" | "short", pinnedExtension?: st
   await check("multi-soak", async dir => {
     if (!fs.existsSync("/usr/bin/brave-browser")) return { status: "skipped", note: "Brave stable not installed" }
     try {
-      const started = await command(dir, ["sudo", "-n", "systemctl", "start", "browse-canary-browser@brave.service"], 2)
+      const started = await command(dir, ["sudo", "-n", "systemctl", "start", "browsevil-canary-browser@brave.service"], 2)
       if (started.status === "fail") return started
-      return await observed(dir, node("multi-soak", `canary-chrome,${chromeDebugPort},browse-canary-browser@chrome`, "canary-brave,19773,browse-canary-browser@brave", "--affinity-only"), 38)
-    } finally { await command(dir, ["sudo", "-n", "systemctl", "stop", "browse-canary-browser@brave.service"], 2) }
+      return await observed(dir, node("multi-soak", `canary-chrome,${chromeDebugPort},browsevil-canary-browser@chrome`, "canary-brave,19773,browsevil-canary-browser@brave", "--affinity-only"), 38)
+    } finally { await command(dir, ["sudo", "-n", "systemctl", "stop", "browsevil-canary-browser@brave.service"], 2) }
   }, { tier: "matrix" })
 }
 

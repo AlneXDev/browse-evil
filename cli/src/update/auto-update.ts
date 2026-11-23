@@ -1,9 +1,9 @@
-// Auto-update for installs, by rerunning whatever installed browse. A checkout never auto-updates: it has `update`.
+// Auto-update for installs, by rerunning whatever installed browsevil. A checkout never auto-updates: it has `update`.
 //
 // Layout: one state file, auto-update.json in the state root (logs are beside it in logs/). There is no versions
 // directory, no current.json and no shim any more:
 //   binary install  the install script this release shipped with (baked in by script/compile.ts) replaces
-//                   ~/.local/bin/browse by atomic rename (Windows renames the running executable aside first); running
+//                   ~/.local/bin/browsevil by atomic rename (Windows renames the running executable aside first); running
 //                   processes keep their old inode on unix.
 //   npm global      `npm install -g @opencode/browsevil@<version>` replaces the package in place.
 //   npx             no-op: npx resolves the package itself, and install never writes npx entries.
@@ -26,7 +26,7 @@ import os from "node:os"
 import path from "node:path"
 import { cliPrefix, compiledBinary, entrySpawnCommand, fromCheckout, installedBinary, stateRoot } from "../paths.ts"
 import { insidePath, legacyDataRoot } from "../setup/legacy.ts"
-import { opencodeBrowserVersion } from "../version.ts"
+import { opencodevilBrowserVersion } from "../version.ts"
 import { checkRelease, releaseChannel, runningServiceTarget, type ReleaseChannel, type ReleaseDecision } from "./release-service.ts"
 
 export const PACKAGE_NAME = "@opencode/browsevil"
@@ -101,13 +101,13 @@ export function installedRuntime(entry = process.argv[1] ?? process.execPath): R
   const kind = installKind(entry)
   if (kind === "binary") {
     const binary = installedBinary()
-    if (binary) return { kind, entry: binary, version: opencodeBrowserVersion }
+    if (binary) return { kind, entry: binary, version: opencodevilBrowserVersion }
     // A downloaded executable run in place has nothing to update.
     return undefined
   }
   if (kind !== "npm" && kind !== "npx") return undefined
   const resolved = realEntry(entry)
-  return { kind, entry: resolved, version: packageVersion(resolved) ?? opencodeBrowserVersion }
+  return { kind, entry: resolved, version: packageVersion(resolved) ?? opencodevilBrowserVersion }
 }
 
 /**
@@ -345,7 +345,7 @@ export type InstallerOptions = {
 const INSTALL_SCRIPT_TIMEOUT_MS = 60 * 60_000
 
 /**
- * Reruns whatever installed browse. A binary install runs the install script this release shipped with, non-interactively
+ * Reruns whatever installed browsevil. A binary install runs the install script this release shipped with, non-interactively
  * with --no-setup, so it only replaces the executable (the PATH and agent entries install wrote stay). npm global installs
  * run npm install -g. npx is a no-op. Returns the version now installed.
  */
@@ -379,8 +379,8 @@ export async function runInstaller(options: InstallerOptions): Promise<string> {
           return response.text()
         })
     : (options.installer ?? globalThis.__OPENCODE_BROWSEVIL_INSTALLER__)
-  if (!script) throw new Error("this build has no installer to run; install browse again with the install script")
-  const directory = mkdtempSync(path.join(os.tmpdir(), "browse-install-"))
+  if (!script) throw new Error("this build has no installer to run; install browsevil again with the install script")
+  const directory = mkdtempSync(path.join(os.tmpdir(), "browsevil-install-"))
   const file = path.join(directory, platform === "win32" ? "install.ps1" : "install")
   const args = [...(options.version ? ["--version", options.version] : options.channel ? ["--channel", options.channel] : []), "--no-setup"]
   try {

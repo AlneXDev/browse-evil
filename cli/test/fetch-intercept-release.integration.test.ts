@@ -13,7 +13,7 @@ import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, unt
 const temporaryRoot = path.join(os.homedir(), ".cache", "oc-tmp")
 fs.mkdirSync(temporaryRoot, { recursive: true })
 // The harness gives the relay its own HOME/OPENCODE_BROWSEVIL_HOME and a free port (never 29698).
-const home = fs.mkdtempSync(path.join(temporaryRoot, "browse-fetch-release-"))
+const home = fs.mkdtempSync(path.join(temporaryRoot, "browsevil-fetch-release-"))
 let relay: ChildProcess | undefined
 let port = 0
 let token = ""
@@ -42,7 +42,7 @@ const targetInfo = (targetId: string, url: string, type: "page" | "iframe" = "pa
 
 async function openClient(sessionId: string) {
   const socket = await connectCdp(
-    `ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${sessionId}`,
+    `ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${sessionId}`,
     { authorization: `Bearer ${token}` },
   )
   if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
@@ -325,7 +325,7 @@ test("a client that never enabled Fetch sends no Fetch.disable", async () => {
 }, 20_000)
 
 test("relay shutdown releases Fetch before the extension link closes", async () => {
-  const shutdownHome = fs.mkdtempSync(path.join(temporaryRoot, "browse-fetch-shutdown-"))
+  const shutdownHome = fs.mkdtempSync(path.join(temporaryRoot, "browsevil-fetch-shutdown-"))
   const started = await startRelay(shutdownHome, { OPENCODE_BROWSEVIL_MANAGED_RELAY: "1", OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   const shutdownRelay = started.child
   const tabId = 421
@@ -337,8 +337,8 @@ test("relay shutdown releases Fetch before the extension link closes", async () 
     expect(await extension.pair()).toBe(true)
     // A sandbox client doesn't block an explicit restart (a raw CDP client would).
     const connected = await connectCdp(
-      `ws://127.0.0.1:${started.port}/devtools/browser/test?opencodeBrowserSessionId=shutdown-a`,
-      { authorization: `Bearer ${started.token}`, "opencode-browser-client-kind": "sandbox" },
+      `ws://127.0.0.1:${started.port}/devtools/browser/test?opencodevilBrowserSessionId=shutdown-a`,
+      { authorization: `Bearer ${started.token}`, "opencodevil-browser-client-kind": "sandbox" },
     )
     if (!(connected instanceof WebSocket)) throw new Error(`CDP connection refused: ${connected}`)
     socket = connected

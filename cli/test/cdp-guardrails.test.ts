@@ -121,7 +121,7 @@ describe("guardCdpMethod", () => {
     for (const method of ["Browser.grantPermissions", "Browser.setPermission", "Browser.resetPermissions"]) {
       for (const readOnly of [false, true]) {
         const message = guardCdpMethod({ method, readOnly, sessionId: "look", params: { origin: "https://app.example.com", permissions: ["geolocation"] } })
-        expect(message).toContain(`browse blocked ${method}`)
+        expect(message).toContain(`browsevil blocked ${method}`)
         expect(message).toContain("always blocked")
       }
     }

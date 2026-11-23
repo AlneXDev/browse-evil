@@ -175,7 +175,7 @@ export class ExecuteRealm {
     const importModuleDynamically = this.refuseDynamicImport
     const dontContextify = (vm.constants as unknown as { readonly DONT_CONTEXTIFY?: unknown } | undefined)?.DONT_CONTEXTIFY
     this.context = vm.createContext((dontContextify ?? Object.create(null)) as vm.Context, {
-      name: "opencode-browser-execute",
+      name: "opencodevil-browser-execute",
       // No eval/new Function in the sandbox, so the static import() check in run() sees all code.
       codeGeneration: { strings: false, wasm: false },
       // Async continuations must drain under runInContext's CPU timeout too.

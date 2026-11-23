@@ -13,7 +13,7 @@ import { AGENT_GROUPING_KEY, AGENT_GROUP_COLLAPSE_KEY, agentGroupCollapse, agent
 // (the default), one per agent session, or none. agent-relay.ts makes and names the groups; this module only keeps
 // them out of the way.
 //
-// The status page's "Collapse agent groups" setting (`collapseMode`) turns the folding off: with "off" browse never
+// The status page's "Collapse agent groups" setting (`collapseMode`) turns the folding off: with "off" browsevil never
 // collapses or re-expands a group by itself, and each group keeps whatever collapsed state the user gave it. A handoff
 // still opens the group holding its tab so the user can find it; afterwards the group stays as it is. Placement,
 // titles, colours and membership don't change.
@@ -29,7 +29,7 @@ export async function mode(): Promise<AgentGrouping> {
   return agentGrouping((await chrome.storage.local.get(AGENT_GROUPING_KEY))[AGENT_GROUPING_KEY])
 }
 
-/** The setting: "auto" (browse folds groups away, the default) or "off" (leave each group as the user set it). */
+/** The setting: "auto" (browsevil folds groups away, the default) or "off" (leave each group as the user set it). */
 async function collapseMode() {
   return agentGroupCollapse((await chrome.storage.local.get(AGENT_GROUP_COLLAPSE_KEY))[AGENT_GROUP_COLLAPSE_KEY])
 }
@@ -108,7 +108,7 @@ export async function settleTab(tabId: number) {
 }
 
 async function collapseUnlessActive(groupId: number) {
-  // "off": the user decides when a group is folded, and browse doesn't touch it.
+  // "off": the user decides when a group is folded, and browsevil doesn't touch it.
   if ((await collapseMode()) === "off") return
   const group = await chrome.tabGroups.get(groupId).catch(() => undefined)
   if (!group) {

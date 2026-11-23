@@ -23,7 +23,7 @@ import { relayTokenQueryParam } from "./relay/secrets.ts"
 import type { RelayShutdown } from "./relay/shutdown.ts"
 import type { OpenCodeBrowserSessions } from "./session-manager.ts"
 import type { TargetRegistry } from "./cdp/target-registry.ts"
-import { opencodeBrowserBuildId, opencodeBrowserVersion } from "./version.ts"
+import { opencodevilBrowserBuildId, opencodevilBrowserVersion } from "./version.ts"
 
 export { hasRelayToken } from "./http-api/errors.ts"
 
@@ -65,7 +65,7 @@ export function createHttpRequestHandler(options: {
       return
     }
     const compatibility = { extensionProtocol: { min: minExtensionProtocolVersion, version: extensionProtocolVersion }, pairing: pairingScheme }
-    const installHint = request.headers["x-browse-install"] === "probe" && Date.now() < installWaitingUntil ? { installWaiting: true } : {}
+    const installHint = request.headers["x-browsevil-install"] === "probe" && Date.now() < installWaitingUntil ? { installWaiting: true } : {}
     const fetchSiteError = validateBrowserFetchSite(request)
     if (fetchSiteError) {
       // Chrome may mark the Options page's probe cross-site. Keep the refusal and disclose only static
@@ -78,7 +78,7 @@ export function createHttpRequestHandler(options: {
     // The version probe stays open: it reveals nothing sensitive and lets clients of another build or install tell
     // which relay holds the port before they send a token it would reject.
     if (pathname !== "/" && pathname !== "/version" && !hasRelayToken(request, options.authToken)) {
-      sendJson(response, { error: "Missing or invalid browse relay token", code: "unauthorized" }, 401)
+      sendJson(response, { error: "Missing or invalid browsevil relay token", code: "unauthorized" }, 401)
       return
     }
     const observational = request.method === "GET" || pathname === "/network/status" || pathname === "/auth/status"
@@ -87,8 +87,8 @@ export function createHttpRequestHandler(options: {
     }
     if (pathname === "/" || pathname === "/version") {
       sendJson(response, {
-        version: opencodeBrowserVersion,
-        buildId: opencodeBrowserBuildId,
+        version: opencodevilBrowserVersion,
+        buildId: opencodevilBrowserBuildId,
         instanceId: options.relayInstance.id,
         startedAt: options.relayInstance.startedAt,
         pid: options.relayInstance.pid,
@@ -109,15 +109,15 @@ export function createHttpRequestHandler(options: {
       return
     }
     if (pathname === "/json/version") {
-      const opencodeBrowserSessionId = headerValue(request.headers["opencode-browser-session-id"])
+      const opencodevilBrowserSessionId = headerValue(request.headers["opencodevil-browser-session-id"])
       const webSocketDebuggerUrl = new URL(`ws://${formatHostForUrl(options.host)}:${options.port}/devtools/browser/${options.browserId}`)
-      if (opencodeBrowserSessionId) {
-        webSocketDebuggerUrl.searchParams.set("opencodeBrowserSessionId", opencodeBrowserSessionId)
+      if (opencodevilBrowserSessionId) {
+        webSocketDebuggerUrl.searchParams.set("opencodevilBrowserSessionId", opencodevilBrowserSessionId)
       }
       // The caller already proved it has the token; clients that connect to this URL without headers need it too.
       webSocketDebuggerUrl.searchParams.set(relayTokenQueryParam, options.authToken)
       sendJson(response, {
-        Browser: `OpenCode-Browser/${opencodeBrowserVersion}`,
+        Browser: `OpenCode-Browser/${opencodevilBrowserVersion}`,
         "Protocol-Version": "1.3",
         webSocketDebuggerUrl: webSocketDebuggerUrl.toString(),
       })
@@ -165,7 +165,7 @@ export function createHttpRequestHandler(options: {
       return
     }
     if (pathname === "/extension/status") {
-      if (request.headers["x-browse-install"] === "waiting") installWaitingUntil = Date.now() + 5_000
+      if (request.headers["x-browsevil-install"] === "waiting") installWaitingUntil = Date.now() + 5_000
       sendJson(response, {
         ...options.extensionStatus(),
         activeTargets: options.registry.rootTargetCount(),

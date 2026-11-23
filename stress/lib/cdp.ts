@@ -1,4 +1,4 @@
-// Harness-only CDP client for Chrome's own --remote-debugging-port (127.0.0.1:9222). browse never uses this port; the
+// Harness-only CDP client for Chrome's own --remote-debugging-port (127.0.0.1:9222). browsevil never uses this port; the
 // runners use it for what a person or the OS would do: click Continue on a handoff card, stop the extension's service
 // worker, and read ground truth (tabs, groups, debugger attachments) from the extension itself.
 import { chromeDebugPort, sleep } from "./env.ts"

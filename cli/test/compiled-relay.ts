@@ -8,9 +8,9 @@ import { FakeExtension, until } from "./relay-harness.ts"
 import { portFromEnv } from "./support/ports.ts"
 
 const binary = process.argv[2]
-assert.ok(binary, "Pass the host's compiled browse executable")
+assert.ok(binary, "Pass the host's compiled browsevil executable")
 const port = await portFromEnv("BROWSE_TEST_RELAY_PORT")
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-compiled-relay-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-compiled-relay-"))
 const base = `http://127.0.0.1:${port}`
 const relay = Bun.spawn([path.resolve(binary), "serve"], {
   cwd: home, stdout: "ignore", stderr: "inherit",

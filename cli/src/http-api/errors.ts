@@ -16,7 +16,7 @@ import { TargetOwnershipError, type TargetRegistry } from "../cdp/target-registr
  * session so a capture or an implicit session outlives its MCP server only briefly (relay.ts, collectOrphans).
  */
 export function noteClient(request: http.IncomingMessage, sessions: OpenCodeBrowserSessions, sessionId: string): void {
-  const pid = Number(headerValue(request.headers["opencode-browser-client-pid"]))
+  const pid = Number(headerValue(request.headers["opencodevil-browser-client-pid"]))
   if (Number.isSafeInteger(pid) && pid > 0) sessions.noteClient(sessionId, pid)
 }
 
@@ -54,7 +54,7 @@ export function targetSummaries(registry: TargetRegistry): TargetSummary[] {
         url: target.targetInfo.url,
         tabId: target.tabId,
         sessionId: target.sessionId,
-        ...(target.opencodeBrowserSessionId ? { opencodeBrowserSessionId: target.opencodeBrowserSessionId } : {}),
+        ...(target.opencodevilBrowserSessionId ? { opencodevilBrowserSessionId: target.opencodevilBrowserSessionId } : {}),
         owner: target.owner,
         ...(target.crashed ? { crashed: true } : {}),
         ...(target.protectedUi ? { protectedUi: true } : {}),

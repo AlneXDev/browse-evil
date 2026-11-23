@@ -23,7 +23,7 @@ edition = "2024"
 const CARGO_LOCK = `version = 4
 
 [[package]]
-name = "browse-core"
+name = "browsevil-core"
 version = "0.0.17"
 
 [[package]]
@@ -32,19 +32,19 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "browse-relay"
+name = "browsevil-relay"
 version = "0.0.17"
 `
 
 const crlf = (text: string) => text.replace(/\n/g, "\r\n")
 
 function checkout(eol: "\n" | "\r\n") {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browse-version-"))
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-version-"))
   tempDirs.push(dir)
   const files: Record<string, string> = {
-    "cli/package.json": `{\n  "name": "browse",\n  "version": "0.0.17"\n}\n`,
-    "package.json": `{\n  "name": "browse",\n  "version": "0.0.17"\n}\n`,
-    "public/manifest.json": `{\n  "manifest_version": 3,\n  "name": "browse",\n  "version": "0.0.17"\n}\n`,
+    "cli/package.json": `{\n  "name": "browsevil",\n  "version": "0.0.17"\n}\n`,
+    "package.json": `{\n  "name": "browsevil",\n  "version": "0.0.17"\n}\n`,
+    "public/manifest.json": `{\n  "manifest_version": 3,\n  "name": "browsevil",\n  "version": "0.0.17"\n}\n`,
     "rust/Cargo.toml": CARGO_TOML,
     "rust/Cargo.lock": CARGO_LOCK,
   }
@@ -74,8 +74,8 @@ describe("version stamping", () => {
     expect(JSON.parse(read(dir, "public/manifest.json"))).toMatchObject({ version: "0.0.18.197", version_name: "0.0.18-dev.197" })
     expect(cargoWorkspaceVersion(read(dir, "rust/Cargo.toml"))).toBe("0.0.18-dev.197")
     expect(cargoLockMemberVersions(read(dir, "rust/Cargo.lock"))).toEqual([
-      { name: "browse-core", version: "0.0.18-dev.197" },
-      { name: "browse-relay", version: "0.0.18-dev.197" },
+      { name: "browsevil-core", version: "0.0.18-dev.197" },
+      { name: "browsevil-relay", version: "0.0.18-dev.197" },
     ])
     expect(read(dir, "rust/Cargo.lock"), "registry crate").toContain('name = "serde"\r\nversion = "1.0.0"')
   })
@@ -91,8 +91,8 @@ describe("version stamping", () => {
     for (const text of [CARGO_TOML, crlf(CARGO_TOML)]) expect(cargoWorkspaceVersion(text)).toBe("0.0.17")
     for (const text of [CARGO_LOCK, crlf(CARGO_LOCK)])
       expect(cargoLockMemberVersions(text)).toEqual([
-        { name: "browse-core", version: "0.0.17" },
-        { name: "browse-relay", version: "0.0.17" },
+        { name: "browsevil-core", version: "0.0.17" },
+        { name: "browsevil-relay", version: "0.0.17" },
       ])
   })
 })

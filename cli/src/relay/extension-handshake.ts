@@ -42,7 +42,7 @@ import type { ExtensionStatus } from "./schema.ts"
 import { secretsEqual } from "./secrets.ts"
 import type { OpenCodeBrowserSession } from "./types.ts"
 import type { TargetRegistry } from "../cdp/target-registry.ts"
-import { opencodeBrowserBuildId } from "../version.ts"
+import { opencodevilBrowserBuildId } from "../version.ts"
 import { relayProcessFaultSummary } from "./process-guard.ts"
 
 /** Before pairing a socket may only send its small handshake; after pairing the ws server's 256 MiB limit applies. */
@@ -167,9 +167,9 @@ export class ExtensionHandshake {
     const nextStep = pairingState === "connected" ? undefined
       : link?.rpc.unresponsive ? browserUnresponsive
       : pairingState === "incompatible" ? this.mismatchAdvice(rejected?.version)
-      : pairingState === "refused" || pairingState === "unpaired" ? `${pairingState === "refused" ? "browse refused the pairing attempt" : "browse is installed but not paired"}. Run \`${cliCommand("install")}\` again: it pairs the browser when it can open it, or prints a code to enter in browse's Options (\`${cliCommand("pair")}\` prints one too).`
-      : pairingState === "paired-offline" ? "Open the browser profile already paired with browse and enable the extension; it reconnects automatically."
-      : `No browser has contacted this relay yet. If browse is installed, open that browser and run \`${cliCommand("install")}\` to pair it. Otherwise ${storeId ? `add browse from ${storeUrl(storeId)}` : `follow the extension steps in \`${installCommand()}\``}.`
+      : pairingState === "refused" || pairingState === "unpaired" ? `${pairingState === "refused" ? "browsevil refused the pairing attempt" : "browsevil is installed but not paired"}. Run \`${cliCommand("install")}\` again: it pairs the browser when it can open it, or prints a code to enter in browsevil's Options (\`${cliCommand("pair")}\` prints one too).`
+      : pairingState === "paired-offline" ? "Open the browser profile already paired with browsevil and enable the extension; it reconnects automatically."
+      : `No browser has contacted this relay yet. If browsevil is installed, open that browser and run \`${cliCommand("install")}\` to pair it. Otherwise ${`load the evil extension unpacked from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip`}.`
     return {
       connected: browsers.connected,
       pairingState,
@@ -249,7 +249,7 @@ export class ExtensionHandshake {
                 const origin = headerValue(request.headers.origin)
                 this.mismatch = { ...protocol, origin }
                 const offerReload = message.method === "protocol" && protocol.version !== null && protocol.version < minExtensionProtocolVersion && origin === stableUnpackedExtensionOrigin && isLocalPeer(request.socket) && fromCheckout()
-                socket.close(4003, offerReload ? checkoutReloadPrefix + opencodeBrowserBuildId : `Extension protocol incompatible: ${(protocol.version ?? 0) > extensionProtocolVersion ? "extension-newer" : "extension-older"}`)
+                socket.close(4003, offerReload ? checkoutReloadPrefix + opencodevilBrowserBuildId : `Extension protocol incompatible: ${(protocol.version ?? 0) > extensionProtocolVersion ? "extension-newer" : "extension-older"}`)
                 return
               }
               this.mismatch = undefined
@@ -342,7 +342,7 @@ export class ExtensionHandshake {
         this.legacyExtensionReloaded = true
         socket.send(JSON.stringify({ id: 0, method: "runtime.reload" }))
       }
-      socket.close(4005, "Pairing required: update browse")
+      socket.close(4005, "Pairing required: update browsevil")
       return undefined
     }
     if (!/^[A-Za-z0-9_-]{22,128}$/.test(extensionNonce)) {
@@ -373,7 +373,7 @@ export class ExtensionHandshake {
     }
     if (mode === "old") {
       const code = legacyPairingCode()
-      if (code === undefined) return refuse("old extension, no shared code", "Pairing failed: update browse, then pair it with the code `pair` prints")
+      if (code === undefined) return refuse("old extension, no shared code", "Pairing failed: update browsevil, then pair it with the code `pair` prints")
       socket.send(JSON.stringify({ method: "auth.challenge", params: { nonce: relayNonce, proof: legacyPairingProof(code, "relay", port, relayNonce, extensionNonce), protocol } }))
       return { ...base, expected: legacyPairingProof(code, "extension", port, extensionNonce, relayNonce) }
     }

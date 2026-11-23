@@ -9,7 +9,7 @@ import * as RelayLifecycle from "../relay/lifecycle.ts"
 import type { SettingsGetResponse, TargetSummary } from "../relay/schema.ts"
 import * as SessionStore from "../session-manager/store.ts"
 import { formatUpdateNotice, updateJson, updateNotice } from "../update.ts"
-import { opencodeBrowserVersion } from "../version.ts"
+import { opencodevilBrowserVersion } from "../version.ts"
 import { formatSettings, settingKeys, type SettingKey, type SettingReport } from "../relay/user-settings.ts"
 import { emitJson, ensureCliRelay, exitWith, failExit, jsonFlag, stderrLine } from "./context.ts"
 import { registerCliCommand } from "./registry.ts"
@@ -108,7 +108,7 @@ function extensionManifestVersion(version: string) {
 
 function formatTargetSummary(target: TargetSummary, options: { readonly includeSession?: boolean } = {}): string {
   const tab = target.tabId === undefined ? "" : ` tab=${target.tabId}`
-  const session = options.includeSession && target.opencodeBrowserSessionId ? ` session=${target.opencodeBrowserSessionId}` : ""
+  const session = options.includeSession && target.opencodevilBrowserSessionId ? ` session=${target.opencodevilBrowserSessionId}` : ""
   const owner = target.owner ? ` owner=${target.owner}` : ""
   const health = `${target.crashed ? " crashed=true" : ""}${target.protectedUi ? " protected-ui=true" : ""}`
   return `${target.type} ${target.id}${tab}${session}${owner}${health} ${target.url || "about:blank"}`
@@ -195,7 +195,7 @@ const status = Command.make(
     )
     if ((extensionStatus.rejectedConnections ?? 0) > 0) {
       yield* Console.log(
-        `Warning: ${extensionStatus.rejectedConnections} competing browser/profile connection attempt(s) rejected; the active connection was preserved. The relay is an older browse that connects one browser at a time; update browse on the computer running the relay, or close the other browser.`,
+        `Warning: ${extensionStatus.rejectedConnections} competing browser/profile connection attempt(s) rejected; the active connection was preserved. The relay is an older browsevil that connects one browser at a time; update browsevil on the computer running the relay, or close the other browser.`,
       )
     }
     if (extensionStatus.nextStep) yield* Console.log(extensionStatus.nextStep)
@@ -217,9 +217,9 @@ const status = Command.make(
       if (extensionStatus.protocolCompatible === false && !extensionStatus.nextStep)
         yield* Console.log(extensionProtocolAdvice(extensionStatus.protocolVersion, { install: installCommand() }))
     }
-    if (extensionStatus.connected && extensionStatus.version && extensionStatus.version !== extensionManifestVersion(opencodeBrowserVersion)) {
+    if (extensionStatus.connected && extensionStatus.version && extensionStatus.version !== extensionManifestVersion(opencodevilBrowserVersion)) {
       yield* Console.log(
-        `Warning: extension ${extensionStatus.version} differs from this CLI's ${extensionManifestVersion(opencodeBrowserVersion)}; update the extension if its protocol is incompatible.`,
+        `Warning: extension ${extensionStatus.version} differs from this CLI's ${extensionManifestVersion(opencodevilBrowserVersion)}; update the extension if its protocol is incompatible.`,
       )
     }
     yield* Console.log(`Active targets: ${extensionStatus.activeTargets}`)
@@ -286,7 +286,7 @@ const mcp = Command.make(
     const { runMcpServer } = yield* Effect.promise(() => import("../mcp.ts"))
     yield* runMcpServer
   }),
-).pipe(Command.withDescription("Run the browse MCP server over stdio"))
+).pipe(Command.withDescription("Run the browsevil MCP server over stdio"))
 
 registerCliCommand(400, () => tabs)
 registerCliCommand(410, () => settings)

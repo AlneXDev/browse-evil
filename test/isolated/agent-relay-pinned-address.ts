@@ -1,8 +1,8 @@
 import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
-// A saved loopback address pins a port outside the browse range (OPENCODE_BROWSEVIL_PORT=9222). A welcome link without
-// a browse-range port must keep that pin, and its code must go to 9222. Run by ../isolated.test.ts.
+// A saved loopback address pins a port outside the browsevil range (OPENCODE_BROWSEVIL_PORT=9222). A welcome link without
+// a browsevil-range port must keep that pin, and its code must go to 9222. Run by ../isolated.test.ts.
 
 const stub = installChrome()
 ;(globalThis as { __OPENCODE_BROWSEVIL_BUILD__?: string }).__OPENCODE_BROWSEVIL_BUILD__ = "test"
@@ -53,7 +53,7 @@ async function until(check: () => boolean) {
   expect(check()).toBe(true)
 }
 
-test("a link without a browse-range port keeps a saved out-of-range loopback address", async () => {
+test("a link without a browsevil-range port keeps a saved out-of-range loopback address", async () => {
   await until(() => atPinned().length === 1 && atPinned()[0]!.received.length > 0)
   const before = atPinned().length
   void relay.pairLink("0123ABCD")

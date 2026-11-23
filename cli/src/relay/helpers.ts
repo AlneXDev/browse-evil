@@ -26,7 +26,7 @@ export {
 } from "./http.ts"
 
 export const defaultHost = "127.0.0.1"
-/** Not Browser Control's 19989, so an old relay can't hold browse's port. Keep in step with the extension. */
+/** Not Browser Control's 19989, so an old relay can't hold browsevil's port. Keep in step with the extension. */
 export const defaultPort = 29698
 
 const RawTargetSelection = Schema.Struct({

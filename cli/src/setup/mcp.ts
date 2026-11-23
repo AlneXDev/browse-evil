@@ -5,7 +5,7 @@ import path from "node:path"
 import { applyEdits, modify, parse, type ParseError } from "jsonc-parser"
 import { npmGlobalRoot, runCommand, installedVersion } from "../update/auto-update.ts"
 import { cliCommand, compiledBinary, entryCommand, entrySpawnCommand, resolveWindowsShim, scriptEntry } from "../paths.ts"
-import { opencodeBrowserVersion } from "../version.ts"
+import { opencodevilBrowserVersion } from "../version.ts"
 import { installBinaryRuntime } from "./binary.ts"
 import { browsers } from "./browsers.ts"
 import {
@@ -28,7 +28,7 @@ import {
 } from "./environment.ts"
 
 /** Where earlier versions kept the npm shim agents ran; install adopts and removes those entries. */
-export const legacyShimPath = () => path.join(files.dir, "bin", "opencode-browser.mjs")
+export const legacyShimPath = () => path.join(files.dir, "bin", "opencodevil-browser.mjs")
 
 export type Servers = Record<
   string,
@@ -36,10 +36,10 @@ export type Servers = Record<
 >
 
 /** OpenCode's user config files under its config folder, in the order OpenCode reads them. */
-export const OPENCODE_CONFIG_NAMES = ["opencode.json", "opencode.jsonc", ".opencode/opencode.json", ".opencode/opencode.jsonc"]
+export const OPENCODE_CONFIG_NAMES = ["opencodevil.json", "opencodevil.jsonc", ".opencodevil/opencodevil.json", ".opencodevil/opencodevil.jsonc"]
 
 export function configFile() {
-  const directory = path.join(configRoot, "opencode")
+  const directory = path.join(configRoot, "opencodevil")
   const candidates = OPENCODE_CONFIG_NAMES.map(
     (name) => path.join(directory, name),
   )
@@ -115,7 +115,7 @@ export function mcpServers(file = configFile()) {
 }
 
 /**
- * A browse server install wrote: `<node> <entry> mcp` or `<executable> mcp`, where the entry is the one install recorded,
+ * A browsevil server install wrote: `<node> <entry> mcp` or `<executable> mcp`, where the entry is the one install recorded,
  * a checkout's bundle, or a binary install's executable on PATH.
  */
 function ownedMcp(server: Servers[string] | undefined, entry: string | undefined) {
@@ -126,9 +126,9 @@ function ownedMcp(server: Servers[string] | undefined, entry: string | undefined
 }
 
 /**
- * The browse MCP server entry: the existing one with its command and runtime fingerprint updated, so environment
+ * The browsevil MCP server entry: the existing one with its command and runtime fingerprint updated, so environment
  * variables and other settings the user added (`disabled`, `timeout`) stay. OpenCode shares one local server across
- * every directory only when `pool` is true and `cwd` is fixed: browse speaks MCP 2026-07-28 and keys per-agent current
+ * every directory only when `pool` is true and `cwd` is fixed: browsevil speaks MCP 2026-07-28 and keys per-agent current
  * sessions on OpenCode's session id, so one server is safe. `cwd` is the absolute home directory because older
  * OpenCode versions don't expand `~` (it fails on Windows). Other agents keep their own schema through `editAgentConfig`.
  */
@@ -147,10 +147,10 @@ function mergedMcpServer(existing: Servers[string] | undefined, command: string[
   }
 }
 
-/** Writes (or updates) the browse MCP server so it runs the installed runtime, keeping the user's settings. */
+/** Writes (or updates) the browsevil MCP server so it runs the installed runtime, keeping the user's settings. */
 export function configureMcp(file: string, entry: string, previousEntry?: string) {
   // A running MCP server keeps its old code after an update. A checkout stamps the bundle's fingerprint into the entry,
-  // so the next install changes the config and makes opencode restart the server; an installed binary or npm package
+  // so the next install changes the config and makes opencodevil restart the server; an installed binary or npm package
   // writes the same entry across updates, and the agent starts the new build when it restarts the server.
   const existing = mcpServers(file)[MCP_NAME]
   if (existing && !ownedMcp(existing, previousEntry)) return undefined
@@ -179,14 +179,14 @@ export function removeMcp(name: string, entry?: string, file = configFile()) {
   return true
 }
 
-/** MCP servers from the separate Browser Control product, which browse replaces. */
+/** MCP servers from the separate Browser Control product, which browsevil replaces. */
 export function legacyBrowserControl() {
   return Object.entries(mcpServers())
     .filter(([name, server]) => name === "browser-control" || JSON.stringify(server.command ?? "").includes("browser-control"))
     .map(([name]) => name)
 }
 
-/** Removes the native messaging host and opencode plugin of earlier versions; true when any was there. */
+/** Removes the native messaging host and opencodevil plugin of earlier versions; true when any was there. */
 export function removeLegacyHost() {
   const leftovers = [
     ...browsers().flatMap((browser) =>
@@ -219,34 +219,34 @@ export async function installRuntime(): Promise<{ entry: string; version: string
   if (fromSource) {
     const bundle = path.join(packageRoot, "dist", "cli.mjs")
     if (!existsSync(bundle)) fail("Build the CLI first: `bun run build` in cli/ (or `bun run setup` at the top).")
-    return { entry: bundle, version: opencodeBrowserVersion, spawnEntry: bundle }
+    return { entry: bundle, version: opencodevilBrowserVersion, spawnEntry: bundle }
   }
   const spec = process.env.OPENCODE_BROWSEVIL_PACKAGE
   const globalRoot = await npmGlobalRoot()
   const at = (...parts: string[]) => (globalRoot ? path.join(globalRoot, ...parts) : undefined)
-  const globalPackage = at("@opencode", "browse")
+  const globalPackage = at("@opencodevil", "browsevil")
   const alreadyGlobal = !!(globalPackage && path.resolve(packageRoot) === path.resolve(globalPackage))
   if (!alreadyGlobal || spec) {
     // npx's cache is evictable, so an npm install becomes a global one: agents then run a stable path, and updates are
     // `npm install -g` (auto-update.ts). The channel matches this build.
-    const target = spec ?? `${PACKAGE}@${opencodeBrowserVersion.includes("-dev.") ? "dev" : "latest"}`
+    const target = spec ?? `${PACKAGE}@${opencodevilBrowserVersion.includes("-dev.") ? "dev" : "latest"}`
     const installed = await runCommand("npm", ["install", "-g", target], { timeoutMs: 10 * 60_000 })
     if (installed.status !== 0)
       fail(`Could not install ${target} globally: ${(installed.stderr || installed.stdout).trim().split("\n").slice(-3).join(" ")}`)
   }
   const root = await npmGlobalRoot()
   if (!root) fail("Could not find npm's global package folder (`npm root -g`); is npm on PATH?")
-  const entry = path.join(root, "@opencode", "browse", "dist", "cli.mjs")
+  const entry = path.join(root, "@opencodevil", "browsevil", "dist", "cli.mjs")
   if (!existsSync(entry)) fail(`npm didn't install ${PACKAGE} in ${root}; run \`npm install -g ${PACKAGE}\` and try again.`)
-  const version = readJson<{ version?: string }>(path.join(root, "@opencode", "browse", "package.json"))?.version ?? opencodeBrowserVersion
-  // Agents run `browse` from PATH, not an absolute node and package path: nvm/fnm change node between sessions, and the
+  const version = readJson<{ version?: string }>(path.join(root, "@opencodevil", "browsevil", "package.json"))?.version ?? opencodevilBrowserVersion
+  // Agents run `browsevil` from PATH, not an absolute node and package path: nvm/fnm change node between sessions, and the
   // global npm bin folder is on PATH whenever npm is. npm keeps it current. Setup-time self-spawns use the bundle this
   // install just wrote, since Windows can't start the PATH shim without a shell.
-  return { entry: "browse", version, spawnEntry: entry }
+  return { entry: "browsevil", version, spawnEntry: entry }
 }
 
 /**
- * What install set up: the runtime the browse MCP server runs and its version. Read from settings.json, else from
+ * What install set up: the runtime the browsevil MCP server runs and its version. Read from settings.json, else from
  * the MCP server entry itself (a checkout install from an earlier version wrote no version there).
  */
 export function installedRuntime(settings: Settings | undefined, server: Servers[string] | undefined) {
@@ -254,12 +254,12 @@ export function installedRuntime(settings: Settings | undefined, server: Servers
     ? server.command.filter((part): part is string => typeof part === "string")
     : []
   const entry = settings?.entry ?? command.find((part) => /cli\.m?js$/.test(part))
-  if (!entry || (entry !== "browse" && !settings?.version && !existsSync(entry))) return undefined
+  if (!entry || (entry !== "browsevil" && !settings?.version && !existsSync(entry))) return undefined
   // A bundle with the sources beside it is a checkout's build: cli/dist/cli.mjs next to cli/src/main.ts.
   const packageDir = path.dirname(path.dirname(entry))
   const source = scriptEntry(entry) && existsSync(path.join(packageDir, "src", "main.ts"))
   // The installed path reports its own version after an update, even when settings.json still has the old one.
-  const windowsShim = process.platform === "win32" && (entry === "browse" || /\.(cmd|bat)$/i.test(entry))
+  const windowsShim = process.platform === "win32" && (entry === "browsevil" || /\.(cmd|bat)$/i.test(entry))
   const onDisk = windowsShim
     ? (() => {
         // No running-entry fallback: report the installed CLI's version, not whatever process happens to ask.
@@ -268,22 +268,22 @@ export function installedRuntime(settings: Settings | undefined, server: Servers
         return installedVersion({
           kind: resolved.length === 2 ? "npm" : "binary",
           entry: resolved[resolved.length - 1]!,
-          version: settings?.version ?? opencodeBrowserVersion,
+          version: settings?.version ?? opencodevilBrowserVersion,
         })
       })()
-    : entry === "browse"
-      ? spawnSync("browse", ["--version"], { encoding: "utf8", timeout: 15_000 }).stdout?.trim() || undefined
+    : entry === "browsevil"
+      ? spawnSync("browsevil", ["--version"], { encoding: "utf8", timeout: 15_000 }).stdout?.trim() || undefined
       : existsSync(entry)
-        ? installedVersion({ kind: scriptEntry(entry) ? "npm" : "binary", entry, version: settings?.version ?? opencodeBrowserVersion })
+        ? installedVersion({ kind: scriptEntry(entry) ? "npm" : "binary", entry, version: settings?.version ?? opencodevilBrowserVersion })
         : undefined
   const version = onDisk ?? settings?.version ?? (path.resolve(entry) === path.join(packageRoot, "dist", "cli.mjs")
-    ? opencodeBrowserVersion
+    ? opencodevilBrowserVersion
     : readJson<{ version?: string }>(path.join(packageDir, "package.json"))?.version)
   return { entry, version, source }
 }
 
 /**
- * For an agent install doesn't know: the browse MCP server as the stdio entry most agents' configs take. `command` runs
+ * For an agent install doesn't know: the browsevil MCP server as the stdio entry most agents' configs take. `command` runs
  * the CLI (entryCommand): `[node, entry]`, or a binary install's `[executable]`.
  */
 export function manualMcpEntry(command: readonly string[]) {
@@ -292,5 +292,5 @@ export function manualMcpEntry(command: readonly string[]) {
     .replace(/","args":/, '", "args": ')
     .replace(/^\{"command":/, '{ "command": ')
     .replace(/\}$/, " }")
-  return `{\n  "mcpServers": {\n    "browse": ${server}\n  }\n}`
+  return `{\n  "mcpServers": {\n    "browsevil": ${server}\n  }\n}`
 }

@@ -10,7 +10,7 @@ afterEach(() => {
 })
 
 function temporaryCatalog() {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "browse-session-catalog-"))
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-session-catalog-"))
   roots.push(root)
   return { root, catalog: new SessionCatalog(path.join(root, "sessions.json")) }
 }

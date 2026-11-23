@@ -8,12 +8,12 @@ import { spawnSync } from "node:child_process"
 const installer = readFileSync(path.join(import.meta.dir, "../../install"), "utf8")
 const powershellInstaller = readFileSync(path.join(import.meta.dir, "../../install.ps1"), "utf8")
 const version = "0.0.7"
-const packageName = "@opencode/browse-test"
+const packageName = "@opencode/browsevil-test"
 
 type Env = { home: string; bin: string; work: string }
 
 function setup(): Env {
-  const home = mkdtempSync(path.join(tmpdir(), "browse installer-integrity-"))
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil installer-integrity-"))
   const bin = path.join(home, "fake bin")
   const work = path.join(home, "work")
   mkdirSync(bin)
@@ -43,7 +43,7 @@ esac
 function tarball(env: Env, name: string, contents: string): string {
   const source = path.join(env.work, `${name}-source`)
   mkdirSync(path.join(source, "package/bin"), { recursive: true })
-  writeFileSync(path.join(source, "package/bin/browse"), contents)
+  writeFileSync(path.join(source, "package/bin/browsevil"), contents)
   const archive = path.join(env.work, `${name}.tgz`)
   const tar = spawnSync("tar", ["-czf", archive, "package"], { cwd: source })
   expect(tar.status, String(tar.stderr)).toBe(0)
@@ -100,7 +100,7 @@ function metadata(env: Env, name: string, options: { archive?: string; integrity
 }
 
 function tempLeftovers(env: Env): string[] {
-  return readdirSync(path.join(env.home, "tmp")).filter((name) => name.startsWith("browse_install_"))
+  return readdirSync(path.join(env.home, "tmp")).filter((name) => name.startsWith("browsevil_install_"))
 }
 
 function runInstaller(env: Env, args: string[], extraEnv: Record<string, string> = {}) {
@@ -132,7 +132,7 @@ test.skipIf(process.platform === "win32")("a pinned tarball matching npm's integ
     const archive = tarball(env, "matching", "#!/bin/sh\nprintf 'good\\n'\n")
     const result = install(env, archive, metadata(env, "matching", { archive }))
     expect(result.status, result.stderr).toBe(0)
-    expect(readFileSync(path.join(env.home, ".local/bin/browse"), "utf8")).toContain("good")
+    expect(readFileSync(path.join(env.home, ".local/bin/browsevil"), "utf8")).toContain("good")
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -143,14 +143,14 @@ test.skipIf(process.platform === "win32")("a tarball with different contents tha
     const tampered = tarball(env, "tampered", "#!/bin/sh\nprintf 'tampered\\n'\n")
     const bin = path.join(env.home, ".local/bin")
     mkdirSync(bin, { recursive: true })
-    writeFileSync(path.join(bin, "browse"), "old binary")
+    writeFileSync(path.join(bin, "browsevil"), "old binary")
     const result = install(env, tampered, metadata(env, "published", { archive: published }))
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("checksum mismatch")
-    expect(result.stderr).toContain("@opencode/browse-")
+    expect(result.stderr).toContain("@opencode/browsevil-")
     expect(result.stderr).toContain("nothing was installed")
-    expect(readFileSync(path.join(bin, "browse"), "utf8")).toBe("old binary")
-    expect(existsSync(path.join(bin, "browse.new"))).toBe(false)
+    expect(readFileSync(path.join(bin, "browsevil"), "utf8")).toBe("old binary")
+    expect(existsSync(path.join(bin, "browsevil.new"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -165,7 +165,7 @@ test.skipIf(process.platform === "win32")("a checksum mismatch fails before extr
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("checksum mismatch")
     expect(result.stderr).toContain("nothing was installed")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -177,7 +177,7 @@ test.skipIf(process.platform === "win32")("a pinned package without integrity fa
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("no published SHA-512 integrity")
     expect(result.stderr).toContain("nothing was installed")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -189,7 +189,7 @@ test.skipIf(process.platform === "win32")("malformed integrity fails as invalid 
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("invalid SHA-512 integrity")
     expect(result.stderr).not.toContain("base64 or openssl is required")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -201,7 +201,7 @@ test.skipIf(process.platform === "win32")("a SHA-512 integrity of the wrong leng
     const result = install(env, archive, metadata(env, "short", { archive, integrity: `sha512-${shortIntegrity}` }))
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("invalid SHA-512 integrity")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -213,7 +213,7 @@ test.skipIf(process.platform === "win32")("a sha1-only integrity fails and insta
     const result = install(env, archive, metadata(env, "sha1", { archive, integrity: `sha1-${sha1}` }))
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("no published SHA-512 integrity")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -223,7 +223,7 @@ test.skipIf(process.platform === "win32")("an empty pinned version fails instead
     const result = runInstaller(env, ["--version", "v", "--no-setup"])
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain("--version needs a version, e.g. 0.0.14")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -236,7 +236,7 @@ test.skipIf(process.platform === "win32")("a failed metadata read removes the te
       FAKE_METADATA: path.join(env.work, "missing.json"),
     })
     expect(result.status).not.toBe(0)
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -248,7 +248,7 @@ test.skipIf(process.platform === "win32")("an archive that is not a tarball fail
     writeFileSync(archive, "not a tarball")
     const result = install(env, archive, metadata(env, "garbage", { archive }))
     expect(result.status).not.toBe(0)
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 
@@ -258,8 +258,8 @@ test.skipIf(process.platform === "win32")("a verified tarball without the binary
     const archive = tarballWithoutBinary(env, "empty")
     const result = install(env, archive, metadata(env, "empty", { archive }))
     expect(result.status).not.toBe(0)
-    expect(result.stderr).toContain("has no package/bin/browse")
-    expect(existsSync(path.join(env.home, ".local/bin/browse"))).toBe(false)
+    expect(result.stderr).toContain("has no package/bin/browsevil")
+    expect(existsSync(path.join(env.home, ".local/bin/browsevil"))).toBe(false)
   } finally { rmSync(env.home, { recursive: true, force: true }) }
 })
 

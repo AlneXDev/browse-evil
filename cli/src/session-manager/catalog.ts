@@ -86,7 +86,7 @@ export class SessionCatalog {
       text = await fs.readFile(this.filePath, "utf8")
     } catch (error) {
       if (isNodeError(error) && error.code === "ENOENT") return []
-      throw new Error(`Could not read browse session catalog at ${this.filePath}`, { cause: error })
+      throw new Error(`Could not read browsevil session catalog at ${this.filePath}`, { cause: error })
     }
     try {
       const sanitized = relayOwnedCatalog(JSON.parse(text))
@@ -142,7 +142,7 @@ export class SessionCatalog {
       try {
         await fs.rm(temporaryPath, { force: true })
       } catch {}
-      throw new Error(`Could not write browse session catalog at ${this.filePath}`, { cause: error })
+      throw new Error(`Could not write browsevil session catalog at ${this.filePath}`, { cause: error })
     }
   }
 }

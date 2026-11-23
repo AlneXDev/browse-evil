@@ -11,11 +11,11 @@ import { ensureRelay, olderMcpClientAdvice, relayBuildProblem } from "../src/rel
 import { freePort } from "./support/ports.ts"
 
 // After an automatic update the relay runs the new build while a running MCP server keeps its old one. The relay keeps
-// serving the older client; only a request it can no longer decode asks the agent to reconnect browse.
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-old-client-"))
+// serving the older client; only a request it can no longer decode asks the agent to reconnect browsevil.
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-old-client-"))
 const previous = {
   home: process.env.HOME,
-  browseHome: process.env.OPENCODE_BROWSEVIL_HOME,
+  browsevilHome: process.env.OPENCODE_BROWSEVIL_HOME,
   port: process.env.OPENCODE_BROWSEVIL_PORT,
 }
 process.env.HOME = home
@@ -24,7 +24,7 @@ let relay: ChildProcess | undefined
 
 afterAll(() => {
   relay?.kill()
-  for (const [name, value] of [["HOME", previous.home], ["OPENCODE_BROWSEVIL_HOME", previous.browseHome], ["OPENCODE_BROWSEVIL_PORT", previous.port]] as const) {
+  for (const [name, value] of [["HOME", previous.home], ["OPENCODE_BROWSEVIL_HOME", previous.browsevilHome], ["OPENCODE_BROWSEVIL_PORT", previous.port]] as const) {
     if (value === undefined) delete process.env[name]
     else process.env[name] = value
   }
@@ -64,13 +64,13 @@ describe("old MCP client against a newer relay", () => {
       expect(readiness.version.buildId).toBe(NEW_BUILD)
       // A normal request of that older build still works.
       expect(yield* client.sessions).toEqual([])
-      // When a request no longer decodes, the tool call says to reconnect browse rather than repeat a wire error.
+      // When a request no longer decodes, the tool call says to reconnect browsevil rather than repeat a wire error.
       const advice = olderMcpClientAdvice(readiness.version, new RelayClient.RelayDecodeFailed({
         message: "Relay returned an unreadable response for /tabs/cleanup",
         path: "/tabs/cleanup",
         cause: null,
       }), OLD_CLIENT)
-      expect(advice).toContain("browse was updated")
+      expect(advice).toContain("browsevil was updated")
       expect(advice).toContain("/mcps")
       // A semantic error is the tool's own, not an update.
       expect(olderMcpClientAdvice(readiness.version, new RelayClient.RelayRejected({

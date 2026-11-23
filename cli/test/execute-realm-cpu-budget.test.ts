@@ -5,7 +5,7 @@ import os from "node:os"
 import path from "node:path"
 import { nodeRealmRunner, values } from "./support/node-realm.ts"
 
-const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browse-realm-cpu-"))
+const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-realm-cpu-"))
 const runInNode = nodeRealmRunner(path.join(scratch, "home"))
 afterAll(() => fs.rmSync(scratch, { recursive: true, force: true }))
 

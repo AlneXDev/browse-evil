@@ -23,7 +23,7 @@ export type LocateOptions = {
 }
 
 /**
- * Reports the browsers and profiles that have browse. Every channel installs the extension from the Chrome Web Store,
+ * Reports the browsers and profiles that have browsevil. Every channel installs the extension from the Chrome Web Store,
  * so when none has it (and none is connected to the relay) the only step is adding it from there, with its page opened
  * when install may open things. Nothing opens when the browsers here aren't the ones the user looks at (SSH, no
  * display), with --no-open, or when a browser couldn't be checked and may already have it.
@@ -32,7 +32,9 @@ export type LocateOptions = {
  */
 export function locateExtension(options: LocateOptions, effects: Effects = systemEffects): "ready" | "off" | "guided" {
   const { log } = effects
-  const listing = options.storeUrl ?? STORE_URL
+  const GUIDE = "load the evil extension unpacked from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip (download the zip, extract it, open chrome://extensions, turn on Developer mode and click Load unpacked)"
+
+const listing = options.storeUrl ?? STORE_URL
   if (options.pairedOffline) return log(pairedOfflineMessage), "ready"
   // A connected extension is installed, even somewhere the scan doesn't look (a custom profile directory, a snap).
   if (options.connected) return log(connectedMessage), "ready"
@@ -40,20 +42,20 @@ export function locateExtension(options: LocateOptions, effects: Effects = syste
   const off = options.detections.flatMap((detection) => detection.disabled)
   if (off.length) {
     log(
-      `! browse is turned off in ${off.map((match) => `${match.browser.name} (${match.profile.name})`).join(", ")}. Turn it on in the browser's extensions page.`,
+      `! browsevil is turned off in ${off.map((match) => `${match.browser.name} (${match.profile.name})`).join(", ")}. Turn it on in the browser's extensions page.`,
     )
     return "off"
   }
   // One that contacted the relay without a token is installed too; setup prints a pairing code for it.
   if (options.unpaired) return "ready"
   const blocked = options.detections.filter((detection) => detection.blocked).map((detection) => detection.browser.name)
-  if (blocked.length) log(`! Couldn't check ${blocked.join(", ")} for browse (${blockedReason()})`)
+  if (blocked.length) log(`! Couldn't check ${blocked.join(", ")} for browsevil (${blockedReason()})`)
   const target = options.preferred ?? options.detections.find((detection) => !detection.blocked)?.browser
   const interactive = options.allowOpen && options.env.display && !options.env.ssh
   // A browser that couldn't be checked may already have it: don't open anything over the user's work.
   const opened =
     interactive && !blocked.length && (target ? effects.open(target, listing) : effects.openDefault?.(listing))
-  log(`Add browse to ${target?.name ?? "your browser"} from the Chrome Web Store${opened ? " (opened)" : ""}: ${listing}`)
+  log(`Add browsevil to ${target?.name ?? "your browser"}: ${GUIDE}`)
   return "guided"
 }
 
@@ -87,10 +89,10 @@ export function pairStoreExtension(
     interactive &&
     effects.open(match.browser, `chrome-extension://${match.id}/welcome.html#code=${options.code()}${port}`, match.profile.dir)
   ) {
-    effects.log(`✓ Opened browse in ${match.browser.name} to connect it`)
+    effects.log(`✓ Opened browsevil in ${match.browser.name} to connect it`)
     return "opened"
   }
-  effects.log(`To connect browse in ${match.browser.name}: ${manualPair(options.code(), options.port)}`)
+  effects.log(`To connect browsevil in ${match.browser.name}: ${manualPair(options.code(), options.port)}`)
   return "manual"
 }
 

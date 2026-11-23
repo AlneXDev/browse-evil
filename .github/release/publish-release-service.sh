@@ -9,8 +9,8 @@
 #
 #   extension  chromium   the extension zip: browse-extension-<version>.zip, the store build on stable and the unpacked
 #                         one on dev
-#   cli        one target per binary (the same eleven targets as @opencode/browse-<target>), npm's darwin is the
-#              service's macos: opencode-browse-<target>-<version>.tgz
+#   cli        one target per binary (the same eleven targets as @opencode/browsevil-<target>), npm's darwin is the
+#              service's macos: opencode-browsevil-<target>-<version>.tgz
 #
 # A signed macOS or Windows tarball (sign-macos.sh, repack-windows.sh) replaces the unsigned one of the same name: the
 # macOS targets then come only from <macOS signed dir> and the Windows ones only from <Windows signed dir>, as
@@ -48,7 +48,7 @@ service_target() {
 # the way publish-npm.sh routes them (the caller dies if one is missing); without a signed dir they come from
 # <binaries dir>.
 target_file() {
-  local name="opencode-browse-$1-$BROWSE_VERSION.tgz" dir=""
+  local name="opencode-browsevil-$1-$BROWSE_VERSION.tgz" dir=""
   case "$1" in
     darwin-*) dir=$signed_dir ;;
     windows-*) dir=$signed_windows_dir ;;

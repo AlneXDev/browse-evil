@@ -15,7 +15,7 @@ export default defineConfig(({ mode }) => ({
     lib: {
       entry: fileURLToPath(new URL("./src/content/page-status.ts", import.meta.url)),
       formats: ["iife"],
-      name: "opencodeBrowserPageStatus",
+      name: "opencodevilBrowserPageStatus",
       fileName: () => "content.js",
     },
   },

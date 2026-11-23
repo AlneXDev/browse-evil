@@ -1,4 +1,4 @@
-// The folders earlier browse layouts used, kept in their own light module: main.ts checks them on every start, and the
+// The folders earlier browsevil layouts used, kept in their own light module: main.ts checks them on every start, and the
 // execute file guard denies them, so neither should pull in the migration module (and its JSON/TOML/YAML parsers).
 import fs from "node:fs"
 import os from "node:os"
@@ -6,18 +6,18 @@ import path from "node:path"
 
 /** The old data root, which followed XDG_DATA_HOME on unix and LOCALAPPDATA on Windows. */
 export function legacyDataRoot(home = os.homedir()): string {
-  if (home !== os.homedir()) return path.join(home, ".local", "share", "opencode-browser")
+  if (home !== os.homedir()) return path.join(home, ".local", "share", "opencodevil-browser")
   if (process.platform === "win32") {
     const configured = process.env.LOCALAPPDATA
-    return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, "AppData", "Local"), "opencode-browser")
+    return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, "AppData", "Local"), "opencodevil-browser")
   }
   const configured = process.env.XDG_DATA_HOME
-  return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, ".local", "share"), "opencode-browser")
+  return path.join(configured && path.isAbsolute(configured) ? configured : path.join(home, ".local", "share"), "opencodevil-browser")
 }
 
-/** Roots earlier layouts kept browse's files in; migration copies them into the XDG folders on the next run. */
+/** Roots earlier layouts kept browsevil's files in; migration copies them into the XDG folders on the next run. */
 export function legacyRoots(home = os.homedir()): readonly string[] {
-  return [path.join(home, ".browse"), legacyDataRoot(home)]
+  return [path.join(home, ".browsevil"), legacyDataRoot(home)]
 }
 
 /** Whether migration has work left: an old root holds more than the extension link it keeps for a dev extension. */
@@ -33,7 +33,7 @@ export function legacyRootsLeft(home = os.homedir()) {
 
 /**
  * The self-managed runtime of releases before 0.0.11: runtime/current.json names the version under runtime/versions
- * that the old shim (bin/opencode-browser.mjs, which agents' MCP entries run) starts, with OPENCODE_BROWSEVIL_HOME set to
+ * that the old shim (bin/opencodevil-browser.mjs, which agents' MCP entries run) starts, with OPENCODE_BROWSEVIL_HOME set to
  * the old data root. `movedTo` is set once a relay from a current install took it over (setup/legacy-runtime.ts).
  */
 export type LegacyRuntime = {
@@ -56,7 +56,7 @@ export function legacyRuntime(home = os.homedir()): LegacyRuntime | undefined {
   }
 }
 
-/** The old shim still starts browse from runtime/versions: nothing has taken it over, and it doesn't run a binary. */
+/** The old shim still starts browsevil from runtime/versions: nothing has taken it over, and it doesn't run a binary. */
 export const legacyRuntimeActive = (runtime: LegacyRuntime | undefined) => !!runtime && !runtime.binary && !runtime.movedTo
 
 /** How long a taken-over runtime stays, so agents' running shims can follow current.json to the new MCP server. */
@@ -84,7 +84,7 @@ export const samePath = (left: string, right: string) => {
 
 /**
  * Settles OPENCODE_BROWSEVIL_HOME for an old runtime before anything resolves a path. While the old shim still starts
- * browse, every browse process shares its folder with the relay it started (as the shim's own processes do), rather than
+ * browsevil, every browsevil process shares its folder with the relay it started (as the shim's own processes do), rather than
  * migrating the folder out from under that relay. Once taken over, the old folder the shim sets is no override.
  */
 export function settleLegacyHome(env: NodeJS.ProcessEnv = process.env, runtime = legacyRuntime()) {

@@ -11,7 +11,7 @@ import { cdpCall, connectCdp, FakeExtension, startRelay, stopRelay, until } from
 // first command, and a restart waiting on the same work failed with 409 "timed out waiting for accepted work". The
 // attach now has its own short command timeout, and a create whose attach fails closes the tab it opened.
 
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-attach-timeout-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-attach-timeout-"))
 let port = 0
 let relay: ChildProcess | undefined
 let base = ""
@@ -60,7 +60,7 @@ async function attachScene(tabId: number, targetId: string, hangs: readonly stri
 }
 
 async function openClient(id: string) {
-  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodeBrowserSessionId=${id}`, { authorization: `Bearer ${token}` })
+  const socket = await connectCdp(`ws://127.0.0.1:${port}/devtools/browser/test?opencodevilBrowserSessionId=${id}`, { authorization: `Bearer ${token}` })
   if (!(socket instanceof WebSocket)) throw new Error(`CDP connection refused: ${socket}`)
   return socket
 }

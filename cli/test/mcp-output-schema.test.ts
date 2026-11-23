@@ -38,7 +38,7 @@ function specs(): readonly McpToolSpec[] {
   return buildRegisteredMcpTools(createMcpToolContext({
     relay: {} as RelayClient.Interface,
     currentSession: { id: "mcp-1234abcd", established: true },
-    packageRoot: "/tmp/browse",
+    packageRoot: "/tmp/browsevil",
   }))
 }
 
@@ -243,7 +243,7 @@ describe("tool output schemas", () => {
     const ctx = createMcpToolContext({
       relay,
       currentSession: { id: "mcp-1234abcd", established: true },
-      packageRoot: "/tmp/browse",
+      packageRoot: "/tmp/browsevil",
     })
     const byName = new Map(buildRegisteredMcpTools(ctx).map((spec) => [spec.name, spec]))
     const cases: Record<string, ReadonlyArray<{ action: string; [key: string]: unknown }>> = {
@@ -285,7 +285,7 @@ describe("tool output schemas", () => {
     const ctx = createMcpToolContext({
       relay,
       currentSession: { id: "mcp-1234abcd", established: true },
-      packageRoot: "/tmp/browse",
+      packageRoot: "/tmp/browsevil",
     })
     const spec = buildRegisteredMcpTools(ctx).find((candidate) => candidate.name === "settings")!
     const read = await Effect.runPromise(spec.handle({}) as Effect.Effect<{ settings: Record<string, unknown> }, Error>)
@@ -293,7 +293,7 @@ describe("tool output schemas", () => {
     expect(Object.keys(read.settings).sort()).toEqual([...agentSettingKeys].sort())
     expect(Schema.is(spec.outputSchema!)(read)).toBe(true)
     const failure = await Effect.runPromise(Effect.flip(spec.handle({ set: { autoUpdate: "notify" } }) as Effect.Effect<unknown, Error>))
-    expect(failure.message).toContain("browse settings set autoUpdate")
+    expect(failure.message).toContain("browsevil settings set autoUpdate")
   })
 
   test("execute structured content validates against its schema and carries the value once", () => {
@@ -399,7 +399,7 @@ describe("tool output schemas", () => {
       sharedSession: false,
       version: { version: "0.0.10", pid: 42 },
       status: { connected: true, version: "0.0.10", activeTargets: 1 },
-      autoUpdate: { install: "npm", cli: "browse", mode: "auto", effective: "auto" },
+      autoUpdate: { install: "npm", cli: "browsevil", mode: "auto", effective: "auto" },
     }
     const result = toolResultForValue(value, { outputSchema: StatusToolOutput })
     expect(Schema.is(StatusToolOutput)(result.structuredContent)).toBe(true)
@@ -456,7 +456,7 @@ describe("tool output schemas", () => {
     const ctx = createMcpToolContext({
       relay,
       currentSession: { id: "mcp-1234abcd", established: true },
-      packageRoot: "/tmp/browse",
+      packageRoot: "/tmp/browsevil",
     })
     const spec = buildRegisteredMcpTools(ctx).find((candidate) => candidate.name === "session_adopt")!
     const value = await Effect.runPromise(spec.handle({}))

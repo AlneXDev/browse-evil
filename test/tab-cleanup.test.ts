@@ -15,7 +15,7 @@ afterAll(() => {
   Date.now = realNow
 })
 
-const ALARM = "opencode-browser-tab-cleanup"
+const ALARM = "opencodevil-browser-tab-cleanup"
 const MARKER = "\u2063"
 const alarm = () => (chrome.alarms.onAlarm as unknown as StubEvent).emit({ name: ALARM })
 const guarded = new Set<number>()
@@ -380,7 +380,7 @@ describe("a tab the relay ungroups itself", () => {
 })
 
 describe("a tab the user takes back", () => {
-  test("comes back with its sound when browse muted it, and keeps a mute the user set", async () => {
+  test("comes back with its sound when browsevil muted it, and keeps a mute the user set", async () => {
     const ours = await agentTab(0)
     const theirs = await agentTab(0)
     await stub.chrome.tabs.group({ tabIds: [ours, theirs] })
@@ -464,7 +464,7 @@ describe("tracked tabs the relay doesn't have after a worker restart", () => {
     expect(closed.map((tab) => tab.tabId)).toEqual([lost])
     expect(open(kept)).toBe(true)
     expect(await TabCleanup.isTracked(lost)).toBe(false)
-    // The pinned tab stays open, so the mute browse set is undone.
+    // The pinned tab stays open, so the mute browsevil set is undone.
     for (let i = 0; i < 20; i++) await settle()
     expect(stub.state.tabs.get(pinned)!.muted).toBe(false)
   })

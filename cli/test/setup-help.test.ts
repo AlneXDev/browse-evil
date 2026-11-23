@@ -31,7 +31,7 @@ function isolatedEnv(home: string): NodeJS.ProcessEnv {
     XDG_STATE_HOME: path.join(home, "xdg-state"),
     XDG_CACHE_HOME: path.join(home, "xdg-cache"),
     XDG_BIN_HOME: path.join(home, "xdg-bin"),
-    OPENCODE_BROWSEVIL_HOME: path.join(home, "browse"),
+    OPENCODE_BROWSEVIL_HOME: path.join(home, "browsevil"),
     OPENCODE_BROWSEVIL_PORT: "29988",
     OPENCODE_BROWSEVIL_AUTO_UPDATE: "off",
     OPENCODE_BROWSEVIL_UPDATE_CHECK: "0",
@@ -50,9 +50,9 @@ function isolatedEnv(home: string): NodeJS.ProcessEnv {
   return env
 }
 
-/** A browse root with settings: uninstall deletes all of it. */
+/** A browsevil root with settings: uninstall deletes all of it. */
 function seed(home: string): string {
-  const root = path.join(home, "browse")
+  const root = path.join(home, "browsevil")
   mkdirSync(path.join(root, "sessions"), { recursive: true })
   writeFileSync(path.join(root, "settings.json"), '{"entry":"/keep"}\n')
   writeFileSync(path.join(root, "sessions", "catalog.json"), '{"version":1}\n')
@@ -69,8 +69,8 @@ test.each(
     [command, ["--help"]],
     [command, ["-h"]],
   ] as const),
-)("browse %s %s prints help without running the command", (command, flags) => {
-  const home = mkdtempSync(path.join(tmpdir(), "browse-setup-help-"))
+)("browsevil %s %s prints help without running the command", (command, flags) => {
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil-setup-help-"))
   try {
     const root = seed(home)
     const before = snapshot(root)
@@ -91,8 +91,8 @@ test.each(
   }
 }, 30_000)
 
-test("browse install --wait-seconds 10 --help prints help anywhere it appears", () => {
-  const home = mkdtempSync(path.join(tmpdir(), "browse-setup-help-"))
+test("browsevil install --wait-seconds 10 --help prints help anywhere it appears", () => {
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil-setup-help-"))
   try {
     const root = seed(home)
     const before = snapshot(root)
@@ -110,8 +110,8 @@ test("browse install --wait-seconds 10 --help prints help anywhere it appears", 
   }
 }, 30_000)
 
-test("browse status --help prints only its own help, not the setup status", () => {
-  const home = mkdtempSync(path.join(tmpdir(), "browse-setup-help-"))
+test("browsevil status --help prints only its own help, not the setup status", () => {
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil-setup-help-"))
   try {
     const result = spawnSync(process.execPath, [cliEntry, "status", "--help"], {
       env: isolatedEnv(home),
@@ -120,7 +120,7 @@ test("browse status --help prints only its own help, not the setup status", () =
     })
     expect(result.status, result.stderr).toBe(0)
     expect(result.stdout.startsWith("DESCRIPTION")).toBe(true)
-    expect(result.stdout).toContain("browse status [flags]")
+    expect(result.stdout).toContain("browsevil status [flags]")
     expect(result.stdout).not.toContain("Setup:")
   } finally {
     rmSync(home, { recursive: true, force: true })

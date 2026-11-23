@@ -3,17 +3,17 @@
 
 import type { PageStatus } from "../agent-relay/protocol"
 
-/** The link to the browse relay, which runs agent sessions for the browse MCP server and CLI. */
+/** The link to the browsevil relay, which runs agent sessions for the browsevil MCP server and CLI. */
 export type AgentRelayStatus =
   /** No relay is running yet; the CLI or MCP server starts one on demand. */
   | "offline"
   | "connecting"
   | "connected"
-  /** browse in another browser or profile holds the relay's connection. */
+  /** browsevil in another browser or profile holds the relay's connection. */
   | "conflict"
   /** The relay speaks another protocol version; updating both fixes it. */
   | "incompatible"
-  /** Not paired with this relay yet: it needs a code from `browse pair`. */
+  /** Not paired with this relay yet: it needs a code from `browsevil pair`. */
   | "unpaired"
   /** The relay didn't pair: a wrong or used code, a revoked browser, an older relay, or a program posing as one. */
   | "untrusted"
@@ -26,7 +26,7 @@ export type AgentRelayState = {
   pairing: PairingSource
   /** Tabs agents use, with their page status when an agent is working or waiting for the user. */
   tabs: { tabId: number; status?: PageStatus }[]
-  /** A newer browse on the clone's remote branch, as the relay's update check found it, and the command to update. */
+  /** A newer browsevil on the clone's remote branch, as the relay's update check found it, and the command to update. */
   update?: AgentRelayUpdate
   /** Settings the connected relay's environment variables fix (OPENCODE_BROWSEVIL_AGENT_WINDOW, …). */
   overrides?: RelayOverrides
@@ -78,7 +78,7 @@ export const autoUpdateMode = (value: unknown): AutoUpdateMode | undefined => (v
 /**
  * How this CLI was installed, as kinds extensions have always known: binary and npm global installs update themselves.
  * Older relays send only npm, checkout or other. A bun, pnpm, yarn or volta global install reads as binary (it updates
- * itself, and `browse update` updates it), a bunx, pnpm dlx or yarn dlx run as npx; `method` names it exactly.
+ * itself, and `browsevil update` updates it), a bunx, pnpm dlx or yarn dlx run as npx; `method` names it exactly.
  */
 export type RelayInstall = "binary" | "npm" | "npx" | "checkout" | "other"
 /** The exact install method a newer relay reports beside `install`. */
@@ -123,7 +123,7 @@ export type RelayAutoUpdate = {
   method?: RelayInstallMethod
   /** The command that updates this install in a terminal (or switches one that can't update to one that can). */
   updateCommand?: string
-  /** The command that runs the relay's CLI in a terminal: `browse` for a binary install, `npx @opencode/browsevil` for npm. */
+  /** The command that runs the relay's CLI in a terminal: `browsevil` for a binary install, `npx @opencode/browsevil` for npm. */
   cli?: string
   mode: AutoUpdateMode
   effective: AutoUpdateMode
@@ -160,7 +160,7 @@ export function cliUpdateCommand(update: Pick<RelayAutoUpdate, "install" | "cli"
   if (update.updateCommand?.trim()) return update.updateCommand.trim()
   if (update.install === "npm") return "npm install -g @opencode/browsevil@latest"
   if (update.install === "npx") return "npx @opencode/browsevil@latest install"
-  return `${update.cli?.trim() || "browse"} update`
+  return `${update.cli?.trim() || "browsevil"} update`
 }
 
 /** Orders the relay's versions as semver does for these shapes: dev below beta below the release, then by run. */
@@ -216,7 +216,7 @@ export const AGENT_GROUPING_KEY = "agentTabsGrouping"
 export type AgentGrouping = "session" | "shared" | "none"
 export const agentGrouping = (value: unknown): AgentGrouping => (value === "session" || value === "none" ? value : "shared")
 
-/** Whether browse collapses agent groups by itself: "auto" (default), or "off" to leave each group as the user set it. */
+/** Whether browsevil collapses agent groups by itself: "auto" (default), or "off" to leave each group as the user set it. */
 export const AGENT_GROUP_COLLAPSE_KEY = "agentTabsGroupCollapse"
 export type AgentGroupCollapse = "auto" | "off"
 export const agentGroupCollapse = (value: unknown): AgentGroupCollapse => (value === "off" ? "off" : "auto")
@@ -248,7 +248,7 @@ export type RelaySettings = { humanInput: HumanInput }
 /** Settings the relay's environment fixes, whatever the status page says (the relay's `relay.settings` answer). */
 export type RelayOverrides = { agentWindow?: "current" | "separate"; humanInput?: HumanInput }
 
-export const STATUS_PORT = "opencode-browser.status"
+export const STATUS_PORT = "opencodevil-browser.status"
 
 export type ToStatusPage =
   | { type: "agents"; state: AgentRelayState }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "browse",
+  "name": "browsevil",
   "version": "0.1.5",
   "private": true,
   "type": "module",

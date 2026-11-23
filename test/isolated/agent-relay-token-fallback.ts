@@ -16,19 +16,19 @@ const STALE_PORT = 29698
 const OTHER_PORT = 29700
 const BROWSER_PORT = 29699
 installFakeRelaySocket({ port: BROWSER_PORT, token: TOKEN })
-// No real relay: any other local probe is a 404, never a connection to this computer's browse.
+// No real relay: any other local probe is a 404, never a connection to this computer's browsevil.
 globalThis.fetch = (async () => new Response("not found", { status: 404 })) as unknown as typeof fetch
 
 await stub.chrome.storage.local.set({
   agentRelayDiscoveredPort: BROWSER_PORT,
   agentRelayTokens: {
-    // The most recently stored browse-range loopback token wins, not the default port's older one nor this port's
+    // The most recently stored browsevil-range loopback token wins, not the default port's older one nor this port's
     // stale one: the token is a guess until the relay's proof accepts it.
     [`127.0.0.1:${STALE_PORT}`]: STALE_TOKEN,
     [`127.0.0.1:${BROWSER_PORT}`]: STALE_OWN_TOKEN,
     [`127.0.0.1:${OTHER_PORT}`]: TOKEN,
-    // Not a port browse listens on: a fallback must never send this one to a relay.
-    "127.0.0.1:20000": "not-a-browse-port-token",
+    // Not a port browsevil listens on: a fallback must never send this one to a relay.
+    "127.0.0.1:20000": "not-a-browsevil-port-token",
   },
 })
 const { createAgentRelay } = await import("../../src/background/agent-relay")
@@ -42,11 +42,11 @@ async function until(check: () => boolean) {
 test("a relay on a new loopback port keeps the token this browser had", async () => {
   await until(() => relay.state().status === "connected")
   expect(relay.state().pairing).toBe("token")
-  // Stored under the new key too, with the original entries untouched and the non-browse token unused.
+  // Stored under the new key too, with the original entries untouched and the non-browsevil token unused.
   expect(await stored("agentRelayTokens")).toEqual({
     [`127.0.0.1:${STALE_PORT}`]: STALE_TOKEN,
     [`127.0.0.1:${OTHER_PORT}`]: TOKEN,
-    "127.0.0.1:20000": "not-a-browse-port-token",
+    "127.0.0.1:20000": "not-a-browsevil-port-token",
     [`127.0.0.1:${BROWSER_PORT}`]: TOKEN,
   })
 })

@@ -43,7 +43,7 @@ export function createCdpDispatcher(options: {
   readonly createAndAttachTab: (createOptions: {
     readonly url: string
     readonly active: boolean
-    readonly opencodeBrowserSessionId?: string
+    readonly opencodevilBrowserSessionId?: string
     readonly autoAttachParams?: JsonObject
   }) => Effect.Effect<ConnectedTarget, Error>
   readonly detachTab: (tabId: number) => Effect.Effect<void, Error>
@@ -145,7 +145,7 @@ export function createCdpDispatcher(options: {
       const tabSessionId = message.method === "Page.navigate"
         ? (() => {
             try {
-              return registry.tabTargets.get(cdpRouter.resolveCommandRoute(socket, message).tabId)?.opencodeBrowserSessionId
+              return registry.tabTargets.get(cdpRouter.resolveCommandRoute(socket, message).tabId)?.opencodevilBrowserSessionId
             } catch {
               return undefined
             }
@@ -229,12 +229,12 @@ export function createCdpDispatcher(options: {
     if (message.method === "Target.createTarget" || message.method === "Target.closeTarget") {
       if (message.method === "Target.createTarget") {
         const url = createTargetUrl(message.params)
-        const opencodeBrowserSessionId = cdpClients.sessionId(socket)
+        const opencodevilBrowserSessionId = cdpClients.sessionId(socket)
         const autoAttachParams = cdpClients.autoAttachParams(socket)
         const target = yield* createAndAttachTab({
           url,
           active: false,
-          ...(opencodeBrowserSessionId ? { opencodeBrowserSessionId } : {}),
+          ...(opencodevilBrowserSessionId ? { opencodevilBrowserSessionId } : {}),
           ...(autoAttachParams ? { autoAttachParams } : {}),
         })
         return { targetId: target.targetInfo.targetId }
@@ -326,7 +326,7 @@ export function createCdpDispatcher(options: {
     }
     if (message.method === "Emulation.setDeviceMetricsOverride" && route.chromeSessionId === undefined) {
       // Emulation only applies at the top target. Remember the tab, and which session's client set
-      // it, so the execute end can clear it if the script doesn't; a raw client without a browse
+      // it, so the execute end can clear it if the script doesn't; a raw client without a browsevil
       // session id marks without an owner, so no session's execute end will clear its viewport.
       deviceMetricsOverrides.mark(tabId, cdpClients.sessionId(socket))
     }

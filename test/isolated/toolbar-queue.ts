@@ -4,7 +4,7 @@ import { installChrome, settle, type StubEvent } from "../chrome-stub"
 import { installFakeRelaySocket, type RelayWireMessage } from "../relay-stub"
 
 // Toolbar clicks that wait for the relay: the queue in chrome.storage.session, the "…" badge that says so, and what
-// happens when an agent's browse starts the relay, the user clicks again, or the worker stops and another one restores
+// happens when an agent's browsevil starts the relay, the user clicks again, or the worker stops and another one restores
 // the queue. Run by ../isolated.test.ts in a process of its own.
 
 const stub = installChrome()
@@ -15,11 +15,11 @@ const PORT = 19910
 const KEY = "agentRelayPendingClicks"
 const WAITING = {
   text: "…",
-  title: "browse is waiting for the relay, which starts when an agent next uses browse. Click again to cancel.",
+  title: "browsevil is waiting for the relay, which starts when an agent next uses browsevil. Click again to cancel.",
 }
 const TAKE_BACK = {
   text: "…",
-  title: "browse will take this tab back when the relay connects, which happens when an agent next uses browse. Click again to cancel.",
+  title: "browsevil will take this tab back when the relay connects, which happens when an agent next uses browsevil. Click again to cancel.",
 }
 
 /** Nothing listens on the port: every attempt is refused, as it is while no relay runs. */

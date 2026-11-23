@@ -16,8 +16,8 @@ declare global {
   var __OPENCODE_BROWSEVIL_INSTALLER__: string | undefined
 }
 
-export const opencodeBrowserVersion: string = globalThis.__OPENCODE_BROWSEVIL_VERSION__ ?? "0.0.0-dev"
-export const opencodeBrowserBuildId: string = globalThis.__OPENCODE_BROWSEVIL_BUILD_ID__ ?? sourceBuildId()
+export const opencodevilBrowserVersion: string = globalThis.__OPENCODE_BROWSEVIL_VERSION__ ?? "0.0.0-dev"
+export const opencodevilBrowserBuildId: string = globalThis.__OPENCODE_BROWSEVIL_BUILD_ID__ ?? sourceBuildId()
 
 export function sourceBuildIdForFiles(files: readonly { readonly name: string; readonly content: string | Buffer }[]): string {
   const hash = crypto.createHash("sha256")

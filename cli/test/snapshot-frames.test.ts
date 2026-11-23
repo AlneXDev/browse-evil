@@ -14,9 +14,9 @@ describe("aria snapshot redaction failures", () => {
   })
 
   test("lookalike errors are not cleanup failures", () => {
-    expect(isRedactionCleanupFailure(new Error("browse could not confirm ARIA snapshot value-redaction cleanup"))).toBe(false)
+    expect(isRedactionCleanupFailure(new Error("browsevil could not confirm ARIA snapshot value-redaction cleanup"))).toBe(false)
     expect(isRedactionCleanupFailure(new AggregateError([], "aggregate"))).toBe(false)
-    expect(isRedactionCleanupFailure("browse could not confirm ARIA snapshot value-redaction cleanup")).toBe(false)
+    expect(isRedactionCleanupFailure("browsevil could not confirm ARIA snapshot value-redaction cleanup")).toBe(false)
   })
 })
 

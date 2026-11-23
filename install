@@ -1,9 +1,9 @@
 #!/bin/sh
-# Installs browse: downloads the browse binary for this computer from Anomaly's release service into ~/.local/bin
-# ($XDG_BIN_HOME when set), then hands over to `browse install`, which does the rest (PATH, your agents, pairing with your
-# browser). Served at https://opencode.ai/browse/install. Platform detection follows opencode's installer.
+# Installs browsevil: downloads the browsevil binary for this computer from Anomaly's release service into ~/.local/bin
+# ($XDG_BIN_HOME when set), then hands over to `browsevil install`, which does the rest (PATH, your agents, pairing with your
+# browser). Served at https://opencode.ai/browse/install. Platform detection follows opencodevil's installer.
 set -eu
-APP=browse
+APP=browsevil
 
 MUTED='\033[0;2m'
 RED='\033[0;31m'
@@ -11,9 +11,9 @@ NC='\033[0m'
 
 usage() {
     cat <<EOF
-browse installer
+browsevil installer
 
-Usage: install [options] [browse install options]
+Usage: install [options] [browsevil install options]
 
 Options:
     -h, --help              Display this help message
@@ -21,9 +21,9 @@ Options:
         --channel <channel> Install the latest version on a release channel:
                             stable (default), beta or dev. \`latest\` means stable
     -b, --binary <path>     Install from a local binary instead of downloading
-        --no-setup          Only install the binary; don't run \`browse install\`
+        --no-setup          Only install the binary; don't run \`browsevil install\`
 
-Anything else goes to \`browse install\`, e.g. --remote, --agent claude or --no-modify-path.
+Anything else goes to \`browsevil install\`, e.g. --remote, --agent claude or --no-modify-path.
 
 Examples:
     curl -fsSL https://opencode.ai/browse/install | bash
@@ -34,7 +34,7 @@ EOF
 }
 
 fail() {
-    printf '%b\n' "${RED}browse: $*${NC}" >&2
+    printf '%b\n' "${RED}browsevil: $*${NC}" >&2
     exit 1
 }
 
@@ -138,11 +138,11 @@ fi
 requested_version="${requested_version#v}"
 
 INSTALL_DIR=${XDG_BIN_HOME:-$HOME/.local/bin}
-# `browse install` and the updater use $OPENCODE_BROWSEVIL_HOME/bin when it's set, so install there too.
+# `browsevil install` and the updater use $OPENCODE_BROWSEVIL_HOME/bin when it's set, so install there too.
 if [ -n "${OPENCODE_BROWSEVIL_HOME:-}" ]; then
     INSTALL_DIR=$OPENCODE_BROWSEVIL_HOME/bin
 fi
-# XDG paths must be absolute; a relative one would put browse in the current directory.
+# XDG paths must be absolute; a relative one would put browsevil in the current directory.
 case "$INSTALL_DIR" in
     /*) ;;
     *) INSTALL_DIR=$HOME/.local/bin ;;
@@ -261,13 +261,13 @@ else
     fi
 
     package="@opencode/browsevil-$target"
-    encoded="@opencode%2fbrowse-$target"
+    encoded="@opencodevil%2fbrowsevil-$target"
     # A pinned version comes from npm: the release service has one current release per channel and no version lookup.
     if [ -n "$requested_version" ]; then
         specific_version=$requested_version
-        tmp_dir="${TMPDIR:-/tmp}/browse_install_$$"
+        tmp_dir="${TMPDIR:-/tmp}/browsevil_install_$$"
         mkdir -p "$tmp_dir"
-        # The pinned flow owns this directory until it execs `browse install` below, which a trap can't cross. Remove it
+        # The pinned flow owns this directory until it execs `browsevil install` below, which a trap can't cross. Remove it
         # on every other exit, including failures inside command substitutions and failed metadata reads. tmp_dir is set
         # before the trap, so it can only ever remove this run's directory.
         trap 'rm -rf "$tmp_dir"' EXIT
@@ -280,7 +280,7 @@ else
         http_status=$(curl -s -o "$metadata_file" -w "%{http_code}" "https://registry.npmjs.org/$encoded/$specific_version" || true)
         if [ "$http_status" = "404" ]; then
             rm -rf "$tmp_dir"
-            printf '%b\n' "${RED}Error: browse ${specific_version} is not available for $target${NC}"
+            printf '%b\n' "${RED}Error: browsevil ${specific_version} is not available for $target${NC}"
             printf '%b\n' "${MUTED}Available versions: https://www.npmjs.com/package/$package?activeTab=versions${NC}"
             exit 1
         fi
@@ -315,7 +315,7 @@ else
             rm -rf "$tmp_dir"
             fail "$package@$specific_version has an invalid SHA-512 integrity; nothing was installed"
         fi
-        filename="browse-$target-$specific_version.tgz"
+        filename="browsevil-$target-$specific_version.tgz"
         url="https://registry.npmjs.org/$package/-/$filename"
     fi
 fi
@@ -366,7 +366,7 @@ service_target() {
 }
 
 download_npm() (
-    print_message info "\n${MUTED}Installing ${NC}browse ${MUTED}version: ${NC}$specific_version"
+    print_message info "\n${MUTED}Installing ${NC}browsevil ${MUTED}version: ${NC}$specific_version"
 
     for delay in 0 15 30 60 75; do
         if [ "$delay" != 0 ]; then
@@ -381,16 +381,16 @@ download_npm() (
     if [ "$ret" = 22 ] && [ "$http_status" = 404 ] && [ -z "$requested_version" ] && { [ "$channel" = latest ] || [ "$channel" = dev ]; }; then
         pattern='[0-9]+\.[0-9]+\.[0-9]+'
         if [ "$channel" = dev ]; then pattern="${pattern}"'-dev\.[0-9]+(\.[0-9]+)?'; fi
-        # The platform manifests contain only browse versions. Sort numeric components (including dev run/rerun).
+        # The platform manifests contain only browsevil versions. Sort numeric components (including dev run/rerun).
         curl -fsSL -H 'Accept: application/vnd.npm.install-v1+json' "https://registry.npmjs.org/$encoded" -o "$tmp_dir/versions.json"
         previous=$(tr ',' '\n' <"$tmp_dir/versions.json" |
             sed -nE "s/.*\"version\":[[:space:]]*\"($pattern)\".*/\\1/p" |
             LC_ALL=C sort -u -t . -k1,1nr -k2,2nr -k3,3nr -k4,4nr -k5,5nr |
             awk -v current="$specific_version" 'prev == current {print} {prev=$0}')
         if [ -n "$previous" ]; then
-            print_message warning "browse $specific_version is still unavailable; falling back to $previous ($channel)." >&2
+            print_message warning "browsevil $specific_version is still unavailable; falling back to $previous ($channel)." >&2
             ret=0
-            curl -f -# -L -o "$tmp_dir/$filename" "${url%/*}/browse-$target-$previous.tgz" || ret=$?
+            curl -f -# -L -o "$tmp_dir/$filename" "${url%/*}/browsevil-$target-$previous.tgz" || ret=$?
         fi
     fi
     # curl exits 23 when it cannot write the file, usually because the temporary directory is full.
@@ -427,18 +427,18 @@ download_release() (
         *) fail "OPENCODE_BROWSEVIL_RELEASE_SERVICE must end in /release, not $service" ;;
     esac
     service_target_name=$(service_target "$target")
-    tmp_dir="${TMPDIR:-/tmp}/browse_install_$$"
+    tmp_dir="${TMPDIR:-/tmp}/browsevil_install_$$"
     mkdir -p "$tmp_dir"
 
     # The version isn't known before the manifest, so the manifest request names the tool instead.
-    curl -fsSL -A "browse/$channel/install" -o "$tmp_dir/manifest.json" "$service/browse/cli/$channel.json" ||
-        fail "no $channel release at $service/browse/cli/$channel.json"
+    curl -fsSL -A "browsevil/$channel/install" -o "$tmp_dir/manifest.json" "$service/browsevil/cli/$channel.json" ||
+        fail "no $channel release at $service/browsevil/cli/$channel.json"
     # The manifest is JSON; without whitespace, every field this needs is a plain "key":value pair (URLs, hashes and
     # versions have no spaces).
     manifest=$(tr -d ' \t\r\n' <"$tmp_dir/manifest.json")
-    if [ "$(field app "$manifest")" != browse ] || [ "$(field artifact "$manifest")" != cli ] ||
+    if [ "$(field app "$manifest")" != browsevil ] || [ "$(field artifact "$manifest")" != cli ] ||
         [ "$(field channel "$manifest")" != "$channel" ]; then
-        fail "$service/browse/cli/$channel.json is not browse's $channel CLI manifest"
+        fail "$service/browsevil/cli/$channel.json is not browsevil's $channel CLI manifest"
     fi
     release_json="${manifest#*\"release\":}"
     specific_version=$(field version "$release_json")
@@ -456,8 +456,8 @@ download_release() (
     esac
     filename="${url##*/}"
 
-    print_message info "\n${MUTED}Installing ${NC}browse ${MUTED}version: ${NC}$specific_version ${MUTED}($channel)${NC}"
-    curl -f -# -L -A "browse/$channel/$specific_version/cli" -o "$tmp_dir/$filename" "$url" || exit $?
+    print_message info "\n${MUTED}Installing ${NC}browsevil ${MUTED}version: ${NC}$specific_version ${MUTED}($channel)${NC}"
+    curl -f -# -L -A "browsevil/$channel/$specific_version/cli" -o "$tmp_dir/$filename" "$url" || exit $?
     actual_sha=$(sha256_file "$tmp_dir/$filename")
     if [ -z "$expected_sha" ] || [ "$expected_sha" != "$actual_sha" ]; then
         fail "checksum mismatch for $filename (expected ${expected_sha:-none}, got $actual_sha)"
@@ -477,7 +477,7 @@ download_release() (
 )
 
 install_from_binary() {
-    print_message info "\n${MUTED}Installing ${NC}browse ${MUTED}from: ${NC}$binary_path"
+    print_message info "\n${MUTED}Installing ${NC}browsevil ${MUTED}from: ${NC}$binary_path"
     cp "$binary_path" "$INSTALL_DIR/$installed_binary.new"
     chmod 755 "$INSTALL_DIR/$installed_binary.new"
     mv -f "$INSTALL_DIR/$installed_binary.new" "$INSTALL_DIR/$installed_binary"
@@ -492,12 +492,12 @@ else
 fi
 
 if [ "$no_setup" = "true" ]; then
-    print_message info "\n${MUTED}Run ${NC}$INSTALL_DIR/$installed_binary install ${MUTED}to add browse to your agents and pair it with your browser.${NC}"
+    print_message info "\n${MUTED}Run ${NC}$INSTALL_DIR/$installed_binary install ${MUTED}to add browsevil to your agents and pair it with your browser.${NC}"
     exit 0
 fi
 
 echo ""
-# `curl | sh` feeds this script through stdin, so give `browse install` the terminal for its agent picker. An agent
+# `curl | sh` feeds this script through stdin, so give `browsevil install` the terminal for its agent picker. An agent
 # running this has no terminal: install then sets up the agent that ran it.
 if [ -t 1 ] && { : </dev/tty; } 2>/dev/null; then
     # Bun on macOS can poll the pty slave, but not the /dev/tty alias.

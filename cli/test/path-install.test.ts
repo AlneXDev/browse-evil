@@ -5,7 +5,7 @@ import path from "node:path"
 import { spawnSync } from "node:child_process"
 
 test.skipIf(process.platform === "win32")("the streamed installer accepts POSIX sh and preserves setup arguments", () => {
-  const home = mkdtempSync(path.join(tmpdir(), "browse installer-"))
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil installer-"))
   try {
     const stub = path.join(home, "test binary")
     writeFileSync(stub, `#!/bin/sh\nprintf '<%s>\\n' "$@"\n`)
@@ -15,14 +15,14 @@ test.skipIf(process.platform === "win32")("the streamed installer accepts POSIX 
       })
       expect(run.status, `${shell}: ${run.stderr}`).toBe(0)
       expect(run.stdout).toEndWith("<install>\n<--remote>\n<two words>\n<>\n<*>\n")
-      expect(existsSync(path.join(home, ".local/bin/browse"))).toBe(true)
-      expect(existsSync(path.join(home, ".browse"))).toBe(false)
+      expect(existsSync(path.join(home, ".local/bin/browsevil"))).toBe(true)
+      expect(existsSync(path.join(home, ".browsevil"))).toBe(false)
     }
   } finally { rmSync(home, { recursive: true, force: true }) }
 })
 
-test.skipIf(process.platform === "win32")("the installer honours XDG_BIN_HOME and still never creates ~/.browse", () => {
-  const home = mkdtempSync(path.join(tmpdir(), "browse installer-xdg-"))
+test.skipIf(process.platform === "win32")("the installer honours XDG_BIN_HOME and still never creates ~/.browsevil", () => {
+  const home = mkdtempSync(path.join(tmpdir(), "browsevil installer-xdg-"))
   try {
     const stub = path.join(home, "test binary")
     writeFileSync(stub, "#!/bin/sh\nexit 0\n")
@@ -32,14 +32,14 @@ test.skipIf(process.platform === "win32")("the installer honours XDG_BIN_HOME an
       input: readFileSync(path.join(import.meta.dir, "../../install")), encoding: "utf8",
     })
     expect(run.status, run.stderr).toBe(0)
-    expect(existsSync(path.join(bin, "browse"))).toBe(true)
-    expect(existsSync(path.join(home, ".browse"))).toBe(false)
+    expect(existsSync(path.join(bin, "browsevil"))).toBe(true)
+    expect(existsSync(path.join(home, ".browsevil"))).toBe(false)
   } finally { rmSync(home, { recursive: true, force: true }) }
 })
 
 test.skipIf(process.platform === "win32")("the installed PATH line works in sh with spaces and shell metacharacters", () => {
   const home = mkdtempSync(path.join(tmpdir(), "Jane O'Neil $home-"))
-  const dir = path.join(home, ".local/bin"), binary = path.join(dir, "browse")
+  const dir = path.join(home, ".local/bin"), binary = path.join(dir, "browsevil")
   mkdirSync(dir, { recursive: true }); writeFileSync(binary, "")
   const env: NodeJS.ProcessEnv = { ...process.env, HOME: home, SHELL: "/bin/sh", TEST_BINARY: binary, GITHUB_ACTIONS: "false" }
   const run = (action: string) => spawnSync(process.execPath, ["-e", `import { addToPath, removeBinaryInstall } from './src/setup/binary.ts'; Object.defineProperty(process,'execPath',{value:process.env.TEST_BINARY}); ${action}`], { cwd: path.join(import.meta.dir, ".."), env })
@@ -48,6 +48,6 @@ test.skipIf(process.platform === "win32")("the installed PATH line works in sh w
     const shell = spawnSync("/bin/sh", ["-c", `. "$HOME/.profile" && printf '%s' "$PATH"`], { env, encoding: "utf8" })
     expect(shell.stdout).toBe(`${dir}:${env.PATH}`)
     expect(run("removeBinaryInstall(process.execPath)").status).toBe(0)
-    expect(readFileSync(path.join(home, ".profile"), "utf8")).not.toContain("# browse")
+    expect(readFileSync(path.join(home, ".profile"), "utf8")).not.toContain("# browsevil")
   } finally { rmSync(home, { recursive: true, force: true }) }
 })

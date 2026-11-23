@@ -2,7 +2,7 @@ import { expect, test } from "bun:test"
 import { installChrome, settle } from "../chrome-stub"
 
 // A pairing code typed without a port must never be carried to a port only a scan found: someone else can answer
-// /version like browse there. It goes to 29698 instead, and the scanned port is forgotten so the next attempt starts
+// /version like browsevil there. It goes to 29698 instead, and the scanned port is forgotten so the next attempt starts
 // from the default. Run by ../isolated.test.ts in its own process.
 
 const stub = installChrome()

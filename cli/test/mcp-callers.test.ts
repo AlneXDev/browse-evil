@@ -13,7 +13,7 @@ import { mcpStdio, type McpReply } from "./support/mcp-stdio.ts"
 // OpenCode runs one MCP server per server config and process, shared by every agent session and subagent, and names
 // the calling agent in each tools/call's _meta. Each named agent gets its own current session; calls that name no
 // agent share one, as when a client runs a parent agent and its subagents through one server without naming them.
-const home = fs.mkdtempSync(path.join(os.tmpdir(), "browse-mcp-callers-"))
+const home = fs.mkdtempSync(path.join(os.tmpdir(), "browsevil-mcp-callers-"))
 afterAll(() => fs.rmSync(home, { recursive: true, force: true }))
 
 const modernMeta = {
@@ -21,7 +21,7 @@ const modernMeta = {
   "io.modelcontextprotocol/clientCapabilities": {},
   "io.modelcontextprotocol/clientInfo": { name: "test", version: "0" },
 }
-const agent = (sessionID: string) => ({ "ai.opencode/sessionID": sessionID })
+const agent = (sessionID: string) => ({ "ai.opencodevil/sessionID": sessionID })
 const structured = (reply: McpReply) => {
   expect(reply.result?.isError, JSON.stringify(reply)).toBe(false)
   return reply.result?.structuredContent as Record<string, unknown>
@@ -48,7 +48,7 @@ async function browser(port: number) {
 
 async function initialized(port: number) {
   const mcp = mcpStdio({ home, port })
-  await mcp.request("initialize", { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "opencode", version: "0" } })
+  await mcp.request("initialize", { protocolVersion: "2025-11-25", capabilities: {}, clientInfo: { name: "opencodevil", version: "0" } })
   mcp.notify("notifications/initialized")
   return mcp
 }
@@ -104,7 +104,7 @@ describe("one MCP server shared by several agents", () => {
       expect(a).toMatch(/^mcp-[0-9a-f]{8}$/)
       expect(new Set([a, b, shared]).size).toBe(3)
       expect(await status(first)).toBe(shared)
-      // A new server (an update swap, or opencode restarting) derives the same session for the same agent.
+      // A new server (an update swap, or opencodevil restarting) derives the same session for the same agent.
       const second = mcpStdio({ home, port: relay.port })
       servers.push(second)
       expect(await status(second, { ...modernMeta, ...agent("ses_agent_a") })).toBe(a)
