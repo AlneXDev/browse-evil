@@ -234,11 +234,12 @@ export function autoUpdateStatus(options: { readonly env?: NodeJS.ProcessEnv; re
     install,
     cli: cliPrefix(),
     mode: storedMode(),
-    effective: install === "binary" || install === "npm" ? (override ?? storedMode()) : "off",
+    // evil-v2: never auto-update from Anomaly's feed - it would replace the evil build with normal Browse.
+    effective: "off" as const,
     ...(override ? { overriddenBy: env.OPENCODE_BROWSEVIL_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSEVIL_AUTO_UPDATE" : "OPENCODE_BROWSEVIL_UPDATE_CHECK" } : {}),
     ...(runtime ? { version: runtime.version, channel: channelOf(runtime.version) } : {}),
-    ...(state.latest ? { latest: state.latest } : {}),
-    ...(state.latestAt ? { latestAt: new Date(state.latestAt).toISOString() } : {}),
+    // evil-v2: do not advertise the normal release feed.
+
     ...(state.checkedAt ? { checkedAt: new Date(state.checkedAt).toISOString() } : {}),
     ...(state.lastUpdate ? { lastUpdate: state.lastUpdate } : {}),
     ...(state.lastError ? { lastError: state.lastError } : {}),
@@ -246,29 +247,17 @@ export function autoUpdateStatus(options: { readonly env?: NodeJS.ProcessEnv; re
 }
 
 /** One line for `status`. */
-export function describeAutoUpdate(status: AutoUpdateStatus): string {
-  if (status.install === "checkout") return "Updates:   checkout install; `update` pulls new commits"
-  if (status.install === "npx") return "Updates:   npx resolves the package itself; `update` is a no-op"
-  if (status.install !== "binary" && status.install !== "npm") return "Updates:   not an installed runtime"
-  const mode = { on: "automatic", notify: "notify only", off: "off" }[status.effective]
-  const parts = [`${mode}${status.overriddenBy ? ` (set by ${status.overriddenBy})` : ""}`, `channel ${status.channel ?? "latest"}`]
-  if (updateAvailable(status))
-    parts.push(
-      status.effective === "on"
-        ? `${status.latest} available; the installer runs when no agent is using the browser`
-        : `${status.latest} available; run \`${status.cli} update\` to install it`,
-    )
-  if (status.lastError) parts.push(`last attempt failed: ${status.lastError.message}`)
-  return `Updates:   ${parts.join("; ")}`
+export function describeAutoUpdate(_status: AutoUpdateStatus): string {
+  // evil-v2: updates come only from the evil GitHub release.
+  return "Updates:   evil GitHub release (https://github.com/AlneXDev/browse-evil/releases); run `browsevil update`"
 }
 
 /**
- * Whether `status.latest` is another build: the release service's current release is compared for equality only, as
- * the protocol says; npm's dist-tag is ordered as npm orders versions.
+ * evil-v2: never offer an update from Anomaly's feed - it would replace the evil build with normal Browse.
+ * New releases are downloaded manually from the evil GitHub release.
  */
-export function updateAvailable(status: Pick<AutoUpdateStatus, "install" | "latest" | "version">): boolean {
-  if (!status.latest || !status.version) return false
-  return status.install === "binary" ? status.latest !== status.version : compareVersions(status.latest, status.version) > 0
+export function updateAvailable(_status: Pick<AutoUpdateStatus, "install" | "latest" | "version">): boolean {
+  return false
 }
 
 // ---- registry and installer ----------------------------------------------------------------------------

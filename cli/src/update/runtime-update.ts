@@ -1,3 +1,4 @@
+import { checkGithubUpdate, installGithubUpdate, GITHUB_RELEASE_PAGE } from "./github-update.ts"
 // Restarting an install after an update (auto-update.ts has the layout): `update`, and the two commands the relay's
 // updater runs in detached children so nothing waits on its event loop:
 //   self-update <version> [--channel <tag>]   reruns the installer (binary: its release service channel; npm: npm
@@ -92,62 +93,35 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
   }
   const channel = channelOf(runtime.version)
   if (runtime.kind === "binary") {
-    const target = runningServiceTarget()
-    if (!target) {
-      log("✗ This executable isn't a released browsevil build, so it has no release channel to follow.")
+    const update = await checkGithubUpdate(runtime.version).catch((error: Error) => error)
+    if (update instanceof Error) {
+      log(`? Couldn't check the evil GitHub release: ${update.message}`)
       process.exitCode = 1
       return true
     }
-    const serviceChannel = releaseChannel(channel)
-    const answer = await checkRelease({ version: runtime.version, channel: serviceChannel, target }).catch((error: Error) => error)
-    if (answer instanceof Error) {
-      log(`✗ Couldn't check for updates: ${answer.message}`)
-      process.exitCode = 1
+    if (!update) {
+      log(`V Up to date: ${runtime.version} is the current evil GitHub release.`)
       return true
     }
-    if (answer.status === "missing") {
-      log(`✗ There is no ${serviceChannel} release of browsevil yet.`)
-      process.exitCode = 1
-      return true
-    }
-    if (answer.status === "unchanged") {
-      log(`✓ Up to date: ${runtime.version} is the current ${serviceChannel} release.`)
-      return true
-    }
-    const decision: ReleaseDecision = answer.decision
-    if (decision.action === "reject") {
-      log(`✗ The ${serviceChannel} release manifest was rejected (${decision.reason}). Try again later.`)
-      process.exitCode = 1
-      return true
-    }
-    if (decision.action === "none") {
-      updateState(({ failed: _failed, latest: _latest, ...state }) => ({ ...state, checkedAt: Date.now() }))
-      log(decision.reason === "rollout_deferred" ? `✓ Up to date: ${runtime.version}; the ${serviceChannel} release ${answer.releaseVersion} is still rolling out.` : `✓ Up to date: ${runtime.version} is the current ${serviceChannel} release.`)
-      return true
-    }
-    updateState(({ failed: _failed, ...state }) => ({ ...state, checkedAt: Date.now(), latest: decision.version, ...(answer.etag ? { etag: answer.etag } : {}) }))
     if (args.includes("--check")) {
-      log(`Update available: ${decision.version} (you have ${runtime.version}). Run \`${cliCommand("update")}\` to install it.`)
+      log(`Update available: ${update.latest} (you have ${runtime.version}) at ${GITHUB_RELEASE_PAGE}. Run \`${cliCommand("update")}\` to install it.`)
       return true
     }
-    log(`Installing ${decision.version} (you have ${runtime.version})…`)
-    // The installer reads the same manifest and checks the file's size and SHA-256; it follows the channel, so a
-    // release that moved on between the check and the download still installs the current build.
-    const installed = await runInstaller({ runtime, channel: serviceChannel }).catch((error: Error) => {
-      log(`✗ ${error.message}`)
+    log(`Installing ${update.latest} (you have ${runtime.version}) from ${GITHUB_RELEASE_PAGE}.`)
+    const installed = await installGithubUpdate(update).catch((error: Error) => {
+      log(`? ${error.message}`)
       process.exitCode = 1
       return undefined
     })
     if (!installed) return true
-    updateState(({ installing: _installing, ...state }) => ({ ...state, lastUpdate: { from: runtime.version, to: installed, at: new Date().toISOString() } }))
+    updateState(({ failed: _failed, latest: _latest, ...state }) => ({ ...state, checkedAt: Date.now(), lastUpdate: { from: runtime.version, to: installed, at: new Date().toISOString() } }))
     const { refused } = await switchTo({ ...runtime, version: installed }, installed, { force: args.includes("--force") })
     if (refused) {
-      const automatic = effectiveMode() === "on"
       log(`! Installed ${installed}, but the relay didn't restart (${refused}).`)
-      log(automatic ? "  It keeps running the old version until no agent is using the browser, then restarts." : `  When no agent is using the browser, run \`${cliCommand("update")}\` again.`)
+      log(`  When no agent is using the browser, run \`${cliCommand("update")}\` again.`)
       return true
     }
-    log(`✓ Updated ${runtime.version} → ${installed}.`)
+    log(`V Updated ${runtime.version} \u2192 ${installed}.`)
     return true
   }
   const published = await fetchPublished({ registry: await registryUrl(), channel }).catch((error: Error) => error)
