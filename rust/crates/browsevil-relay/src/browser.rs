@@ -303,8 +303,7 @@ impl Relay {
             }
             "paired-offline" => Some("The paired browser isn't connected right now: open it (the profile with browsevil) and check that the extension is turned on. It reconnects by itself.".into()),
             _ => Some(format!(
-                "No browser has connected to browsevil yet. Add the browsevil extension from https://chromewebstore.google.com/detail/{} (if it's already added, open that browser), then run `browsevil install` to pair it, or `browsevil pair` for a code to enter in the extension.",
-                protocol::store_id()
+                "No browser has connected to browsevil yet. Download the evil extension zip from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip, extract it and load it unpacked in chrome://extensions (Developer mode -> Load unpacked), then run `browsevil install` to pair it, or `browsevil pair` for a code to enter in the extension."
             )),
         };
         let browsers: Vec<Value> = st

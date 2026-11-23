@@ -388,7 +388,7 @@ async fn answer(relay: Arc<Relay>, peer: SocketAddr, request: &mut Request<Incom
     let probing = header(request, "x-browsevil-install") == Some("probe") && relay.st().install_waiting_until.is_some_and(|until| Instant::now() < until);
     let compatibility = json!({ "extensionProtocol": { "min": MIN_EXTENSION_PROTOCOL_VERSION, "version": EXTENSION_PROTOCOL_VERSION }, "pairing": PAIRING_SCHEME });
     if let Err(error) = crate::origins::validate_fetch_site(header(request, "sec-fetch-site")) {
-        let mut body = json!({ "error": error });
+        let mut body = json!({ "error": error, "app": "browsevil" });
         if request.method() == hyper::Method::GET && path == "/version" {
             body["extensionProtocol"] = compatibility["extensionProtocol"].clone();
             body["pairing"] = compatibility["pairing"].clone();
@@ -402,6 +402,7 @@ async fn answer(relay: Arc<Relay>, peer: SocketAddr, request: &mut Request<Incom
         let mut body = json!({
             "version": relay.version,
             "buildId": relay.build_id,
+            "app": "browsevil",
             "instanceId": relay.instance_id,
             "startedAt": relay.started_at,
             "pid": std::process::id(),

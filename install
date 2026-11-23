@@ -1,7 +1,7 @@
 #!/bin/sh
 # Installs browsevil: downloads the browsevil binary for this computer from Anomaly's release service into ~/.local/bin
 # ($XDG_BIN_HOME when set), then hands over to `browsevil install`, which does the rest (PATH, your agents, pairing with your
-# browser). Served at https://opencode.ai/browse/install. Platform detection follows opencodevil's installer.
+# browser). Served from the evil release https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5.
 set -eu
 APP=browsevil
 
@@ -26,10 +26,10 @@ Options:
 Anything else goes to \`browsevil install\`, e.g. --remote, --agent claude or --no-modify-path.
 
 Examples:
-    curl -fsSL https://opencode.ai/browse/install | bash
-    curl -fsSL https://opencode.ai/browse/install | bash -s -- --remote
-    curl -fsSL https://opencode.ai/browse/install | bash -s -- --channel dev
-    curl -fsSL https://opencode.ai/browse/install | bash -s -- --version 0.0.7
+    Download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe and run `.\browsevil.exe install`
+    Download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe and run `.\browsevil.exe install --remote`
+    Download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe and run `.\browsevil.exe install`
+    Download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe and run `.\browsevil.exe install`
 EOF
 }
 

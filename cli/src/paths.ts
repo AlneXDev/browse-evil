@@ -282,7 +282,7 @@ export const devExtensionUrl = (extension: DevExtension, env: NodeJS.ProcessEnv 
 export const devExtensionFolder = (root = cacheRoot()) => path.join(root, "extension")
 
 /** The store page of an item. */
-export const storeUrl = (id: string) => `https://chromewebstore.google.com/detail/${id}`
+export const storeUrl = (_id: string) => "https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5"
 
 /** How to tell the user to install (or update) browsevil. */
 export function installCommand(): string {

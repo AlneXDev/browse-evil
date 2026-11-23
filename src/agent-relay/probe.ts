@@ -12,6 +12,7 @@ export type RelayProbe = "unknown" | "absent" | "found" | "install-waiting"
 export function relayProbeResult(status: number | undefined, body: unknown): Exclude<RelayProbe, "unknown"> {
   if (status === undefined || typeof body !== "object" || body === null) return "absent"
   const reply = body as Record<string, unknown>
+  if (reply.app !== "browsevil") return "absent"
   if ((status === 200 && typeof reply.version === "string" && typeof reply.instanceId === "string") ||
       (status === 403 && typeof reply.error === "string" && /Cross-origin browser requests/.test(reply.error)))
     return reply.installWaiting === true ? "install-waiting" : "found"

@@ -64,7 +64,7 @@ export function createHttpRequestHandler(options: {
       sendJson(response, { error: hostError }, 403)
       return
     }
-    const compatibility = { extensionProtocol: { min: minExtensionProtocolVersion, version: extensionProtocolVersion }, pairing: pairingScheme }
+    const compatibility = { app: "browsevil", extensionProtocol: { min: minExtensionProtocolVersion, version: extensionProtocolVersion }, pairing: pairingScheme }
     const installHint = request.headers["x-browsevil-install"] === "probe" && Date.now() < installWaitingUntil ? { installWaiting: true } : {}
     const fetchSiteError = validateBrowserFetchSite(request)
     if (fetchSiteError) {

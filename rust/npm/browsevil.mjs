@@ -42,7 +42,7 @@ const file = binary()
 if (!file) {
   console.error(
     `browsevil: no browsevil binary for ${process.platform}-${process.arch} is installed. Reinstall without --omit=optional ` +
-      "or --no-optional, or install the binary instead: curl -fsSL https://opencode.ai/browse/install | bash",
+      "or --no-optional, or install the binary instead: download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe and run it with install",
   )
   process.exit(1)
 }
