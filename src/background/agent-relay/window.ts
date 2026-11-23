@@ -62,7 +62,7 @@ export function isPlacement(value: unknown): value is Placement {
 /** The status page's setting: "current" (the user's window, the default) or "separate". */
 export async function placement(): Promise<Placement> {
   const stored = (await chrome.storage.local.get(PLACEMENT_KEY))[PLACEMENT_KEY]
-  return isPlacement(stored) ? stored : "current"
+  return isPlacement(stored) ? stored : "separate"
 }
 
 /** The agent window's id, if it is still open. */
