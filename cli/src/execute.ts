@@ -522,7 +522,7 @@ export class ExecuteSandbox extends DefaultPageHost {
           timeout: adoptedDefaultTarget ? adoptedPageConnectTimeoutMs : playwrightConnectTimeoutMs,
           headers: {
             Authorization: `Bearer ${this.options.authToken ?? relayToken()}`,
-            ...(this.options.sessionId ? { "OpenCode-Browser-Session-Id": encodeURIComponent(this.options.sessionId), "OpenCode-Browser-Client-Kind": "sandbox" } : {}),
+            ...(this.options.sessionId ? { "opencodevil-browser-session-id": encodeURIComponent(this.options.sessionId), "opencodevil-browser-client-kind": "sandbox" } : {}),
           },
         })
       } catch (cause) {
