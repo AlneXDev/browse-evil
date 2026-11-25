@@ -17,7 +17,7 @@ fi
 
 export COPYFILE_DISABLE=1
 for target in darwin-arm64 darwin-x64 darwin-x64-baseline; do
-  file="opencode-browse-$target-$BROWSE_VERSION.tgz"
+  file="opencode-browsevil-$target-$BROWSE_VERSION.tgz"
   test -s "$in/$file" || die "Missing $in/$file"
   work=$(mktemp -d)
   tar -xzf "$in/$file" -C "$work" package/package.json package/LICENSE package/bin/browse

@@ -261,7 +261,7 @@ else
     fi
 
     package="@opencode/browsevil-$target"
-    encoded="@opencodevil%2fbrowsevil-$target"
+    encoded="@opencode%2fbrowsevil-$target"
     # A pinned version comes from npm: the release service has one current release per channel and no version lookup.
     if [ -n "$requested_version" ]; then
         specific_version=$requested_version

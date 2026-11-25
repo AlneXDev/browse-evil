@@ -141,7 +141,7 @@ Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --
             }
 
             $package = "@opencode/browsevil-windows-$target"
-            $encoded = "@opencodevil%2fbrowsevil-windows-$target"
+            $encoded = "@opencode%2fbrowsevil-windows-$target"
             if ($pinned) {
                 $version = $requested -replace "^v", ""
                 if (-not $version) { throw "--version needs a version, e.g. 0.0.14" }

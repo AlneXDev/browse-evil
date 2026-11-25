@@ -7,7 +7,7 @@
 #
 # Every channel publishes both artifacts:
 #
-#   extension  chromium   the extension zip: browse-extension-<version>.zip, the store build on stable and the unpacked
+#   extension  chromium   the extension zip: opencode-evil-browse-extension-<version>.zip, the store build on stable and the unpacked
 #                         one on dev
 #   cli        one target per binary (the same eleven targets as @opencode/browsevil-<target>), npm's darwin is the
 #              service's macos: opencode-browsevil-<target>-<version>.tgz
@@ -30,7 +30,7 @@ case "$BROWSE_CHANNEL" in
   latest) channel=stable ;;
   *) die "Unknown channel $BROWSE_CHANNEL" ;;
 esac
-extension="browse-extension-$BROWSE_VERSION.zip"
+extension="opencode-evil-browse-extension-$BROWSE_VERSION.zip"
 [[ "$BROWSE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || die "Not a release version: $BROWSE_VERSION"
 if [ "$channel" = stable ]; then stable_version "$BROWSE_VERSION" || die "Not a stable version: $BROWSE_VERSION"; fi
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# publish-cws.sh <build dir>: uploads browse-extension-<BROWSE_VERSION>.zip to the Chrome Web Store item and submits it
+# publish-cws.sh <build dir>: uploads opencode-evil-browse-extension-<BROWSE_VERSION>.zip to the Chrome Web Store item and submits it
 # for review, with the Chrome Web Store API v2 and curl.
 #
 # Environment: CWS_CLIENT_ID, CWS_PUBLISHER_ID and CWS_ITEM_ID (repository variables), CWS_CLIENT_SECRET and
@@ -43,7 +43,7 @@ older_version() {
 }
 # Prints the version of the newest stable release other than this one (no "v"), fails with 1 when there is none and
 # 2 when the releases can't be read. release.yml creates a GitHub release only after this job succeeded, and every
-# release carries browse-extension-<version>.zip (opencode-browser-<version>.zip before the zip was renamed, which
+# release carries opencode-evil-browse-extension-<version>.zip (opencode-browser-<version>.zip before the zip was renamed, which
 # download_extension still reads), so that asset is the extension the store last received. A rerun of
 # this version skips its own release and compares with the one before.
 previous_release() {
@@ -70,11 +70,11 @@ same_extension() {
     <(cd "$2" && find . -type f -print0 | LC_ALL=C sort -z | xargs -0 sha256sum) > /dev/null
 }
 # download_extension <version> <dir>: downloads that release's extension zip into <dir> and prints its file name. The
-# current name is browse-extension-<version>.zip; releases up to the rename carry opencode-browser-<version>.zip, and a
+# current name is opencode-evil-browse-extension-<version>.zip; releases up to the rename carry opencode-browser-<version>.zip, and a
 # skip check against one of those still compares with the extension the store has.
 download_extension() {
   local version=$1 dir=$2 name
-  for name in "browse-extension-$version.zip" "opencode-browser-$version.zip"; do
+  for name in "opencode-evil-browse-extension-$version.zip" "opencode-browser-$version.zip"; do
     if gh release download "v$version" --repo "$GITHUB_REPOSITORY" --pattern "$name" --dir "$dir" --clobber 2> "$work/download.err"; then
       printf '%s' "$name"
       return 0
@@ -89,7 +89,7 @@ compare_with() {
   note=""
   mkdir -p "$dir/zip" "$dir/unpacked" "$work/current"
   if ! file=$(download_extension "$version" "$dir/zip"); then
-    note="Couldn't download browse-extension-$version.zip or opencode-browser-$version.zip from v$version ($(head -n 1 "$work/download.err")), so there's nothing to compare with."
+    note="Couldn't download opencode-evil-browse-extension-$version.zip or opencode-browser-$version.zip from v$version ($(head -n 1 "$work/download.err")), so there's nothing to compare with."
     return 1
   fi
   if [ ! -f "$work/current/manifest.json" ]; then unzip -q "$zip" -d "$work/current"; fi
@@ -101,7 +101,7 @@ token_url=$(endpoint "${CWS_TOKEN_URL:-}" https://oauth2.googleapis.com/token)
 poll=${CWS_POLL_SECONDS:-5}
 
 stable_version "$BROWSE_VERSION" || die "Not a stable version: $BROWSE_VERSION"
-zip="$1/browse-extension-$BROWSE_VERSION.zip"
+zip="$1/opencode-evil-browse-extension-$BROWSE_VERSION.zip"
 test -s "$zip" || die "Missing $zip"
 verify_attestation "$zip"
 # Never upload a zip whose manifest isn't the version being released.

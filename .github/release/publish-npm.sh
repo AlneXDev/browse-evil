@@ -33,7 +33,7 @@ for target in $targets; do
   IFS=- read -r os arch _ <<< "$target"
   executable=browse libc=""
   case $os in
-    windows) os=win32 executable=browse.exe ;;
+    windows) os=win32 executable=browsevil.exe ;;
     linux) libc=glibc ;;
   esac
   if [[ "$target" == *-musl ]]; then libc=musl; fi

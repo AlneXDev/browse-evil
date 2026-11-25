@@ -100,7 +100,7 @@ if [ "$mode" = stable ]; then
   stable_version "$version" || die "Invalid release version $version (x.y.z, each part at most 65535)"
   [ "$(printf '%s\n%s\n' "$base" "$version" | sort -V | tail -n 1)" = "$version" ] && [ "$version" != "$base" ] ||
     die "$version must be newer than cli/package.json ($current) and the newest tag (${base_tag:-none})"
-  status=$(curl -sS -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/@opencode%2fbrowse/$version")
+  status=$(curl -sS -o /dev/null -w '%{http_code}' "https://registry.npmjs.org/@opencode%2fbrowsevil/$version")
   [ "$status" != 200 ] || die "@opencode/browsevil@$version is already published"
   channel=latest npm_tag=latest dry_run=false
 elif [ "$mode" = dev ]; then
