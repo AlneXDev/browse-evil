@@ -15,7 +15,7 @@ use crate::{VERSION, jsonc, relay, session, update};
 
 const MCP_NAME: &str = "browsevil";
 const LEGACY_MCP_NAME: &str = "opencodevil-browser";
-const OPENCODE_CONFIG_NAMES: &[&str] = &["opencode.json", "opencode.jsonc", ".opencode/opencode.json", ".opencode/opencode.jsonc"];
+const OPENCODE_CONFIG_NAMES: &[&str] = &["opencodevil.json", "opencodevil.jsonc", ".opencodevil/opencodevil.json", ".opencodevil/opencodevil.jsonc"];
 const CONNECTED: &str = "✓ Connected to your browser. Ask your agent to open a page.";
 const PAIRED_OFFLINE: &str = "! Not connected yet. Open the browser profile already paired with browsevil and make sure the extension is enabled. It reconnects automatically.";
 
@@ -39,7 +39,7 @@ fn flag<'a>(args: &'a [String], name: &str) -> Option<&'a str> {
     args.iter().position(|a| a == name).and_then(|i| args.get(i + 1)).map(String::as_str)
 }
 
-/// OpenCode's global config file: the first that exists, else opencode.json.
+/// OpenCode's global config file: the first that exists, else opencodevil.json.
 pub fn opencodevil_config() -> PathBuf {
     let dir = config_home().join("opencodevil");
     OPENCODE_CONFIG_NAMES.iter().map(|name| dir.join(name)).find(|f| f.is_file()).unwrap_or_else(|| dir.join(OPENCODE_CONFIG_NAMES[0]))

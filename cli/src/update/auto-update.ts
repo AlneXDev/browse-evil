@@ -446,39 +446,9 @@ export function createAutoUpdater(deps: AutoUpdaterDeps) {
   let timer: NodeJS.Timeout | undefined
 
   /** A binary install's check: its channel's release service manifest, through the protocol's client rules. */
-  async function checkBinary(state: AutoUpdateState, channel: Channel): Promise<AutoUpdateState> {
-    const target = runningServiceTarget()
-    if (!target) throw new Error("this install has no release service target")
-    const serviceChannel: ReleaseChannel = releaseChannel(channel)
-    const result = await checkRelease({
-      version: running,
-      channel: serviceChannel,
-      target,
-      ...(state.etag ? { etag: state.etag } : {}),
-      ...(deps.fetch ? { fetch: deps.fetch } : {}),
-    })
-    if (result.status === "unchanged") {
-      deps.log("autoupdate.unchanged", { channel: serviceChannel, running })
-      // A state file from before latestAt existed gets one now, so the pending clock starts rather than never running.
-      return updateState(({ failed: _failed, ...rest }) => ({
-        ...rest,
-        checkedAt: now(),
-        ...(rest.latest && !rest.latestAt ? { latestAt: now() } : {}),
-      }))
-    }
-    if (result.status === "missing") {
-      deps.log("autoupdate.no_release", { channel: serviceChannel, running })
-      return updateState(({ failed: _failed, latest: _latest, latestAt: _latestAt, etag: _etag, ...rest }) => ({ ...rest, checkedAt: now() }))
-    }
-    const decision: ReleaseDecision = result.decision
-    if (decision.action === "reject") throw new Error(`the ${serviceChannel} manifest was rejected: ${decision.reason}`)
-    deps.log("autoupdate.checked", { channel: serviceChannel, current: result.releaseVersion, running, decision: decision.reason })
-    return updateState(({ failed: _failed, latest: previous, latestAt: previousAt, etag: _etag, ...rest }) => ({
-      ...rest,
-      checkedAt: now(),
-      ...(result.etag ? { etag: result.etag } : {}),
-      ...(decision.action === "install" ? { latest: decision.version, latestAt: previous === decision.version && previousAt ? previousAt : now() } : {}),
-    }))
+  // evil-v2: no Anomaly feed — updates come from the evil GitHub release only.
+  async function checkBinary(state: AutoUpdateState, _channel: Channel): Promise<AutoUpdateState> {
+    return state
   }
 
   async function tick() {

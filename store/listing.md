@@ -1,6 +1,6 @@
 # Chrome Web Store listing
 
-Copy these into the developer dashboard. The release workflow uploads `browsevil-extension-<version>.zip` (see RELEASING.md); `bun run package` builds the same zip locally.
+Copy these into the developer dashboard. The release workflow uploads `opencode-evil-browse-extension-<version>.zip` (see RELEASING.md); `bun run package` builds the same zip locally.
 
 ## Store listing
 

@@ -6,8 +6,8 @@
 //   npm tarball    @opencode/browsevil at the release version: the launcher dist/cli.mjs and package metadata, an optional
 //                  dependency on each platform package, no install scripts; with --platform-tarball, it installs with
 //                  npm next to that platform package and starts its relay and MCP server
-//   bun scripts/check-artifacts.ts --version 0.1.0 --zip release/browsevil-extension-0.1.0.zip --tarball release/opencodevil-browsevil-0.1.0.tgz \
-//     [--platform-tarball opencodevil-browsevil-linux-x64-0.1.0.tgz]
+//   bun scripts/check-artifacts.ts --version 0.1.0 --zip release/opencode-evil-browse-extension-0.1.0.zip --tarball release/opencode-browsevil-0.1.0.tgz \
+//     [--platform-tarball opencode-browsevil-linux-x64-0.1.0.tgz]
 import { $ } from "bun"
 import { mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import net from "node:net"

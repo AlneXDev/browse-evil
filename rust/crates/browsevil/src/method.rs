@@ -259,7 +259,7 @@ impl Global {
                 let mut command = npm_command(launcher.node.as_deref());
                 command.args(["install", "--global", "--prefix"]).arg(prefix).args(["--no-fund", "--no-audit", "--no-update-notifier", &spec]);
                 if let Some(registry) = registry {
-                    command.arg(format!("--registry={registry}")).arg(format!("--@opencodevil:registry={registry}"));
+                    command.arg(format!("--registry={registry}")).arg(format!("--@opencode:registry={registry}"));
                 }
                 command
             }
@@ -382,12 +382,12 @@ pub fn platform_binary(package: &Path, platform: &str) -> Option<PathBuf> {
     if cfg!(target_os = "linux") {
         names.push(platform.strip_suffix("-musl").map_or_else(|| format!("{platform}-musl"), str::to_owned));
     }
-    names.iter().find_map(|name| package.ancestors().map(|dir| dir.join("node_modules").join("@opencodevil").join(name).join("bin").join(EXECUTABLE)).find(|file| file.is_file()))
+    names.iter().find_map(|name| package.ancestors().map(|dir| dir.join("node_modules").join("@opencode").join(name).join("bin").join(EXECUTABLE)).find(|file| file.is_file()))
 }
 
 /// Whether `package` is an @opencode/browsevil package folder with the launcher.
 fn is_package(package: &Path) -> bool {
-    named(Some(package), "browsevil") && named(package.parent(), "@opencodevil") && package.join("dist").join("cli.mjs").is_file()
+    named(Some(package), "browsevil") && named(package.parent(), "@opencode") && package.join("dist").join("cli.mjs").is_file()
 }
 
 /// What kind of install the executable `exe` belongs to; `installed` is the bin folder's executable.
@@ -408,7 +408,7 @@ fn package_install(exe: &Path, launcher: &Launcher) -> Option<Install> {
     let bin = exe.parent().filter(|b| named(Some(b), "bin"))?;
     let platform_dir = bin.parent()?;
     let platform = platform_dir.file_name()?.to_str().filter(|n| n.starts_with("browsevil-"))?.to_owned();
-    let scope = platform_dir.parent().filter(|s| named(Some(s), "@opencodevil"))?;
+    let scope = platform_dir.parent().filter(|s| named(Some(s), "@opencode"))?;
     let modules = scope.parent().filter(|m| named(Some(m), "node_modules"))?;
     let runs_this = |package: &Path| is_package(package) && platform_binary(package, &platform).is_some_and(|b| canonical(&b) == exe);
     // The launcher that ran this (its dist/cli.mjs), else the package an older launcher, which doesn't say, runs from:
@@ -417,8 +417,8 @@ fn package_install(exe: &Path, launcher: &Launcher) -> Option<Install> {
     let given = launcher.file.as_deref().and_then(|l| canonical(l).parent()?.parent().map(Path::to_path_buf));
     let mut candidates = vec![given, modules.parent().map(Path::to_path_buf), Some(scope.join("browsevil"))];
     if let Some(store) = ancestor(modules, ".pnpm").and_then(Path::parent) {
-        candidates.push(Some(canonical(&store.join("node_modules").join("@opencodevil").join("browsevil"))));
-        candidates.push(Some(canonical(&store.parent()?.join("node_modules").join("@opencodevil").join("browsevil"))));
+        candidates.push(Some(canonical(&store.join("node_modules").join("@opencode").join("browsevil"))));
+        candidates.push(Some(canonical(&store.parent()?.join("node_modules").join("@opencode").join("browsevil"))));
     }
     match candidates.into_iter().flatten().find(|package| runs_this(package)) {
         Some(package) => Some(classify(&package, platform, launcher)),
@@ -456,7 +456,7 @@ fn classify(package: &Path, platform: String, launcher: &Launcher) -> Install {
         let found = homes.into_iter().find_map(|home| Some((pnpm_globals(&home).into_iter().find(|entry| canonical(entry) == package)?, home)));
         return found.map_or(Install::Runner(Runner::PnpmDlx), |(entry, home)| global(entry, Manager::Pnpm { home }));
     }
-    // pnpm before 11: <PNPM_HOME>/global/5/[node_modules/].pnpm/@opencodevil+browsevil@<version>/node_modules/@opencode/browsevil,
+    // pnpm before 11: <PNPM_HOME>/global/5/[node_modules/].pnpm/@opencode+browsevil@<version>/node_modules/@opencode/browsevil,
     // linked from <PNPM_HOME>/global/5/node_modules/@opencode/browsevil; pnpm dlx's under <cache>/pnpm/dlx/.
     if let Some(store) = ancestor(package, ".pnpm").and_then(Path::parent) {
         if has_component(store, |c| c == "dlx") {
@@ -465,7 +465,7 @@ fn classify(package: &Path, platform: String, launcher: &Launcher) -> Install {
         let root = if named(Some(store), "node_modules") { store.parent() } else { Some(store) };
         let Some(root) = root.filter(|r| named(r.parent(), "global")) else { return Install::Other };
         let home = root.parent().and_then(Path::parent).map(Path::to_path_buf);
-        return home.map_or(Install::Other, |home| global(root.join("node_modules").join("@opencodevil").join("browsevil"), Manager::Pnpm { home }));
+        return home.map_or(Install::Other, |home| global(root.join("node_modules").join("@opencode").join("browsevil"), Manager::Pnpm { home }));
     }
     let Some(modules) = package.parent().and_then(Path::parent).filter(|m| named(Some(m), "node_modules")) else { return Install::Other };
     let Some(folder) = modules.parent() else { return Install::Other };
@@ -518,7 +518,7 @@ fn pnpm_store_home(path: &Path) -> Option<Vec<PathBuf>> {
 /// The @opencode/browsevil links of pnpm's global installs under `home`: `global/<layout>/node_modules/...` before
 /// pnpm 11, `global/v11/<install>/node_modules/...` since, the stable alias links to an install folder first.
 fn pnpm_globals(home: &Path) -> Vec<PathBuf> {
-    let link = |dir: &Path| dir.join("node_modules").join("@opencodevil").join("browsevil");
+    let link = |dir: &Path| dir.join("node_modules").join("@opencode").join("browsevil");
     let mut found: Vec<(bool, PathBuf)> = Vec::new();
     let Ok(layouts) = std::fs::read_dir(home.join("global")) else { return Vec::new() };
     for layout in layouts.flatten().map(|e| e.path()) {
@@ -668,25 +668,25 @@ mod tests {
 
         // pnpm 10: $PNPM_HOME/global/5/.pnpm, linked from global/5/node_modules.
         let store = "pnpm10/global/5/.pnpm";
-        let launcher = tree.package(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/browsevil"));
-        let binary = tree.platform(&format!("{store}/@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
-        tree.link(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
-        tree.link("pnpm10/global/5/node_modules/@opencode/browsevil", &format!("../../.pnpm/@opencodevil+browsevil@{V}/node_modules/@opencode/browsevil"));
+        let launcher = tree.package(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/browsevil"));
+        let binary = tree.platform(&format!("{store}/@opencode+{P}@{V}/node_modules/@opencode/{P}"));
+        tree.link(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencode+{P}@{V}/node_modules/@opencode/{P}"));
+        tree.link("pnpm10/global/5/node_modules/@opencode/browsevil", &format!("../../.pnpm/@opencode+browsevil@{V}/node_modules/@opencode/browsevil"));
         cases.push(("pnpm 10", launcher, binary.clone(), "pnpm", Some("pnpm10".into()), Some("pnpm10/global/5/node_modules/@opencode/browsevil".into())));
         cases.push(("pnpm 10, older launcher", PathBuf::new(), binary, "pnpm", Some("pnpm10".into()), Some("pnpm10/global/5/node_modules/@opencode/browsevil".into())));
 
         // pnpm 9 and earlier: global/5/node_modules/.pnpm.
         let store = "pnpm9/global/5/node_modules/.pnpm";
-        let launcher = tree.package(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/browsevil"));
-        let binary = tree.platform(&format!("{store}/@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
-        tree.link(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
-        tree.link("pnpm9/global/5/node_modules/@opencode/browsevil", &format!("../.pnpm/@opencodevil+browsevil@{V}/node_modules/@opencode/browsevil"));
+        let launcher = tree.package(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/browsevil"));
+        let binary = tree.platform(&format!("{store}/@opencode+{P}@{V}/node_modules/@opencode/{P}"));
+        tree.link(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencode+{P}@{V}/node_modules/@opencode/{P}"));
+        tree.link("pnpm9/global/5/node_modules/@opencode/browsevil", &format!("../.pnpm/@opencode+browsevil@{V}/node_modules/@opencode/browsevil"));
         cases.push(("pnpm 9", launcher, binary.clone(), "pnpm", Some("pnpm9".into()), Some("pnpm9/global/5/node_modules/@opencode/browsevil".into())));
         cases.push(("pnpm 9, older launcher", PathBuf::new(), binary, "pnpm", Some("pnpm9".into()), Some("pnpm9/global/5/node_modules/@opencode/browsevil".into())));
 
         // pnpm 11: the global virtual store in $PNPM_HOME/store/v11/links, linked from global/v11/<install>, which a
         // stable alias names; the platform package is a sibling link to its own store folder.
-        let links = "pnpm11/store/v11/links/@opencodevil";
+        let links = "pnpm11/store/v11/links/@opencode";
         let package = format!("{links}/browsevil/{V}/aaa/node_modules/@opencode/browsevil");
         let launcher = tree.package(&package);
         let binary = tree.platform(&format!("{links}/{P}/{V}/bbb/node_modules/@opencode/{P}"));
@@ -704,9 +704,9 @@ mod tests {
 
         // pnpm 10 dlx: <cache>/pnpm/dlx/<hash>/<id>/node_modules/.pnpm.
         let store = "home/.cache/pnpm/dlx/e432/1a1d-3f05/node_modules/.pnpm";
-        let launcher = tree.package(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/browsevil"));
-        let binary = tree.platform(&format!("{store}/@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
-        tree.link(&format!("{store}/@opencodevil+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencodevil+{P}@{V}/node_modules/@opencode/{P}"));
+        let launcher = tree.package(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/browsevil"));
+        let binary = tree.platform(&format!("{store}/@opencode+{P}@{V}/node_modules/@opencode/{P}"));
+        tree.link(&format!("{store}/@opencode+browsevil@{V}/node_modules/@opencode/{P}"), &format!("../../../@opencode+{P}@{V}/node_modules/@opencode/{P}"));
         cases.push(("pnpm 10 dlx", launcher, binary, "pnpm-dlx", None, None));
 
         // npx, bunx and yarn dlx: their temporary installs.
@@ -786,7 +786,7 @@ mod tests {
         let npm = global(Manager::Npm { prefix: "/p".into() }, Launcher::default());
         let command = npm.command("0.2.0", Some("http://r"));
         assert_eq!(command.get_program(), shim("npm").as_str());
-        assert_eq!(args(&command), ["install", "--global", "--prefix", "/p", "--no-fund", "--no-audit", "--no-update-notifier", "@opencode/browsevil@0.2.0", "--registry=http://r", "--@opencodevil:registry=http://r"]);
+        assert_eq!(args(&command), ["install", "--global", "--prefix", "/p", "--no-fund", "--no-audit", "--no-update-notifier", "@opencode/browsevil@0.2.0", "--registry=http://r", "--@opencode:registry=http://r"]);
 
         // bun: the bun that ran the launcher, else the bun folder's own, else PATH; always into that folder.
         let root = tree.path(".bun");

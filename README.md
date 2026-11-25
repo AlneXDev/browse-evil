@@ -1,6 +1,6 @@
 # OpenCode Eʌil Browse — Made by ✧Alne
 
-Evil side-by-side fork of `anomalyco/browsevil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
+Evil side-by-side fork of `AlneXDev/browse-evilvil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">
@@ -387,7 +387,7 @@ earlier TypeScript implementation, kept as a reference.
 
 ## Contributing
 
-We don't take pull requests. [Open an issue](https://github.com/anomalyco/browse/issues)
+We don't take pull requests. [Open an issue](https://github.com/AlneXDev/browse-evil/issues)
 describing the bug or idea, and our agents usually turn it around fast.
 
 ## License

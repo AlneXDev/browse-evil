@@ -2,7 +2,7 @@
 //   bun run release:check [--tag v0.1.0] [--require-changelog] [--versions-only]
 // 1. the version is one release version everywhere: cli/package.json, package.json, public/manifest.json, the Rust
 //    workspace (rust/Cargo.toml and every workspace crate in rust/Cargo.lock), and the tag
-// 2. the extension zip (scripts/package.ts): release/browsevil-extension-<version>.zip, the store build (stable) or the
+// 2. the extension zip (scripts/package.ts): release/opencode-evil-browse-extension-<version>.zip, the store build (stable) or the
 //    release service's unpacked build (dev); then release/opencodevil-browsevil-<version>.tgz, the npm launcher package
 //    (scripts/npm-package.ts)
 // 3. scripts/check-artifacts.ts on both, then release/SHA256SUMS. The npm install check needs a platform package, so

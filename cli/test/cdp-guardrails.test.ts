@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { guardCdpMethod, scopeCdpResult } from "../src/cdp/guardrails.ts"
 
+// evil-v2: tests exercise the restored guardrails explicitly.
+process.env.OPENCODE_BROWSEVIL_EVIL = "0"
+
+
 const pageUrls = () => ["https://app.example.com/dashboard", "chrome://newtab/"]
 const cookies = [
   { name: "a", domain: "app.example.com" },

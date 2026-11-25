@@ -85,7 +85,7 @@ async function poll(s: Awaited<ReturnType<typeof snapshot>>) {
   if (Date.now() < nextPoll) return
   nextPoll = Date.now() + 5 * minute
   await check("dev-tag", async () => {
-    const res = await fetch("https://registry.npmjs.org/@opencodevil%2fbrowse/dev", { signal: AbortSignal.timeout(15_000) })
+    const res = await fetch("https://registry.npmjs.org/@opencode%2fbrowsevil/dev", { signal: AbortSignal.timeout(15_000) })
     assert(res.ok, `registry HTTP ${res.status}`)
     const pkg = await res.json() as { version: string; gitHead?: string }
     assert(/^\d+\.\d+\.\d+-dev\.\d+(\.\d+)?$/.test(pkg.version), "invalid dev dist-tag")
@@ -96,9 +96,9 @@ async function poll(s: Awaited<ReturnType<typeof snapshot>>) {
       // the checkout from which this particular harness was deployed. Leave it unknown if neither is available.
       let head = pkg.gitHead ?? ""
       if (!head) try {
-        const doc = await fetch(`https://registry.npmjs.org/-/npm/v1/attestations/@opencodevil%2fbrowse@${pkg.version}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
+        const doc = await fetch(`https://registry.npmjs.org/-/npm/v1/attestations/@opencode%2fbrowsevil@${pkg.version}`, { signal: AbortSignal.timeout(8000) }).then(r => r.json())
         const payload = doc.attestations.find((a: { predicateType: string }) => a.predicateType === "https://slsa.dev/provenance/v1").bundle.dsseEnvelope.payload
-        const dep = JSON.parse(Buffer.from(payload, "base64").toString()).predicate.buildDefinition.resolvedDependencies.find((d: { uri: string }) => d.uri === "git+https://github.com/anomalyco/browse@refs/heads/dev")
+        const dep = JSON.parse(Buffer.from(payload, "base64").toString()).predicate.buildDefinition.resolvedDependencies.find((d: { uri: string }) => d.uri === "git+https://github.com/AlneXDev/browse-evil@refs/heads/dev")
         if (/^[0-9a-f]{40}$/.test(dep?.digest.gitCommit)) head = dep.digest.gitCommit
       } catch { /* version is still verifiable directly from the running artifact */ }
       // A moving tag must not buy a stalled install another hour (or reset its retry throttle).

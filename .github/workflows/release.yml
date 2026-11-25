@@ -313,7 +313,7 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  # The platform packages: opencodevil-browsevil-<target>-<version>.tgz for every install script target (scripts/npm-package.ts,
+  # The platform packages: opencode-browsevil-<target>-<version>.tgz for every install script target (scripts/npm-package.ts,
   # which checks each binary's format, CPU, C library and glibc floor), from build-binary's executables. Then the
   # linux-x64 ones as users get them: the install script against a local copy of the release service, the relay and MCP
   # server, and `npm install` of build's @opencode/browsevil next to its platform package.
@@ -372,7 +372,7 @@ jobs:
         run: |
           for target in linux-x64 linux-x64-baseline linux-x64-musl linux-x64-baseline-musl; do
             dir=$(mktemp -d)
-            tar -xzf "$RUNNER_TEMP/binaries/opencodevil-browsevil-$target-$VERSION.tgz" -C "$dir"
+            tar -xzf "$RUNNER_TEMP/binaries/opencode-browsevil-$target-$VERSION.tgz" -C "$dir"
             actual=$("$dir/package/bin/browsevil" --version)
             [ "$actual" = "$VERSION" ] || { echo "::error::$target --version printed $actual, expected $VERSION"; exit 1; }
             echo "$target: $actual"
@@ -384,7 +384,7 @@ jobs:
         run: |
           set -eu
           channel=stable; [ "$NPM_CHANNEL" = dev ] && channel=dev
-          file="opencodevil-browsevil-linux-x64-$VERSION.tgz"
+          file="opencode-browsevil-linux-x64-$VERSION.tgz"
           root=$(mktemp -d)
           mkdir -p "$root/release/browsevil/cli" "$root/release/files"
           cp "$RUNNER_TEMP/binaries/$file" "$root/release/files/"
@@ -408,7 +408,7 @@ jobs:
         run: |
           set -eu
           dir=$(mktemp -d)
-          tar -xzf "$RUNNER_TEMP/binaries/opencodevil-browsevil-linux-x64-$VERSION.tgz" -C "$dir"
+          tar -xzf "$RUNNER_TEMP/binaries/opencode-browsevil-linux-x64-$VERSION.tgz" -C "$dir"
           binary="$dir/package/bin/browsevil"
           home=$(mktemp -d)
           port=29988
@@ -451,8 +451,8 @@ jobs:
       - name: npm install of @opencode/browsevil with its linux-x64 package
         run: >-
           bun scripts/check-artifacts.ts --version "$VERSION"
-          --tarball "$RUNNER_TEMP/in/build/opencodevil-browsevil-$VERSION.tgz"
-          --platform-tarball "$RUNNER_TEMP/binaries/opencodevil-browsevil-linux-x64-$VERSION.tgz"
+          --tarball "$RUNNER_TEMP/in/build/opencode-browsevil-$VERSION.tgz"
+          --platform-tarball "$RUNNER_TEMP/binaries/opencode-browsevil-linux-x64-$VERSION.tgz"
 
       - id: upload
         name: Upload
