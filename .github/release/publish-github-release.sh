@@ -8,13 +8,13 @@
 tag="v$BROWSE_VERSION"
 assets=$(mktemp -d)
 zip="opencode-evil-browse-extension-$BROWSE_VERSION.zip" tarball="opencode-browsevil-$BROWSE_VERSION.tgz"
-for file in "$1/$zip" "$1/$tarball"; do
+for file in "$1/$zip" "$1/$tarball" "$1/browsevil.exe"; do
   test -s "$file" || die "Missing $file"
   verify_attestation "$file"
   cp "$file" "$assets/"
 done
 cp "$2/attestation.sigstore.json" "$assets/"
-(cd "$assets" && sha256 -- "$zip" "$tarball" > SHA256SUMS && cat SHA256SUMS)
+(cd "$assets" && sha256 -- "$zip" "$tarball" browsevil.exe > SHA256SUMS && cat SHA256SUMS)
 
 {
   notes_summary

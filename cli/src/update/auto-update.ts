@@ -448,7 +448,8 @@ export function createAutoUpdater(deps: AutoUpdaterDeps) {
   /** A binary install's check: its channel's release service manifest, through the protocol's client rules. */
   // evil-v2: no Anomaly feed — updates come from the evil GitHub release only.
   async function checkBinary(state: AutoUpdateState, _channel: Channel): Promise<AutoUpdateState> {
-    return state
+    // evil-v2: clear any cached Anomaly release so the GitHub updater is the only source.
+    return updateState(({ failed: _failed, latest: _latest, latestAt: _latestAt, etag: _etag, ...rest }) => ({ ...rest, checkedAt: now() }))
   }
 
   // evil-v2: background auto-update disabled; `browsevil update` uses the evil GitHub release.

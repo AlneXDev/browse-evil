@@ -345,10 +345,10 @@ pub fn connect_extension(open: bool, wait: bool, timeout: Duration) -> anyhow::R
     if !offered {
         let url = browsers::store_url();
         let opened = open && browsers::open_default(&url);
-        println!("Add browsevil to your browser from the Chrome Web Store{}: {url}", if opened { " (opened)" } else { "" });
+        println!("Load the evil unpacked extension from {url}{}", if opened { " (opened)" } else { "" });
     }
     if !std::io::stdout().is_terminal() {
-        println!("Agent: ask the user to {}. Then call the browsevil status tool to check the connection.", if offered { "finish connecting browsevil in their browser" } else { "add browsevil from the Chrome Web Store" });
+        println!("Agent: ask the user to {}. Then call the browsevil status tool to check the connection.", if offered { "finish connecting browsevil in their browser" } else { "load the evil unpacked extension from the GitHub release" });
     }
     if !wait || ssh || !display {
         return Ok(0);

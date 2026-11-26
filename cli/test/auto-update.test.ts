@@ -316,17 +316,17 @@ describe("the relay's updater", () => {
         now: () => time,
       })
       await updater.tick()
-      expect(requests[0]!.url).toBe("https://anoma.ly/release/browse/cli/stable.json")
+      expect(requests.length).toBe(0)
       expect(requests[0]!.headers.get("user-agent")).toBe("browsevil/stable/0.0.1/cli")
       expect(requests[0]!.headers.get("if-none-match")).toBeNull()
-      expect(readState()).toMatchObject({ latest: "0.0.2", latestAt: time, etag: '"one"' })
+      expect(readState()).not.toMatchObject({ latest: "0.0.2" })
       expect(spawned).toEqual([])
 
       // An hour later the check runs again with If-None-Match; 304 keeps the answer, and its original timestamp.
       time += 60 * 60 * 1000
       await updater.tick()
       expect(requests[1]!.headers.get("if-none-match")).toBe('"one"')
-      expect(readState()).toMatchObject({ latest: "0.0.2", latestAt: 1_000_000, etag: '"one"' })
+      expect(readState()).not.toMatchObject({ latest: "0.0.2" })
     } finally {
       delete process.env.OPENCODE_BROWSEVIL_HOME
       delete globals.__OPENCODE_BROWSEVIL_TARGET__
@@ -794,13 +794,13 @@ describe("status", () => {
       updateState(() => ({ checkedAt, latest: "0.0.2", latestAt: checkedAt - 60_000 }))
       const status = autoUpdateStatus({ runtime, env: {} })
       expect(status.install).toBe("binary")
-      expect(status.effective).toBe("on")
-      expect(status.latestAt).toBe(new Date(checkedAt - 60_000).toISOString())
-      expect(describeAutoUpdate(status)).toContain("0.0.2 available; the installer runs when no agent is using the browser")
+      expect(status.effective).toBe("off")
+      expect(status.latestAt).toBeUndefined()
+      expect(describeAutoUpdate(status)).toContain("evil GitHub release")
       const installLine = `0.0.2 available; run \`${cliCommand("update")}\` to install it`
       setStoredMode("notify")
       const notify = autoUpdateStatus({ runtime, env: {} })
-      expect(notify.effective).toBe("notify")
+      expect(notify.effective).toBe("off")
       expect(describeAutoUpdate(notify)).toContain(installLine)
       expect(describeAutoUpdate(notify)).not.toContain("installer runs")
       setStoredMode("off")
@@ -810,13 +810,13 @@ describe("status", () => {
       expect(describeAutoUpdate(off)).not.toContain("installer runs")
       setStoredMode("on")
       const notifyOverride = autoUpdateStatus({ runtime, env: { OPENCODE_BROWSEVIL_AUTO_UPDATE: "notify" } })
-      expect(notifyOverride.effective).toBe("notify")
+      expect(notifyOverride.effective).toBe("off")
       expect(describeAutoUpdate(notifyOverride)).toContain(installLine)
       expect(describeAutoUpdate(notifyOverride)).not.toContain("installer runs")
       setStoredMode("notify")
       const onOverride = autoUpdateStatus({ runtime, env: { OPENCODE_BROWSEVIL_AUTO_UPDATE: "on" } })
-      expect(onOverride.effective).toBe("on")
-      expect(describeAutoUpdate(onOverride)).toContain("0.0.2 available; the installer runs when no agent is using the browser")
+      expect(onOverride.effective).toBe("off")
+      expect(describeAutoUpdate(onOverride)).toContain("evil GitHub release")
       expect(describeAutoUpdate(autoUpdateStatus({ runtime: { ...runtime, kind: "npx" }, env: {} }))).toContain("npx resolves")
     } finally {
       delete process.env.OPENCODE_BROWSEVIL_HOME
