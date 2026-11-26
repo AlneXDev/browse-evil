@@ -52,11 +52,10 @@ There's always exactly one `browsevil`: a global package install is left to its 
 to it, and a leftover `~/.local/bin/browsevil` from an earlier install is removed), and agents run the same `browsevil` your
 terminal does. If `browsevil install` finds another `browsevil` on your PATH it tells you which one and how to remove it.
 
-The install script reads the channel's manifest from [the evil GitHub release](https://github.com/AlneXDev/browse-evil/releases), downloads
-the binary for this computer and checks its size and SHA-256 before installing it. `--channel stable|beta|dev` picks
-the channel (`stable` by default); `--version <version>` installs a specific version from npm, checked against npm's
-published SHA-512 integrity. With npm, `@opencode/browsevil@dev` is the dev channel. The npm package is a small Node
-launcher (Node 22+) that runs the native binary npm installed for your platform.
+The evil install script never reads Anomaly's release service or npm. It accepts `--binary <path>` to install a
+locally supplied evil binary, or refuses with instructions to download `browsevil.exe` from
+[the evil GitHub release](https://github.com/AlneXDev/browse-evil/releases/latest). `--version` and `--channel` are
+not supported by this fork. Every install ends with `browsevil install`.
 
 ### What `browsevil install` does
 

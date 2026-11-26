@@ -536,9 +536,8 @@ fn package_command_update(install: &Install, global: &Global, check_only: bool) 
 
 /// How to switch an install that doesn't update itself to one that does.
 fn switch_hint(exe: &Path) -> String {
-    let tag = dist_tag(VERSION);
-    let globals = ["browsevil", "browsevil", "pnpm add -g", "yarn global add", "volta install"].map(|c| format!("`{c} {PACKAGE}@{tag}`")).join(", ");
-    format!("run `{} install` for the self-updating binary, or install it globally with one of {globals}", exe.display())
+    // evil-v2: the only supported distribution is the evil GitHub release.
+    format!("run `{} install` after downloading browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/latest", exe.display())
 }
 
 /// `browsevil update [--check]`.
