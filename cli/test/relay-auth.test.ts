@@ -85,8 +85,8 @@ describe("Host, Origin and Sec-Fetch-Site checks", () => {
     expect(validateWebSocketOrigin({ origin: stableUnpackedExtensionOrigin, requireChromeExtension: true })).toBeUndefined()
     expect(validateWebSocketOrigin({ origin: store, requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: store, requireChromeExtension: true, additionalChromeExtensionOrigins: new Set([store]) })).toBeUndefined()
-    // The store ID earlier builds hard-coded is accepted only once a release configures it.
-    expect(validateWebSocketOrigin({ origin: "chrome-extension://lfmeghngagemglmdnplimokblljgmnoj", requireChromeExtension: true })).toBeDefined()
+    // The evil unpacked extension ID is the pinned ID and is accepted by default.
+    expect(validateWebSocketOrigin({ origin: "chrome-extension://lfmeghngagemglmdnplimokblljgmnoj", requireChromeExtension: true })).toBeUndefined()
     expect(validateWebSocketOrigin({ origin: "chrome-extension://aaaabbbbccccddddeeeeffffgggghhhh", requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: undefined, requireChromeExtension: true })).toBeDefined()
     expect(validateWebSocketOrigin({ origin: "https://evil.test" })).toBeDefined()

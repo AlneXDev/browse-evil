@@ -648,15 +648,15 @@ describe("execute file access", () => {
 
   test("browsevil-owned checks ignore case where the platform's filesystem does", () => {
     for (const platform of ["darwin", "win32"] as const) {
-      expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
+      expect(isInside("/tmp/xdg/BROWSEVIL/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
       expect(isInside("/TMP/xdg/browsevil/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
-      for (const sibling of ["/bin/BROWSE.NEW", "/bin/browsevil.NEW", "/bin/Browse.Old-1", "/BIN/browsevil.new", "/bin/browsevil.MIGRATE-9"]) {
+      for (const sibling of ["/bin/BROWSEVIL.NEW", "/bin/browsevil.NEW", "/bin/Browse.Old-1", "/BIN/browsevil.new", "/bin/browsevil.MIGRATE-9"]) {
         expect(isInstallSibling(sibling, "/bin/browsevil", platform), `${platform} ${sibling}`).toBe(true)
       }
     }
     // Linux keeps paths case-sensitive, so these are different files and stay allowed.
-    expect(isInside("/tmp/xdg/BROWSE/config.json", "/tmp/xdg/browsevil", "linux")).toBe(false)
-    expect(isInstallSibling("/bin/BROWSE.NEW", "/bin/browsevil", "linux")).toBe(false)
+    expect(isInside("/tmp/xdg/BROWSEVIL/config.json", "/tmp/xdg/browsevil", "linux")).toBe(false)
+    expect(isInstallSibling("/bin/BROWSEVIL.NEW", "/bin/browsevil", "linux")).toBe(false)
     expect(isInstallSibling("/bin/browsevil.NEW", "/bin/browsevil", "linux")).toBe(false)
   })
 

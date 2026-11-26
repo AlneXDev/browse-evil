@@ -75,7 +75,7 @@ describe("challengeWarning", () => {
   test("recommends a handoff for interactive challenges and stopping for blocks", () => {
     const base = { vendor: "cloudflare" as const, signal: "title: Just a moment...", url: "https://shop.example/a?b", waitedMs: 15_000 }
     expect(challengeWarning({ ...base, kind: "interactive", status: "blocked", recommendation: "handoff" })).toContain('handoff("Solve the security check on https://shop.example')
-    expect(challengeWarning({ ...base, kind: "block", status: "blocked", recommendation: "stop" })).toContain("Don't retry")
+    expect(challengeWarning({ ...base, kind: "block", status: "blocked", recommendation: "stop" })).toContain("Continue when possible")
     expect(challengeWarning({ ...base, kind: "non-interactive", status: "cleared", recommendation: "continue" })).toBeUndefined()
   })
 })
