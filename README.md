@@ -40,14 +40,13 @@ side-by-side with normal Browse without touching it.
 
 Other ways to install, all of which end in the same `browsevil install`:
 
-| How | Command | Where `browsevil` lives, and what updates it |
+| How | Command | Where `browsevil` lives |
 | --- | --- | --- |
-| Evil release | Download `browsevil.exe` from [the release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5) | `~/.local/bin/browsevil`; updates itself |
-| Evil release (Windows) | `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe` then `.\browsevil.exe install` | `%USERPROFILE%\.local\bin\browsevil.exe`; updates itself |
-| npx, bunx | `browsevil install` | copied to `~/.local/bin/browsevil` once; updates itself from then on |
-| npm | `npm i -g @opencode/browsevil`, then `browsevil install` | npm's global `browsevil`; browsevil runs `npm install -g` to update |
-| bun | `bun add -g @opencode/browsevil`, then `browsevil install` | `~/.bun/bin/browsevil`; browsevil runs `bun add -g` to update |
-| pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browsevil`, then `browsevil install` | that manager's `browsevil`; updated with the same manager |
+| Evil release | Download `browsevil.exe` from [the release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5), then run `browsevil install` | `~/.local/bin/browsevil`; updates come only from the evil GitHub release |
+| Evil release (Windows) | `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe` then `.\browsevil.exe install` | `%USERPROFILE%\.local\bin\browsevil.exe` |
+
+Package-manager installs (npm/bun/pnpm/yarn/volta) and the install scripts' Anomaly/npm download paths are disabled
+in this fork: they would install normal Browse. `--binary <path>` installs a locally supplied evil binary.
 
 There's always exactly one `browsevil`: a global package install is left to its package manager (nothing is copied next
 to it, and a leftover `~/.local/bin/browsevil` from an earlier install is removed), and agents run the same `browsevil` your
@@ -162,34 +161,17 @@ The connection isn't encrypted by browsevil; use a network that is (Tailscale or
 
 ### Updates
 
-**Updates are automatic.** Every relay checks at launch and then hourly, whatever the update setting, and installs the
-channel's release when it isn't the one running (a rollback reaches everyone too):
+**Updates are manual and GitHub-only.** The evil build has no release-service feed and no background hourly update:
+`Updater::spawn()` returns `None`, the TypeScript tick is a no-op, and the status reports mode `off`.
 
-- every install reads its channel's manifest from the release service (`stable`, or `dev`/`beta` for those builds),
-  with `browsevil/<channel>/<version>/cli/<install kind>` as the User-Agent;
-- the install script's binary replaces `~/.local/bin/browsevil` with the manifest's tarball after checking its size and
-  SHA-256;
-- global installs run the package manager that installed them (`npm install -g`, `bun add -g`, `pnpm add -g`,
-  `yarn global add`, `volta install`) to install `@opencode/browsevil@<the manifest's version>` into the same place. A
-  release reaches the service a few minutes before npm, so a package manager that doesn't have the version yet is
-  retried quietly;
-- `npx`, `bunx`, `pnpm dlx` and `yarn dlx` runs resolve the package themselves: they only tell you another release is
-  out.
+- Download the newest `browsevil.exe` from [the evil GitHub release](https://github.com/AlneXDev/browse-evil/releases/latest)
+  and run `browsevil install` to replace the binary (the installed MCP entries and pairing stay).
+- `browsevil update` prints the release URL; it does not install from npm or Anomaly. The extension zip is
+  [in the same release](https://github.com/AlneXDev/browse-evil/releases/latest) and is loaded unpacked.
+- `OPENCODE_BROWSEVIL_AUTO_UPDATE` is ignored by this fork; there is no automatic install.
 
-A relay browsevil started restarts on the new version when it's idle (one you run with `browsevil serve` in a terminal keeps
-running until you restart it); agent tabs stay open and come back. A running MCP server keeps
-working with the newer relay until the agent restarts it. `browsevil update` updates now and `browsevil update --check` only
-looks. Choose **Tell me** or **Off** under **updates** on the extension's options page, or run `browsevil update --mode
-notify|off` (`OPENCODE_BROWSEVIL_AUTO_UPDATE=off` in the environment overrides both). Off still checks hourly, and
-installs nothing. To go back, rerun the install
-script with `--channel <channel>` or `--version <version>`, or install `@opencode/browsevil@<version>` with your package
-manager. The evil GitHub release updates the extension.
-
-**Dev builds**: download from [the evil release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5): `curl -fsSL https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -o browsevil.exe
---channel dev`, or `browsevil@dev install`. The store extension works with dev builds. To try the dev
-extension too, download https://github.com/AlneXDev/browse-evil/releases, unzip it, turn on **Developer mode** on
-your browser's extensions page, click **Load unpacked**, pick the folder and run `browsevil pair` (`browsevil extension`
-prints these steps on the dev channel). Remove the store extension first so only one browsevil runs in that profile.
+**Dev builds**: download the release's `browsevil.exe` (or build from this checkout) and run `browsevil install`.
+Load the evil extension unpacked from the release zip; there is no store extension to remove.
 
 ### Uninstall
 
@@ -346,7 +328,7 @@ when it starts: it stops after 30 minutes without use, or run `browsevil restart
 | `OPENCODE_BROWSEVIL_FILE_ROOTS` | More folders tools may read and write (path-list separated) |
 | `OPENCODE_BROWSEVIL_AGENT_WINDOW=separate` | Open agent tabs in a separate window (`current`: in yours), overriding the options page |
 | `OPENCODE_BROWSEVIL_HUMAN_INPUT=0` | Send input at full speed; overrides the options page |
-| `OPENCODE_BROWSEVIL_AUTO_UPDATE=notify` | Only tell about new versions (`off`: check, but never install or tell; `on`: install them, the default) |
+| `OPENCODE_BROWSEVIL_AUTO_UPDATE` | Ignored in this fork; the evil build never checks or installs automatically |
 | `OPENCODE_BROWSEVIL_CHALLENGE_WAIT_MS=15000` | How long to wait for a bot check the browser clears by itself |
 | `OPENCODE_BROWSEVIL_EXTENSION_TIMEOUT_MS=30000` | How long the relay waits for the extension to answer a command |
 | `OPENCODE_BROWSEVIL_PING_TIMEOUT_MS=10000` | How long a ping may go unanswered before the browser counts as asleep |

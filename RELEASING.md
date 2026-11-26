@@ -1,3 +1,10 @@
+# NOTE (evil fork)
+
+Upstream release-service publishing, npm trusted publishing and Chrome Web Store submission are **disabled** in this
+fork (the corresponding workflow jobs have `if: false`). The only supported distribution is the GitHub release
+`evil-v<version>` at https://github.com/AlneXDev/browse-evil/releases, with the unpacked extension zip and, when
+built, `browsevil.exe`. The text below is upstream history and does not describe this fork's release flow.
+
 # Releasing browsevil
 
 One version ships an extension zip, the npm package `@opencode/browsevil` (`opencode-browsevil-<version>.tgz`: a Node
