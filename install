@@ -17,9 +17,8 @@ Usage: install [options] [browsevil install options]
 
 Options:
     -h, --help              Display this help message
-    -v, --version <version> Evil releases pin the version in the tag evil-v<version>
-        --channel <channel> Install the latest version on a release channel:
-                            stable (default), beta or dev. \`latest\` means stable
+    -v, --version <version> Not supported in this fork (GitHub release only)
+        --channel <channel> Not supported in this fork (GitHub release only)
     -b, --binary <path>     Install from a local binary instead of downloading
         --no-setup          Only install the binary; don't run \`browsevil install\`
 
