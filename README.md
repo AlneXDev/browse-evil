@@ -32,7 +32,7 @@ Then load the evil extension unpacked: download
 Developer mode and click **Load unpacked** on the extracted folder. Run `.\browsevil.exe install` again to pair it.
 
 > The `https://opencode.ai/browse/install` installers install **normal** OpenCode Browse. Don't use them for the evil
-> build — this fork is not published to the Chrome Web Store, so the extension must be loaded unpacked.
+> build — this fork is not published to the evil GitHub release (unpacked extension), so the extension must be loaded unpacked.
 
 The evil build lives under `~/.config/browsevil`, `~/.local/share/browsevil`, `~/.local/state/browsevil` and
 `~/.cache/browsevil`, registers the MCP server as `browsevil`, and its relay listens on port `29698`, so it runs
@@ -44,7 +44,7 @@ Other ways to install, all of which end in the same `browsevil install`:
 | --- | --- | --- |
 | Evil release | Download `browsevil.exe` from [the release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5) | `~/.local/bin/browsevil`; updates itself |
 | Evil release (Windows) | `iwr -useb https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -OutFile browsevil.exe` then `.\browsevil.exe install` | `%USERPROFILE%\.local\bin\browsevil.exe`; updates itself |
-| npx, bunx | `npx @opencode/browsevil install` | copied to `~/.local/bin/browsevil` once; updates itself from then on |
+| npx, bunx | `browsevil install` | copied to `~/.local/bin/browsevil` once; updates itself from then on |
 | npm | `npm i -g @opencode/browsevil`, then `browsevil install` | npm's global `browsevil`; browsevil runs `npm install -g` to update |
 | bun | `bun add -g @opencode/browsevil`, then `browsevil install` | `~/.bun/bin/browsevil`; browsevil runs `bun add -g` to update |
 | pnpm, yarn, volta | `pnpm add -g` / `yarn global add` / `volta install @opencode/browsevil`, then `browsevil install` | that manager's `browsevil`; updated with the same manager |
@@ -53,7 +53,7 @@ There's always exactly one `browsevil`: a global package install is left to its 
 to it, and a leftover `~/.local/bin/browsevil` from an earlier install is removed), and agents run the same `browsevil` your
 terminal does. If `browsevil install` finds another `browsevil` on your PATH it tells you which one and how to remove it.
 
-The install script reads the channel's manifest from [Anomaly's release service](https://anoma.ly/release), downloads
+The install script reads the channel's manifest from [the evil GitHub release](https://github.com/AlneXDev/browse-evil/releases), downloads
 the binary for this computer and checks its size and SHA-256 before installing it. `--channel stable|beta|dev` picks
 the channel (`stable` by default); `--version <version>` installs a specific version from npm, checked against npm's
 published SHA-512 integrity. With npm, `@opencode/browsevil@dev` is the dev channel. The npm package is a small Node
@@ -68,7 +68,7 @@ launcher (Node 22+) that runs the native binary npm installed for your platform.
    to toggle, Enter to confirm. An agent running `browsevil install` sets up itself. Without a terminal OpenCode is the
    default. Edits keep the comments and formatting of each agent's config, and a config that's a symlink (a
    dotfiles repo, Nix Home Manager) stays one: browsevil writes the file it points at.
-3. **Connects the extension.** If no browser has browsevil yet, install opens it in the Chrome Web Store; add it, and
+3. **Connects the extension.** If no browser has browsevil yet, install opens it in the evil GitHub release (unpacked extension); add it, and
    install pairs it once it's there. If a browser already has it, install opens its setup page with a one-time pairing
    code in the link, so it pairs without copying anything. Over SSH or without a display it prints a code instead.
 
@@ -183,10 +183,10 @@ looks. Choose **Tell me** or **Off** under **updates** on the extension's option
 notify|off` (`OPENCODE_BROWSEVIL_AUTO_UPDATE=off` in the environment overrides both). Off still checks hourly, and
 installs nothing. To go back, rerun the install
 script with `--channel <channel>` or `--version <version>`, or install `@opencode/browsevil@<version>` with your package
-manager. The Chrome Web Store updates the extension.
+manager. The evil GitHub release updates the extension.
 
 **Dev builds**: download from [the evil release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5): `curl -fsSL https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -o browsevil.exe
---channel dev`, or `npx @opencode/browsevil@dev install`. The store extension works with dev builds. To try the dev
+--channel dev`, or `browsevil@dev install`. The store extension works with dev builds. To try the dev
 extension too, download https://github.com/AlneXDev/browse-evil/releases, unzip it, turn on **Developer mode** on
 your browser's extensions page, click **Load unpacked**, pick the folder and run `browsevil pair` (`browsevil extension`
 prints these steps on the dev channel). Remove the store extension first so only one browsevil runs in that profile.

@@ -542,7 +542,7 @@ fn switch_hint(exe: &Path) -> String {
 }
 
 /// `browsevil update [--check]`.
-pub fn command(_check_only: bool) -> anyhow::Result<()> {
+pub fn command(_args: &[String]) -> anyhow::Result<()> {
     println!("browsevil {VERSION} ({})", channel());
     println!("Evil builds update only from the GitHub release:");
     println!("https://github.com/AlneXDev/browse-evil/releases/latest");
@@ -565,14 +565,8 @@ fn record_install(version: &str) -> anyhow::Result<()> {
 /// The channel's release, when this install hasn't taken it: `(summary, command)`. A self-updating install tells it when updates
 /// are notify-only; a package runner, which can't update, whenever updates aren't off.
 pub fn pending_notice() -> Option<(String, String)> {
-    let mode = effective_mode();
-    let command = match install() {
-        Install::Binary(_) | Install::Global(_) if mode == Mode::Notify => "browsevil update".to_owned(),
-        Install::Runner(runner) if mode != Mode::Off => format!("{} install", runner.run(dist_tag(VERSION))),
-        _ => return None,
-    };
-    let latest = state().get("latest")?.as_str()?.to_owned();
-    (latest != VERSION).then(|| (format!("browsevil {latest} is available (running {VERSION})"), command))
+    // evil-v2: no Anomaly feed, so no update notices.
+    None
 }
 
 /// What the extension's options page shows about updates (cli/src/update/auto-update.ts `AutoUpdateStatus`).
@@ -660,7 +654,7 @@ pub fn describe() -> String {
         Install::Global(global) => format!("{} {PACKAGE}@{tag}", global.manager.name()),
         Install::Binary(_) => format!("{} channel", channel()),
     };
-    let mut line = format!("{} ({source})", describe_mode(effective_mode()));
+    let mut line = format!("{} ({source})", "off");
     if let Some(latest) = latest {
         line.push_str(&format!(", {latest} available"));
     }

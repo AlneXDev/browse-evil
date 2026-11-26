@@ -28,7 +28,7 @@ cp "$2/attestation.sigstore.json" "$assets/"
   echo
   echo "## Install"
   echo
-  echo '`download browsevil.exe from the evil GitHub release and run `browsevil install``'
+  echo 'Download browsevil.exe from the evil GitHub release, then run `browsevil install`.'
   echo
   echo "## Verify"
   echo

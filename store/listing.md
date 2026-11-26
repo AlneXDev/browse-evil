@@ -1,4 +1,4 @@
-# Chrome Web Store listing
+# evil GitHub release listing
 
 Copy these into the developer dashboard. The release workflow uploads `opencode-evil-browse-extension-<version>.zip` (see RELEASING.md); `bun run package` builds the same zip locally.
 

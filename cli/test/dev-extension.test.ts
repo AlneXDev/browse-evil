@@ -63,7 +63,7 @@ describe("dev extension", () => {
     const server = serve(first.bytes)
     expect(await syncDevExtension(first.extension, { root, fetch: server.fetch, env: {}, port: 29698 })).toBe("updated")
     expect(server.requests).toEqual([devExtensionUrl(first.extension, {})])
-    expect(server.requests[0]).toBe(`https://anoma.ly/release/browsevil/files/${first.extension.sha256}/first.zip`)
+    expect(server.requests[0]).toBe(`https://github.com/AlneXDev/browse-evil/releases/browsevil/files/${first.extension.sha256}/first.zip`)
     const folder = devExtensionFolder(root)
     expect(fs.readFileSync(path.join(folder, "assets", "background.js"), "utf8")).toContain("b1")
     expect(JSON.parse(fs.readFileSync(path.join(folder, "relay-pairing.json"), "utf8"))).toMatchObject({ port: 29698, code: expect.stringMatching(/^[0-9A-Z]{8}$/) })

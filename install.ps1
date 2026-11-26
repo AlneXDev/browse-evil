@@ -20,11 +20,6 @@
 #       --no-setup          Only install the binary; don't run `browsevil install`
 # Anything else goes to `browsevil install`, e.g. --remote, --agent claude or --no-modify-path.
 
-# evil-v2: never install normal Browse from Anomaly or npm.
-if (-not $binary -and -not $help) {
-    throw "evil builds install only from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe (or use -Binary)"
-}
-
 # Windows PowerShell 5.1 can fail to autoload Get-FileHash when a PowerShell 7 module directory earlier in PSModulePath
 # shadows Microsoft.PowerShell.Utility, so hash a file with .NET directly: the same lowercase hex on 5.1 and 7+.
 function Get-FileDigest {
@@ -106,6 +101,11 @@ Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --
             }
             default { $setupArgs += $arg }
         }
+    }
+
+    # evil-v2: never install normal Browse from Anomaly or npm.
+    if (-not $binary) {
+        throw "evil builds install only from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe (or use -Binary)"
     }
 
     # `latest` was the npm tag and is now an alias for the release service's stable channel.

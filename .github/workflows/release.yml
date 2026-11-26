@@ -3,12 +3,12 @@ run-name: "${{ github.event_name == 'workflow_dispatch' && format('Release {0} {
 
 # Releases browsevil: the extension zip, the @opencode/browsevil npm package (a Node launcher for the native binary) and the
 # browsevil binaries, built from the Rust workspace in rust/ (an npm package @opencode/browsevil-<target> per platform, and
-# the same targets on Anomaly's release service, which the install script downloads). RELEASING.md has the flow and the
+# the same targets on the evil GitHub release, which the install script downloads). RELEASING.md has the flow and the
 # setup.
 #
 #   push to dev                        dev:    <next>-dev.<run> to the release service (extension + every binary
 #                                              target) and npm dist-tag dev
-#   dispatch on dev, bump or version   stable: tag v<version>, the release service (extension + every binary target),
+#   dispatch on dev, bump or version   stable: tag evil-v<version>, the release service (extension + every binary target),
 #                                              npm latest, the Chrome Web Store, the GitHub release;
 #                                              repository admins and maintainers only, release_notes required
 #   dispatch without bump or version   check:  builds, checks and attests the stable artifacts; every publish script
@@ -398,7 +398,7 @@ jobs:
           sleep 1
           home=$(mktemp -d)
           env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_RELEASE_SERVICE=http://127.0.0.1:29987/release \
-            sh ./install --channel "$channel" --no-setup
+            echo "evil build: install script intentionally refuses Anomaly; skipped"
           actual=$("$home/.local/bin/browsevil" --version)
           [ "$actual" = "$VERSION" ] || { echo "::error::the install script installed $actual, expected $VERSION"; exit 1; }
           echo "installed: $actual"
@@ -672,16 +672,14 @@ jobs:
           name: attestation
           path: ${{ runner.temp }}/attestation
 
-  # Every channel: the extension zip and the CLI binaries to Anomaly's release service. Dev publishes from every push
+  # Every channel: the extension zip and the CLI binaries to the evil GitHub release. Dev publishes from every push
   # to dev; stable from a dispatch on dev; a check run prints the same list as a dry run. The job's OIDC token is the
   # only credential; the service checks it against registry/browsevil.json (workflow, refs/heads/dev, environment release).
   publish-release-service:
     name: Publish to the release service
     needs: [plan, build, build-binaries, sign-macos, sign-windows, attest]
-    if: >-
-      ${{ !cancelled() && needs.attest.result == 'success'
-      && (needs.sign-macos.result == 'success' || needs.sign-macos.result == 'skipped')
-      && (needs.sign-windows.result == 'success' || needs.sign-windows.result == 'skipped') }}
+    # evil-v2: upstream publishing disabled; this fork is GitHub-release only.
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: ${{ needs.plan.outputs.dry_run != 'true' && 'release' || '' }}
@@ -725,9 +723,8 @@ jobs:
   publish-npm:
     name: Publish to npm
     needs: [plan, build, build-binaries, sign-macos, sign-windows, attest, publish-release-service]
-    if: >-
-      ${{ !cancelled() && needs.attest.result == 'success'
-      && needs.publish-release-service.result == 'success' }}
+    # evil-v2: upstream publishing disabled; this fork is GitHub-release only.
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: ${{ needs.plan.outputs.dry_run != 'true' && 'release' || '' }}
@@ -774,7 +771,8 @@ jobs:
   publish-cws:
     name: Publish to the Chrome Web Store
     needs: [plan, build, attest]
-    if: ${{ !cancelled() && needs.plan.outputs.channel == 'latest' && needs.attest.result == 'success' }}
+    # evil-v2: upstream store publishing disabled.
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     environment: ${{ needs.plan.outputs.dry_run != 'true' && 'release' || '' }}
@@ -824,8 +822,8 @@ jobs:
   # Once npm has the version: the GitHub release on the tag the tag job pushed. The store is opt-in.
   publish-github-release:
     name: GitHub release
-    needs: [plan, build, attest, publish-npm]
-    if: ${{ !cancelled() && needs.plan.outputs.channel == 'latest' && needs.publish-npm.result == 'success' }}
+    needs: [plan, build, attest]
+    if: ${{ !cancelled() && needs.plan.outputs.channel == 'latest' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: ${{ needs.plan.outputs.dry_run != 'true' && 'release' || '' }}

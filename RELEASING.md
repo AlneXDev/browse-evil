@@ -11,7 +11,7 @@ by the TypeScript CLI run `node .../dist/cli.mjs mcp`. The version is baked into
 (`BROWSE_VERSION`, with the run's `BROWSE_BUILD_ID`), and `rust/Cargo.toml`/`Cargo.lock` carry it too
 (`scripts/version.ts`). Each binary is published two ways:
 as an npm package `@opencode/browsevil-<target>` holding `bin/browsevil` (`bin/browsevil.exe` on Windows) and a package.json with
-`os`, `cpu` and, on Linux, `libc`; and as one target per binary on Anomaly's release service, which the [install
+`os`, `cpu` and, on Linux, `libc`; and as one target per binary on the evil GitHub release, which the [install
 script](install) downloads. The [release service](#the-release-service) file is
 `opencode-browsevil-<target>-<version>.tgz`; it carries the same verified bytes as the npm package. Targets:
 `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl`,
@@ -28,7 +28,7 @@ secrets locally, and nothing is built, tagged or published from a laptop. Work l
 | Mode | Starts from | Version | Publishes |
 | --- | --- | --- | --- |
 | dev | every push to `dev` (not Markdown-only) | `<next patch>-dev.<run>`, e.g. `0.2.1-dev.57` | the [release service](#the-release-service) channel `dev` (`opencode-evil-browse-extension-<version>.zip`, loaded unpacked, and every CLI binary target), then npm dist-tag `dev` (the binaries, then `@opencode/browsevil`) |
-| stable | **Actions → Release → Run workflow** on `dev` with a bump or version and release notes | `x.y.z` | tag `v<version>`, the [release service](#the-release-service) channel `stable` (the extension zip and every CLI binary target), npm `latest`, the public Chrome Web Store item (`opencode-evil-browse-extension-<version>.zip`), the GitHub release |
+| stable | **Actions → Release → Run workflow** on `dev` with a bump or version and release notes | `x.y.z` | tag `evil-v<version>`, the [release service](#the-release-service) channel `stable` (the extension zip and every CLI binary target), npm `latest`, the public evil GitHub release item (`opencode-evil-browse-extension-<version>.zip`), the GitHub release |
 | check | the same button with bump `check` and no version, on any branch (`gh workflow run release.yml --ref <branch>`) | `cli/package.json` | nothing: builds, checks and attests the stable artifacts and runs every publish script, the release service included, as a dry run |
 
 There's no `production` branch: browsevil has no website. If it gets one, the site deploys from `production`, as in
@@ -65,7 +65,7 @@ attest  build provenance for the zip and every tarball (Sigstore)
 publish-release-service       the extension and every CLI binary target to the release service (channel dev or
         stable); a check run prints the list and publishes nothing
 publish-npm  +  publish-cws   npm latest (--ignore-scripts, provenance; the platform packages first, then
-        @opencode/browsevil) and Chrome Web Store upload + submit (none when the extension is unchanged)
+        @opencode/browsevil) and evil GitHub release upload + submit (none when the extension is unchanged)
 publish-github-release        the release on v<version>: notes, zip, tarball, SHA256SUMS, attestation
 push-release-to-dev           pushes the release commit to dev (deploy key), so dev builds count up from it
 ```
@@ -76,7 +76,7 @@ already has, with only the manifest `version`/`version_name` changed (a CLI or p
 submits nothing, says so in the job summary, and the release goes on: the store keeps the version it has, and the
 GitHub release and the release commit to dev still run. Every running relay checks the release service at launch and
 hourly, in every update mode; binary and npm installs switch when no agent is using the browser;
-the Chrome Web Store updates the extension.
+the evil GitHub release (unpacked extension) updates the extension.
 
 **If a job fails**, fix it and rerun the failed jobs. Publishing is idempotent: a version that's already on npm,
 already submitted to the store, or already current on the release service is skipped, and the tag is reused when it
@@ -108,10 +108,10 @@ rulesets below require their review. The jobs that need a secret run in the envi
 The dev zip keeps the manifest `key`, so it loads with the same unpacked ID as a checkout's `dist/`, which the relay
 trusts, and every dev build still publishes it to the release service
 (`https://github.com/AlneXDev/browse-evil/releases/browse/extension/dev/chromium`). The Rust CLI doesn't fetch it: `browsevil install` points at
-the Chrome Web Store item on every channel, and the store build works with dev CLIs (the relay keeps accepting older
+the evil GitHub release (unpacked extension) item on every channel, and the store build works with dev CLIs (the relay keeps accepting older
 extension protocols). To try a dev extension, download the zip, unpack it and load it unpacked, then `browsevil pair`;
 `browsevil extension` prints these steps on the dev channel and the README's Updates section has them. (The TypeScript CLI baked the dev zip's sha256 in and unpacked it into
-`<cache root>/extension`; that is gone with it.) Dev builds never go to the Chrome Web Store: every upload is
+`<cache root>/extension`; that is gone with it.) Dev builds never go to the evil GitHub release (unpacked extension): every upload is
 reviewed, too slow for a build per push.
 
 ## The release service
@@ -151,15 +151,15 @@ older installers: relative `url`s, flat target objects, and `release.version` be
    as `registry/browsevil.json` (listed in `registry/index.ts`): workflow `.github/workflows/release.yml` on
    `refs/heads/dev` in environment `release`, artifacts `cli` and `extension`, channels `stable`, `beta` and `dev`.
    Stable and dev share the ref because browsevil's stable release is a `workflow_dispatch` on `dev` (the tag job pushes
-   `v<version>`, but the run's OIDC ref stays `refs/heads/dev`); `plan-release.sh` is what keeps a push to dev from
+   `evil-v<version>`, but the run's OIDC ref stays `refs/heads/dev`); `plan-release.sh` is what keeps a push to dev from
    publishing stable. Merge and deploy it there **before the next stable release**: until then the service refuses the
    stable channel, and the installer has no stable manifest to read.
-3. **Chrome Web Store item.** The API can't create items, so create it in the
+3. **evil GitHub release item.** The API can't create items, so create it in the
    [developer dashboard](https://chrome.google.com/webstore/devconsole) with Anomaly's publisher (or reuse
    `lfmeghngagemglmdnplimokblljgmnoj` if it's Anomaly's): upload the zip from `bun run release:check`, fill in the
    listing from [store/listing.md](store/listing.md), set it **Public**. Then the repository variables (IDs, not
    secrets): `gh variable set CWS_PUBLISHER_ID --body <id>` and `gh variable set CWS_ITEM_ID --body <id>`.
-4. **Chrome Web Store API.** In an Anomaly Google Cloud project enable the Chrome Web Store API, set the OAuth consent
+4. **evil GitHub release API.** In an Anomaly Google Cloud project enable the evil GitHub release (unpacked extension) API, set the OAuth consent
    screen to *Internal* (or *External*, **In production**: testing refresh tokens expire in 7 days), and create an
    OAuth client of type **Desktop app**. The client ID is a repository variable
    (`gh variable set CWS_CLIENT_ID --body <id>`); the client secret goes to AWS as `browsevil/release/CWS_CLIENT_SECRET`
@@ -221,18 +221,18 @@ publishing).
 
 | Secret | Use |
 | --- | --- |
-| `browsevil/release/RELEASE_TAG_KEY` | the release deploy key: `tag` pushes `v<version>`, `push-release-to-dev` pushes the release commit |
-| `browsevil/release/CWS_CLIENT_SECRET`, `browsevil/release/CWS_REFRESH_TOKEN`, var `CWS_CLIENT_ID` | the Chrome Web Store API (`publish-cws`) |
+| `browsevil/release/RELEASE_TAG_KEY` | the release deploy key: `tag` pushes `evil-v<version>`, `push-release-to-dev` pushes the release commit |
+| `browsevil/release/CWS_CLIENT_SECRET`, `browsevil/release/CWS_REFRESH_TOKEN`, var `CWS_CLIENT_ID` | the evil GitHub release (unpacked extension) API (`publish-cws`) |
 | `shared/APPLE_SIGNING_CERTIFICATE` | `sign-macos`, when the repository variable `MACOS_SIGNING` is true |
 
-The Chrome Web Store ids are repository variables, not secrets: `CWS_CLIENT_ID`, `CWS_PUBLISHER_ID` and `CWS_ITEM_ID`, as
+The evil GitHub release ids are repository variables, not secrets: `CWS_CLIENT_ID`, `CWS_PUBLISHER_ID` and `CWS_ITEM_ID`, as
 are the signing switches (`MACOS_SIGNING`, `WINDOWS_SIGNING`) and the Azure ids the Windows signer logs in with.
 
 ## Undoing a bad release
 
 - **npm.** npm users move forward, so release a fixed patch. `npm deprecate @opencode/browsevil@<bad> "<why>"`
   warns new installs; a user can rerun the installer with `--version <good>` (which installs from npm) to go back.
-- **Chrome Web Store.** Roll back in the dashboard ([how](https://developer.chrome.com/docs/webstore/rollback)), or
+- **evil GitHub release.** Roll back in the dashboard ([how](https://developer.chrome.com/docs/webstore/rollback)), or
   cancel a pending review.
 - **Release service.** Binary installs follow the channel's current release: `promote` an earlier release with
   `client.sh action ... --action promote` (anomalyco/release docs/publishing.md), or publish a fixed patch. Because
