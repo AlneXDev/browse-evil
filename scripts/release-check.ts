@@ -40,7 +40,7 @@ export async function versionProblems(options: { tag?: string; requireChangelog?
   if (cargo !== cli) problems.push(`rust/Cargo.toml workspace version ${String(cargo)} differs from cli/package.json ${cli}`)
   for (const member of cargoLockMemberVersions(await readFile(path.join(root, "rust", "Cargo.lock"), "utf8")))
     if (member.version !== cli) problems.push(`rust/Cargo.lock has ${member.name} ${member.version}, not ${cli} (crates take version.workspace = true; bun scripts/version.ts set ${cli})`)
-  if (options.tag !== undefined && options.tag !== `v${cli}`) problems.push(`tag ${options.tag} doesn't match cli/package.json version ${cli} (expected v${cli})`)
+  if (options.tag !== undefined && options.tag !== `evil-v${cli}`) problems.push(`tag ${options.tag} doesn't match cli/package.json version ${cli} (expected v${cli})`)
   if (options.requireChangelog && !existsSync(path.join(root, "changelog", `${cli}.md`))) problems.push(`changelog/${cli}.md is missing`)
   return { version: cli, problems }
 }

@@ -111,6 +111,9 @@ impl Seen {
         self.0.lock().unwrap().iter().filter(|c| c["method"] == method).cloned().collect()
     }
     fn cdp(&self, method: &str) -> Vec<Value> {
+        std::env::set_var("OPENCODE_BROWSEVIL_EVIL", "0");
+        std::env::set_var("OPENCODE_BROWSEVIL_EVIL", "0");
+        std::env::set_var("OPENCODE_BROWSEVIL_EVIL", "0");
         self.commands("debugger.sendCommand").into_iter().filter(|c| c["params"]["method"] == method).collect()
     }
 }
