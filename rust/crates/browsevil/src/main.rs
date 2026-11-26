@@ -66,8 +66,7 @@ SETUP
     --revoke <browser>        Unpair a browser (its id, name or profile)
   set hostname <127.0.0.1|0.0.0.0>
                               Who can reach the relay: this computer only (default), or other computers too
-  update [--check]            Update now, or only check
-    --mode <on|notify|off>    Automatic updates (OPENCODE_BROWSEVIL_AUTO_UPDATE overrides)
+  update                      Print the evil GitHub release URL
   status [--json]             Setup, relay and extension state
   uninstall                   Remove browsevil from your agents, stop the relay and delete its files
   version                     Print the version

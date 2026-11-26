@@ -453,13 +453,8 @@ pub fn pair(args: &[String]) -> anyhow::Result<i32> {
 }
 
 pub fn extension() -> i32 {
-    println!("Load the evil unpacked extension from https://github.com/AlneXDev/browse-evil/releases; then run `browsevil install` (or `browsevil pair`) to connect it.");
-    if update::channel() == "dev" {
-        println!();
-        println!("The evil extension comes from the GitHub release zip:");
-        println!("https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip, unzip it, turn on Developer mode on your browser's");
-        println!("extensions page, click Load unpacked and pick the unzipped folder; then run `browsevil pair`.");
-    }
+    println!("Load the evil unpacked extension from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip; then run `browsevil install` (or `browsevil pair`) to connect it.");
+    println!("Download the zip, extract it, open chrome://extensions, turn on Developer mode and click Load unpacked.");
     0
 }
 

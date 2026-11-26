@@ -635,16 +635,17 @@ pub fn describe() -> String {
     let install = install();
     let state = state();
     let latest = state.get("latest").and_then(Value::as_str).filter(|l| *l != VERSION);
-    let tag = dist_tag(VERSION);
+    let _tag = dist_tag(VERSION);
     let source = match &install {
         Install::Runner(runner) => {
             let mut line = format!("{} resolves {PACKAGE} itself, so it doesn't update", runner.name().replace('-', " "));
             if let Some(latest) = latest {
                 line.push_str(&format!(" ({latest} is out)"));
             }
-            line.push_str(&format!("; for automatic updates run `{} install` or `{}`", runner.run(tag), runner.global_words(tag)));
+            line.push_str("; evil builds update only from https://github.com/AlneXDev/browse-evil/releases/latest");
             return line;
         }
+        Install::Global(_) => return "evil builds do not update from package managers; download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/latest".into(),
         Install::Checkout => return "a build from a checkout; it doesn't update itself".into(),
         Install::Other => {
             let exe = crate::relay::current_exe().unwrap_or_else(|_| "browsevil".into());

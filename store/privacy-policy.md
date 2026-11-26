@@ -15,7 +15,7 @@ browsevil is a browser extension that lets OpenCode, running on your own compute
 - To **the OpenCode tools on your computer**, over a local connection (127.0.0.1). The extension only obeys a relay that proves it holds this browser's key, and the relay only answers programs that hold its token, a file only your user account can read.
 - OpenCode may send it to the AI model provider **you** configured in OpenCode, under that provider's terms. The extension itself doesn't choose or contact any provider.
 
-Anomaly, the maker of OpenCode, doesn't run a server for this extension and doesn't receive, sell, or share your data. There's no analytics or tracking.
+AlneXDev, the maker of OpenCode Eʌil, doesn't run a server for this extension and doesn't receive, sell, or share your data. There's no analytics or tracking.
 
 ## Your choices
 - Agents can't use your tabs unless you click the toolbar button on them. Click again to take a tab back.

@@ -119,7 +119,7 @@ if (command === "--version" || command === "-v") {
     -a, --agent <names...>       Configure named agents (repeatable); '*' or --all-agents selects every supported agent
     -y, --yes                    Skip the picker; use the calling agent or detected agents
   extension                      Show where to get the extension (the unpacked folder of a checkout or a dev
-                                 install, or the evil GitHub release zip)
+                                 install, or the evil https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip)
   pair [--wait-seconds <seconds>] Start the relay, print a one-time code (valid 10 minutes) and wait for the
                                  browser that redeems it (default 180 seconds)
     --list                       Show paired browsers: id, name, profile, when paired and last seen

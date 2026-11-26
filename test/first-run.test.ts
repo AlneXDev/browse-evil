@@ -73,9 +73,9 @@ describe("relay probe", () => {
   })
 
   test("recognizes browsevil's own answers and nothing else", () => {
-    expect(relayProbeResult(200, { version: "0.0.2", buildId: "x", instanceId: "abc", pid: 1 })).toBe("found")
-    expect(relayProbeResult(403, { error: "Cross-origin browser requests are not allowed" })).toBe("found")
-    expect(relayProbeResult(403, { error: "Cross-origin browser requests are not allowed", installWaiting: true })).toBe("install-waiting")
+    expect(relayProbeResult(200, { app: "browsevil", version: "0.0.2", buildId: "x", instanceId: "abc", pid: 1 })).toBe("found")
+    expect(relayProbeResult(403, { app: "browsevil", error: "Cross-origin browser requests are not allowed" })).toBe("found")
+    expect(relayProbeResult(403, { app: "browsevil", error: "Cross-origin browser requests are not allowed", installWaiting: true })).toBe("install-waiting")
     expect(relayProbeResult(200, { version: "1.0" })).toBe("absent")
     expect(relayProbeResult(404, undefined)).toBe("absent")
     expect(relayProbeResult(undefined, undefined)).toBe("absent")

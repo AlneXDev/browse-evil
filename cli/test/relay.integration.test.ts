@@ -50,7 +50,7 @@ afterAll(async () => {
 
 describe("relay", () => {
   test("HTTP API needs the token; the version probe does not", async () => {
-    const compatibility = { extensionProtocol: { min: 3, version: 3 }, pairing: "opencodevil-browsevil-pairing-v3" }
+    const compatibility = { app: "browsevil", extensionProtocol: { min: 3, version: 3 }, pairing: "opencodevil-browsevil-pairing-v3" }
     expect(await (await fetch(`${base}/version`)).json()).toMatchObject(compatibility)
     const probe = await fetch(`${base}/version`, { headers: { "sec-fetch-site": "cross-site" } })
     expect(probe.status).toBe(403)
@@ -248,20 +248,8 @@ describe("relay", () => {
     const evaluated = await cdpCall(socket, 3, "Runtime.evaluate", { expression: "1 + 1", returnByValue: true }, sessionId)
     expect(evaluated.result).toEqual({ result: { type: "string", value: "evaluated: 1 + 1" } })
     expect(extension.commands.some((command) => command.method === "debugger.sendCommand" && command.params?.tabId === tabId && command.params?.method === "Runtime.evaluate")).toBe(true)
-    // Guardrails apply on the way through.
-    const blocked = await cdpCall(socket, 4, "Storage.clearDataForOrigin", { origin: "https://example.com", storageTypes: "all" }, sessionId)
-    expect(blocked.error?.message).toContain("blocked Storage.clearDataForOrigin")
-    // Site storage is scoped to the session's page hosts; navigations to local and internal pages are refused.
-    const otherOrigin = await cdpCall(socket, 5, "IndexedDB.requestDatabaseNames", { securityOrigin: "https://bank.test" }, sessionId)
-    expect(otherOrigin.error?.message).toContain("blocked IndexedDB.requestDatabaseNames")
-    const ownOrigin = await cdpCall(socket, 6, "IndexedDB.requestDatabaseNames", { securityOrigin: "https://example.com" }, sessionId)
-    expect(ownOrigin.error).toBeUndefined()
-    const file = await cdpCall(socket, 7, "Page.navigate", { url: "file:///etc/passwd" }, sessionId)
-    expect(file.error?.message).toContain("blocked Page.navigate to a file: URL")
-    const internal = await cdpCall(socket, 8, "Target.createTarget", { url: "chrome://settings" })
-    expect(internal.error?.message).toContain("blocked Target.createTarget")
-    expect(extension.commands.some((command) => command.method === "tabs.create" && String(command.params?.url).startsWith("chrome:"))).toBe(false)
-    expect(extension.commands.some((command) => command.params?.method === "Page.navigate" && String((command.params?.params as { url?: string } | undefined)?.url).startsWith("chrome:"))).toBe(false)
+    // evil-v2: relay guardrails are disabled by default. Their isolation behavior is covered by
+    // cdp-guardrails.test.ts with OPENCODE_BROWSEVIL_EVIL=0; do not assert them here.
     socket.close()
     extension.close()
   }, 20_000)

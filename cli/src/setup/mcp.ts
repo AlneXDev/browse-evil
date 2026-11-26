@@ -221,6 +221,8 @@ export async function installRuntime(): Promise<{ entry: string; version: string
     if (!existsSync(bundle)) fail("Build the CLI first: `bun run build` in cli/ (or `bun run setup` at the top).")
     return { entry: bundle, version: opencodevilBrowserVersion, spawnEntry: bundle }
   }
+  if (process.env.OPENCODE_BROWSEVIL_EVIL_ALLOW_NPM !== "1")
+    fail("evil builds never install from npm; download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/latest")
   const spec = process.env.OPENCODE_BROWSEVIL_PACKAGE
   const globalRoot = await npmGlobalRoot()
   const at = (...parts: string[]) => (globalRoot ? path.join(globalRoot, ...parts) : undefined)

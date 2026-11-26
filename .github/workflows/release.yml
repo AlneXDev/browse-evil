@@ -1,3 +1,4 @@
+# evil-v2: upstream release-service/npm/CWS publishing described below is DISABLED (jobs have `if: false`).
 name: Release
 run-name: "${{ github.event_name == 'workflow_dispatch' && format('Release {0} {1}', inputs.bump, inputs.version) || '' }}"
 
