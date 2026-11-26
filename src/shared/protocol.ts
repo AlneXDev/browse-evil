@@ -158,7 +158,6 @@ export type CliUpdateNotice = {
  */
 export function cliUpdateCommand(update: Pick<RelayAutoUpdate, "install" | "cli" | "updateCommand">): string {
   if (update.updateCommand?.trim()) return update.updateCommand.trim()
-  if (update.install === "npm") return "npm install -g @opencode/browsevil@latest"
   if (update.install === "npx") return "browsevil install"
   return `${update.cli?.trim() || "browsevil"} update`
 }

@@ -327,7 +327,7 @@ test("a client that never enabled Fetch sends no Fetch.disable", async () => {
 
 test("relay shutdown releases Fetch before the extension link closes", async () => {
   const shutdownHome = fs.mkdtempSync(path.join(temporaryRoot, "browsevil-fetch-shutdown-"))
-  const started = await startRelay(shutdownHome, { OPENCODE_BROWSEVIL_MANAGED_RELAY: "1", OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
+  const started = await startRelay(shutdownHome, { OPENCODE_BROWSEVIL_EVIL: "1", OPENCODE_BROWSEVIL_MANAGED_RELAY: "1", OPENCODE_BROWSEVIL_STORE_ID: "b".repeat(32) })
   const shutdownRelay = started.child
   const tabId = 421
   const extension = new FakeExtension(shutdownHome, started.port)

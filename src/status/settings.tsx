@@ -247,18 +247,8 @@ function Settings() {
         <Show when={selfUpdatingInstall(state()?.autoUpdate) && state()?.autoUpdate}>
           {(autoUpdate) => (
             <Section title="updates">
-              <Row label="When a new version is published" description={updateFacts(autoUpdate())}>
-                <SegmentedControl
-                  class="seg-update"
-                  value={autoUpdate().mode}
-                  onChange={(value) => {
-                    if (value === "on" || value === "notify" || value === "off") relay.send({ type: "autoUpdate.set", mode: value })
-                  }}
-                >
-                  <SegmentedControlItem value="on">Install</SegmentedControlItem>
-                  <SegmentedControlItem value="notify">Tell me</SegmentedControlItem>
-                  <SegmentedControlItem value="off">Off</SegmentedControlItem>
-                </SegmentedControl>
+              <Row label="When a new version is published" description="evil builds update manually from the GitHub release">
+                <span>manual</span>
               </Row>
               <Show when={autoUpdate().overriddenBy}>
                 {(variable) => (

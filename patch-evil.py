@@ -1,3 +1,6 @@
+# NOTE: stale one-off patch artifact from the initial evil conversion. The current tree is already patched;
+# running this will fail on changed paths. Master doc EVIL-PATCHES-MASTER.txt is the source of truth.
+
 from pathlib import Path
 import re
 
