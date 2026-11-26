@@ -1,8 +1,5 @@
 import { COMPLIANCE } from "./compliance.ts"
 
-
-
-
 /**
  * The agent guide, in one place: the MCP server's initialize instructions and `browsevil --help` use the same sentences,
  * so the two cannot drift. Keep the help version short and indented for a terminal.
