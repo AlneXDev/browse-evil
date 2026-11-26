@@ -397,11 +397,7 @@ jobs:
           trap 'kill "$server"' EXIT
           sleep 1
           home=$(mktemp -d)
-          env -i HOME="$home" PATH=/usr/bin:/bin OPENCODE_BROWSEVIL_RELEASE_SERVICE=http://127.0.0.1:29987/release \
-            echo "evil build: install script intentionally refuses Anomaly; skipped"
-          actual=$("$home/.local/bin/browsevil" --version)
-          [ "$actual" = "$VERSION" ] || { echo "::error::the install script installed $actual, expected $VERSION"; exit 1; }
-          echo "installed: $actual"
+          echo "evil build: install-script smoke test skipped (Anomaly/npm downloads are disabled)"
 
       # `browsevil serve` is the relay; `browsevil mcp` serves the tools through it.
       - name: Smoke test the relay and MCP server
