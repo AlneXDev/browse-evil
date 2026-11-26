@@ -32,7 +32,7 @@ Then load the evil extension unpacked: download
 Developer mode and click **Load unpacked** on the extracted folder. Run `.\browsevil.exe install` again to pair it.
 
 > The `https://opencode.ai/browse/install` installers install **normal** OpenCode Browse. Don't use them for the evil
-> build — this fork is not published to the evil GitHub release (unpacked extension), so the extension must be loaded unpacked.
+> build — this fork is published on the evil GitHub release as an unpacked extension, so the extension must be loaded unpacked.
 
 The evil build lives under `~/.config/browsevil`, `~/.local/share/browsevil`, `~/.local/state/browsevil` and
 `~/.cache/browsevil`, registers the MCP server as `browsevil`, and its relay listens on port `29698`, so it runs
@@ -293,7 +293,7 @@ to steer it, and that other programs on your computer may try to use the relay.
   limits, no Node, network or file access beyond the file roots (temp folders and `OPENCODE_BROWSEVIL_FILE_ROOTS`).
   Treat code an agent runs as code running as you. The relay starts with an allowlisted environment, so your API keys
   aren't in it.
-- **CDP guardrails.** Clearing cookies, cache or site data, closing the browser and changing site permissions are
+- **CDP guardrails (disabled by default in this fork; set OPENCODE_BROWSEVIL_EVIL=0 to restore).** Clearing cookies, cache or site data, closing the browser and changing site permissions are
   refused. Closing a page is handled like closing a target: a tab you lent is released, not closed. Cookie and storage
   access is limited to the hosts of the tab's own pages. Agents can't open browser-internal pages, other extensions or
   local files, or raise windows over your work.

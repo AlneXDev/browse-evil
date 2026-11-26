@@ -87,7 +87,7 @@ pub fn advice(version: Option<i64>, distribution: Option<&str>) -> String {
         ),
         Some(_) => {
             let unpacked = "Reload browsevil on your browser's extensions page (↻).";
-            let store = "Reload the unpacked evil extension from the GitHub release (to update now, open chrome://extensions, turn on Developer mode and click Update).";
+            let store = "Reload the unpacked evil extension from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip (to update now, open chrome://extensions, turn on Developer mode and click Update).";
             let next = match distribution {
                 Some("unpacked") => unpacked.to_string(),
                 Some("store") => store.to_string(),

@@ -1,3 +1,9 @@
+# NOTE (evil fork)
+
+Upstream npm/release-service publishing, hourly self-update polling and package-manager updates described below are
+**disabled** in this fork. The only distribution is the evil GitHub release at
+https://github.com/AlneXDev/browse-evil/releases with the unpacked extension zip (and a locally built browsevil.exe).
+
 # Releasing the Rust browsevil
 
 Releases run in GitHub Actions ([../RELEASING.md](../RELEASING.md), [../.github/workflows/release.yml](../.github/workflows/release.yml)).

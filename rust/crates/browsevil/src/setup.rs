@@ -457,7 +457,7 @@ pub fn extension() -> i32 {
     if update::channel() == "dev" {
         println!();
         println!("The evil extension comes from the GitHub release zip:");
-        println!("https://github.com/AlneXDev/browse-evil/releases, unzip it, turn on Developer mode on your browser's");
+        println!("https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip, unzip it, turn on Developer mode on your browser's");
         println!("extensions page, click Load unpacked and pick the unzipped folder; then run `browsevil pair`.");
     }
     0

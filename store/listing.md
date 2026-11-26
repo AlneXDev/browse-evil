@@ -1,3 +1,7 @@
+# NOTE (evil fork)
+
+This fork has no Chrome Web Store item; the extension is loaded unpacked from the evil GitHub release. The listing text below is upstream history.
+
 # evil GitHub release listing
 
 Copy these into the developer dashboard. The release workflow uploads `opencode-evil-browse-extension-<version>.zip` (see RELEASING.md); `bun run package` builds the same zip locally.
