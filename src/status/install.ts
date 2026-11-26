@@ -18,7 +18,7 @@ const TERMINAL = "Run this in your terminal"
 
 const curl: InstallMethod = { id: "curl", label: "curl", command: SHELL, title: TERMINAL }
 const powershell: InstallMethod = { id: "powershell", label: "PowerShell", command: POWERSHELL, title: "Run this in PowerShell" }
-const npm: InstallMethod = { id: "npm", label: "npm", command: NPM, title: TERMINAL }
+const npm: InstallMethod = { id: "npm", label: "GitHub release", command: NPM, title: TERMINAL }
 const remoteCurl: InstallMethod = { ...curl, command: `${SHELL} -s -- --remote` }
 const remoteNpm: InstallMethod = { ...npm, command: `${NPM} --remote` }
 

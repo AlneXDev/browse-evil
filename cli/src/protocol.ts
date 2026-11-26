@@ -58,7 +58,7 @@ export function extensionProtocolAdvice(version: number | null | undefined, comm
     return `The browsevil extension is newer than this browsevil CLI (${versions}). Update the CLI: run \`${commands.install}\`, then restart opencodevil.`
   if (skew === "extension-older") {
     const store = `Reload the unpacked extension from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip: open chrome://extensions, turn on Developer mode and click Update.`
-    const next = distribution === "unpacked" ? unpackedReloadAdvice : distribution === "store" ? store : `For an unpacked extension: ${unpackedReloadAdvice} For a store extension: ${store}`
+    const next = distribution === "unpacked" ? unpackedReloadAdvice : distribution === "store" ? store : `For an unpacked extension: ${unpackedReloadAdvice}`
     return `The browsevil extension is older than this browsevil CLI (${versions}). ${next}`
   }
   return `The browsevil extension and this browsevil CLI don't speak the same protocol (${versions}). Run \`${commands.install}\` again and update the extension.`

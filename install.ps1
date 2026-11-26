@@ -69,10 +69,9 @@ Usage:
 
 Options:
   -h, --help              Show this help
-  -v, --version <version> Install a specific version from npm (e.g., 0.0.7), or set `$env:VERSION
-      --channel <channel> Install the latest version on a release channel: stable (default), beta or dev.
-                          `latest` means stable, or set `$env:BROWSE_CHANNEL
-  -b, --binary <path>     Install from a local browsevil.exe instead of downloading
+  -v, --version <version> Not supported in this fork (no npm installs)
+      --channel <channel> Not supported in this fork (GitHub release only)
+  -b, --binary <path>     Install from a local evil browsevil.exe (the only supported path)
       --no-setup          Only install the binary; don't run ``browsevil install``
 
 Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --no-modify-path.
