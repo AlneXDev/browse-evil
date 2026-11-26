@@ -22,4 +22,4 @@ Anomaly, the maker of OpenCode, doesn't run a server for this extension and does
 - Remove the extension and run `browsevil uninstall` (`npx @opencode/browsevil uninstall` if you installed with npx, `node cli/dist/cli.mjs uninstall` from a checkout) to delete everything it set up.
 
 ## Contact
-Questions: open an issue at https://github.com/anomalyco/browse.
+Questions: open an issue at https://github.com/AlneXDev/browse-evil.

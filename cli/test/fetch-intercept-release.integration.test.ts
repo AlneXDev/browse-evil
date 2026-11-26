@@ -5,6 +5,7 @@ import os from "node:os"
 import path from "node:path"
 import WebSocket from "ws"
 import { cdpCall, collect, connectCdp, FakeExtension, startRelay, stopRelay, until } from "./relay-harness.ts"
+process.env.OPENCODE_BROWSEVIL_EVIL = "0"
 
 // Patchright enables Fetch on every page it attaches to. A client that enabled it can stop answering for a tab in
 // several ways (closing, detaching its root, losing the announcement), and a relay restart keeps the debugger attached.

@@ -180,7 +180,7 @@ older installers: relative `url`s, flat target objects, and `release.version` be
    - tags `v*`: restrict creation, updates and deletion; bypass: *Repository admin* and *Deploy keys* (the tag job).
 8. **Actions** (Settings → Actions → General): require actions pinned to a full-length commit SHA.
 9. **npm.** Every package publishes with trusted publishing: `@opencode/browsevil` and each `@opencode/browsevil-<target>`
-   trust GitHub Actions in `anomalyco/browsevil`, workflow `release.yml`. There is no npm token anywhere.
+   trust GitHub Actions in `AlneXDev/browse-evil`, workflow `release.yml`. There is no npm token anywhere.
 
    The eleven platform packages are set up already (November 2026): trusted publishing can only be configured on a
    package that exists, so each `@opencode/browsevil-<target>` was published once by hand as an empty `0.0.0` on the
@@ -188,7 +188,7 @@ older installers: relative `url`s, flat target objects, and `release.version` be
 
    ```sh
    npm publish --access public --tag placeholder   # in a folder with just package.json (name, version 0.0.0) and a README
-   npm trust github "@opencode/browsevil-<target>" --file release.yml --repository anomalyco/browsevil --allow-publish -y
+   npm trust github "@opencode/browsevil-<target>" --file release.yml --repository AlneXDev/browse-evil --allow-publish -y
    ```
 
    `npm trust list @opencode/browsevil-<target>` checks one.
@@ -202,7 +202,7 @@ older installers: relative `url`s, flat target objects, and `release.version` be
     profile; an Azure identity with the **Artifact Signing Certificate Profile Signer** role (formerly Trusted Signing
     Certificate Profile Signer) on the account or profile and read access to the subscription; and a federated
     credential on that identity for this repository's `release` environment (issuer
-    `https://token.actions.githubusercontent.com`, subject `repo:anomalyco/browsevil:environment:release`, audience
+    `https://token.actions.githubusercontent.com`, subject `repo:AlneXDev/browse-evil:environment:release`, audience
     `api://AzureADTokenExchange`). Then the six repository variables `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`,
     `AZURE_SUBSCRIPTION_ID`, `AZURE_TRUSTED_SIGNING_ENDPOINT`, `AZURE_TRUSTED_SIGNING_ACCOUNT_NAME` and
     `AZURE_TRUSTED_SIGNING_CERTIFICATE_PROFILE`, and `gh variable set WINDOWS_SIGNING --body true`: the sign-windows

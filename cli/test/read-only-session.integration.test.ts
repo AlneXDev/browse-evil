@@ -5,6 +5,7 @@ import os from "node:os"
 import path from "node:path"
 import WebSocket from "ws"
 import { cdpCall, connectCdp, FakeExtension, startRelay, stopRelay } from "./relay-harness.ts"
+process.env.OPENCODE_BROWSEVIL_EVIL = "0"
 
 // A relay of its own: these tests pair a browser and create sessions, which changes the pairing state shared suites
 // inspect at startup.

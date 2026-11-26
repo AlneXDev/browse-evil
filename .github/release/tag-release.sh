@@ -6,7 +6,7 @@
 . "$(dirname "$0")/lib.sh"
 
 stable_version "$BROWSE_VERSION" || die "Not a stable version: $BROWSE_VERSION"
-tag="v$BROWSE_VERSION"
+tag="evil-v$BROWSE_VERSION"
 
 # The top-level "version" (two-space indent) of each file, edited in place so nothing else is reformatted; a stable
 # manifest has no version_name.
