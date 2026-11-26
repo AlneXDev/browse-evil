@@ -1,3 +1,7 @@
+# NOTE (evil fork)
+
+This fork has no Chrome Web Store item and no npm/npx distribution; the extension is loaded unpacked from the evil GitHub release.
+
 # browsevil privacy policy
 
 _Last updated: October 28, 2026_
@@ -19,7 +23,7 @@ AlneXDev, the maker of OpenCode Eʌil, doesn't run a server for this extension a
 
 ## Your choices
 - Agents can't use your tabs unless you click the toolbar button on them. Click again to take a tab back.
-- Remove the extension and run `browsevil uninstall` (`browsevil uninstall` if you installed with npx, `node cli/dist/cli.mjs uninstall` from a checkout) to delete everything it set up.
+- Remove the unpacked extension and run `browsevil uninstall` to delete everything it set up.
 
 ## Contact
 Questions: open an issue at https://github.com/AlneXDev/browse-evil.

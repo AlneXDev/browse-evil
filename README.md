@@ -178,10 +178,9 @@ Load the evil extension unpacked from the release zip; there is no store extensi
 browsevil uninstall
 ```
 
-It removes browsevil from every agent config it was added to, stops the relay, deletes `~/.local/bin/browsevil` (for the
-install script and npx installs), the PATH line it added and browsevil's files. A global package stays with its package
-manager: uninstall prints the command (`npm rm -g @opencode/browsevil`, `bun remove -g @opencode/browsevil`, ...). Remove the
-extension from your browser to finish.
+It removes browsevil from every agent config it was added to, stops the relay, deletes `~/.local/bin/browsevil`, the
+PATH line it added and browsevil's files. Package-manager and npx installs are disabled in this fork, so there is no
+global package to remove. Remove the unpacked extension from your browser to finish.
 
 ## Using it
 
