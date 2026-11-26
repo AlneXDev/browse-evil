@@ -20,8 +20,8 @@ for target in darwin-arm64 darwin-x64 darwin-x64-baseline; do
   file="opencode-browsevil-$target-$BROWSE_VERSION.tgz"
   test -s "$in/$file" || die "Missing $in/$file"
   work=$(mktemp -d)
-  tar -xzf "$in/$file" -C "$work" package/package.json package/LICENSE package/bin/browsevilvil
-  bin="$work/package/bin/browsevilvil"
+  tar -xzf "$in/$file" -C "$work" package/package.json package/LICENSE package/bin/browsevil
+  bin="$work/package/bin/browsevil"
   file -b "$bin" | grep -q '^Mach-O' || die "$target is not a Mach-O binary"
   codesign --force "$timestamp" --options runtime --entitlements "$entitlements" --sign "$identity" "$bin"
   codesign --verify --strict --verbose=2 "$bin"
@@ -29,6 +29,6 @@ for target in darwin-arm64 darwin-x64 darwin-x64-baseline; do
   chmod 644 "$work/package/package.json" "$work/package/LICENSE"
   touch -t 198510260415 "$bin" "$work/package/package.json" "$work/package/LICENSE"
   # Files only (no directory entries), owned by root, as npm pack writes them; publish-npm.sh checks the listing.
-  tar --no-mac-metadata --uid 0 --gid 0 -czf "$out/$file" -C "$work" package/package.json package/LICENSE package/bin/browsevilvil
+  tar --no-mac-metadata --uid 0 --gid 0 -czf "$out/$file" -C "$work" package/package.json package/LICENSE package/bin/browsevil
   rm -rf "$work"
 done

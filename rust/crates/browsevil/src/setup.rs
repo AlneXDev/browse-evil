@@ -453,12 +453,12 @@ pub fn pair(args: &[String]) -> anyhow::Result<i32> {
 }
 
 pub fn extension() -> i32 {
-    println!("Add browsevil to your Chrome-family browser from the Chrome Web Store: {}", browsers::store_url());
+    println!("Load the evil unpacked extension from https://github.com/AlneXDev/browse-evil/releases; then run `browsevil install` (or `browsevil pair`) to connect it.");
     println!("Then run `browsevil install` (or `browsevil pair`) to connect it.");
     if update::channel() == "dev" {
         println!();
-        println!("The store extension works with dev builds too. To try the dev extension instead, download");
-        println!("https://anoma.ly/release/browse/extension/dev/chromium, unzip it, turn on Developer mode on your browser's");
+        println!("The evil extension comes from the GitHub release zip:");
+        println!("https://github.com/AlneXDev/browse-evil/releases, unzip it, turn on Developer mode on your browser's");
         println!("extensions page, click Load unpacked and pick the unzipped folder; then run `browsevil pair`.");
     }
     0

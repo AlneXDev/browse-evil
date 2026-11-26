@@ -158,7 +158,7 @@ export async function packPlatforms(binaries: string, version: string, out: stri
         version,
         description: `The browsevil binary for ${item.name}.`,
         license: "MIT",
-        repository: { type: "git", url: "git+https://github.com/anomalyco/browse.git", directory: "rust" },
+        repository: { type: "git", url: "git+https://github.com/AlneXDev/browse-evil.git", directory: "rust" },
         os: [item.os],
         cpu: [item.cpu],
         ...(item.libc ? { libc: [item.libc] } : {}),

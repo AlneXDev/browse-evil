@@ -315,7 +315,7 @@ else
             rm -rf "$tmp_dir"
             fail "$package@$specific_version has an invalid SHA-512 integrity; nothing was installed"
         fi
-        filename="browsevil-$target-$specific_version.tgz"
+        filename="opencode-browsevil-$target-$specific_version.tgz"
         url="https://registry.npmjs.org/$package/-/$filename"
     fi
 fi
@@ -390,7 +390,7 @@ download_npm() (
         if [ -n "$previous" ]; then
             print_message warning "browsevil $specific_version is still unavailable; falling back to $previous ($channel)." >&2
             ret=0
-            curl -f -# -L -o "$tmp_dir/$filename" "${url%/*}/browsevil-$target-$previous.tgz" || ret=$?
+            curl -f -# -L -o "$tmp_dir/$filename" "${url%/*}/opencode-browsevil-$target-$previous.tgz" || ret=$?
         fi
     fi
     # curl exits 23 when it cannot write the file, usually because the temporary directory is full.

@@ -338,7 +338,7 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   if (version.error || version.status !== 0) return refuse("git isn't installed or isn't on PATH.", "Install git, then run this again.")
   const top = git(["rev-parse", "--show-toplevel"]).stdout
   if (!top || realpath(top) !== realpath(repo))
-    return refuse(`${repo} isn't a git clone.`, `Clone it again: git clone https://github.com/anomalyco/browse.git && cd browsevil && bun run setup`)
+    return refuse(`${repo} isn't a git clone.`, `Clone it again: git clone https://github.com/AlneXDev/browse-evil.git && cd browsevil && bun run setup`)
   if (!(deps.hasBun ?? (() => !spawnSync("bun", ["--version"], { stdio: "ignore" }).error))())
     return refuse("bun isn't installed or isn't on PATH (setup builds with it).", "Install Bun from https://bun.sh, then run this again.")
 

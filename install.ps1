@@ -201,7 +201,7 @@ Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --
         }
 
         $download = {
-            $filename = "browsevil-windows-$target-$version.tgz"
+            $filename = "opencode-browsevil-windows-$target-$version.tgz"
             $archive = Join-Path $tmp $filename
             Write-Host ""
             Write-Host "Installing browsevil version: $version"

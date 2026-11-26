@@ -1,3 +1,4 @@
+import { compareVersions } from "./auto-update.ts"
 // evil-v2: updates come from the evil build's own GitHub release, never from Anomaly's feed.
 import { createHash } from "node:crypto"
 import { existsSync, renameSync, rmSync, writeFileSync } from "node:fs"
@@ -24,7 +25,7 @@ export type GithubUpdate = {
   readonly size: number | undefined
 }
 
-const versionOf = (tag: string) => tag.replace(/^v/, "")
+const versionOf = (tag: string) => tag.replace(/^evil-v/, "").replace(/^v/, "")
 
 /** The newest evil release, if it offers a Windows CLI newer than the running one. */
 export async function checkGithubUpdate(current: string, fetchFn: typeof fetch = fetch): Promise<GithubUpdate | undefined> {
@@ -38,6 +39,7 @@ export async function checkGithubUpdate(current: string, fetchFn: typeof fetch =
   if (!asset) throw new Error(`the latest evil release has no ${ASSET_NAME} asset`)
   const latest = versionOf(release.tag_name ?? "")
   if (!latest || latest === current) return undefined
+  if (compareVersions(latest, current) <= 0) return undefined
   return { latest, url: asset.browser_download_url, digest: asset.digest, size: asset.size }
 }
 

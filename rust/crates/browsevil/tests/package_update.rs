@@ -331,7 +331,7 @@ fn npm_global_install() {
     let stubs = scene.root.join("stubs");
     write_executable(&stubs.join("npm"), &format!("#!/bin/sh\necho \"$*\" >> '{}'\n{}", scene.calls.display(), scene.swap(&package, &binary)));
     scene.run("npm", &binary, &launcher, Some(&stubs), |registry| {
-        format!("install --global --prefix {} --no-fund --no-audit --no-update-notifier @opencode/browsevil@{NEXT} --registry={registry} --@opencodevil:registry={registry}", prefix.display())
+        format!("install --global --prefix {} --no-fund --no-audit --no-update-notifier @opencode/browsevil@{NEXT} --registry={registry} --@opencode:registry={registry}", prefix.display())
     });
 }
 

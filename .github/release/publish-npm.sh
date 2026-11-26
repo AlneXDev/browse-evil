@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # publish-npm.sh <build dir> <binaries dir> [<macOS signed dir>] [<Windows signed dir>]: publishes the platform packages
-# @opencode/browsevil-<target> (opencode-browsevil-<target>-<version>.tgz: package/bin/browsevilvil, which the install script
+# @opencode/browsevil-<target> (opencode-browsevil-<target>-<version>.tgz: package/bin/browsevil, which the install script
 # downloads), then opencode-browsevil-<version>.tgz (@opencode/browsevil, the npx package), all with BROWSE_NPM_TAG. Names, the
 # version and the package set come from this script and the environment, never from the tarballs: each package.json is
 # read as data and must match. With a signed dir (sign-macos.sh, repack-windows.sh), the macOS and Windows packages must
@@ -31,9 +31,9 @@ check_package() { # <file> <name> [<os> <cpu> <libc or "">]
 list=$(mktemp)
 for target in $targets; do
   IFS=- read -r os arch _ <<< "$target"
-  executable=browsevilvil libc=""
+  executable=browsevil libc=""
   case $os in
-    windows) os=win32 executable=browsevilvilvil.exe ;;
+    windows) os=win32 executable=browsevil.exe ;;
     linux) libc=glibc ;;
   esac
   if [[ "$target" == *-musl ]]; then libc=musl; fi

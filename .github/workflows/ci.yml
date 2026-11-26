@@ -119,8 +119,8 @@ jobs:
           cp rust/target/x86_64-unknown-linux-gnu/release/browsevil "$RUNNER_TEMP/rust/linux-x64/browsevil"
           bun scripts/npm-package.ts platforms --binaries "$RUNNER_TEMP/rust" --out "$RUNNER_TEMP/npm" --target linux-x64
           bun scripts/npm-package.ts main --out "$RUNNER_TEMP/npm"
-          bun scripts/check-artifacts.ts --version "$version" --tarball "$RUNNER_TEMP/npm/opencodevil-browsevil-$version.tgz" \
-            --platform-tarball "$RUNNER_TEMP/npm/opencodevil-browsevil-linux-x64-$version.tgz"
+          bun scripts/check-artifacts.ts --version "$version" --tarball "$RUNNER_TEMP/npm/opencode-browsevil-$version.tgz" \
+            --platform-tarball "$RUNNER_TEMP/npm/opencode-browsevil-linux-x64-$version.tgz"
 
   rust-windows:
     name: Rust on Windows

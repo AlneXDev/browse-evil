@@ -1,6 +1,6 @@
 # OpenCode Eʌil Browse — Made by ✧Alne
 
-Evil side-by-side fork of `AlneXDev/browse-evilvil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
+Evil side-by-side fork of `AlneXDev/browse-evil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">

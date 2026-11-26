@@ -1,6 +1,6 @@
 # Releasing browsevil
 
-One version ships an extension zip, the npm package `@opencode/browsevil` (`opencodevil-browsevil-<version>.tgz`: a Node
+One version ships an extension zip, the npm package `@opencode/browsevil` (`opencode-browsevil-<version>.tgz`: a Node
 launcher, for `npx` and `npm install -g`) and the `browsevil` binaries. The npm package carries no extension.
 
 The CLI, relay and MCP server are the Rust `browsevil` binary (crate `rust/crates/browsevil`, workspace `rust/`; the
@@ -13,7 +13,7 @@ by the TypeScript CLI run `node .../dist/cli.mjs mcp`. The version is baked into
 as an npm package `@opencode/browsevil-<target>` holding `bin/browsevil` (`bin/browsevil.exe` on Windows) and a package.json with
 `os`, `cpu` and, on Linux, `libc`; and as one target per binary on Anomaly's release service, which the [install
 script](install) downloads. The [release service](#the-release-service) file is
-`opencodevil-browsevil-<target>-<version>.tgz`; it carries the same verified bytes as the npm package. Targets:
+`opencode-browsevil-<target>-<version>.tgz`; it carries the same verified bytes as the npm package. Targets:
 `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl`,
 `darwin-arm64`, `darwin-x64`, `darwin-x64-baseline`, `windows-x64`, `windows-x64-baseline` (Windows on ARM64 runs x64).
 The service names macOS `macos-*`. A `-baseline` target carries the same binary as its base target (Rust's x86-64
@@ -27,8 +27,8 @@ secrets locally, and nothing is built, tagged or published from a laptop. Work l
 
 | Mode | Starts from | Version | Publishes |
 | --- | --- | --- | --- |
-| dev | every push to `dev` (not Markdown-only) | `<next patch>-dev.<run>`, e.g. `0.2.1-dev.57` | the [release service](#the-release-service) channel `dev` (`browsevil-extension-<version>.zip`, loaded unpacked, and every CLI binary target), then npm dist-tag `dev` (the binaries, then `@opencode/browsevil`) |
-| stable | **Actions → Release → Run workflow** on `dev` with a bump or version and release notes | `x.y.z` | tag `v<version>`, the [release service](#the-release-service) channel `stable` (the extension zip and every CLI binary target), npm `latest`, the public Chrome Web Store item (`browsevil-extension-<version>.zip`), the GitHub release |
+| dev | every push to `dev` (not Markdown-only) | `<next patch>-dev.<run>`, e.g. `0.2.1-dev.57` | the [release service](#the-release-service) channel `dev` (`opencode-evil-browse-extension-<version>.zip`, loaded unpacked, and every CLI binary target), then npm dist-tag `dev` (the binaries, then `@opencode/browsevil`) |
+| stable | **Actions → Release → Run workflow** on `dev` with a bump or version and release notes | `x.y.z` | tag `v<version>`, the [release service](#the-release-service) channel `stable` (the extension zip and every CLI binary target), npm `latest`, the public Chrome Web Store item (`opencode-evil-browse-extension-<version>.zip`), the GitHub release |
 | check | the same button with bump `check` and no version, on any branch (`gh workflow run release.yml --ref <branch>`) | `cli/package.json` | nothing: builds, checks and attests the stable artifacts and runs every publish script, the release service included, as a dry run |
 
 There's no `production` branch: browsevil has no website. If it gets one, the site deploys from `production`, as in
@@ -123,10 +123,10 @@ checks the token against `registry/browsevil.json` there ([scripts/release-regis
 
 | Artifact | Target | File | Latest link |
 | --- | --- | --- | --- |
-| `extension` | `chromium` | `browsevil-extension-<version>.zip` (the store build on stable, unpacked on dev); `opencodevil-browser-<version>.zip` on releases before the rename | https://anoma.ly/release/browse/extension/stable/chromium |
-| `cli` | `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl` | `opencodevil-browsevil-<target>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/linux-x64 |
-| `cli` | `macos-arm64`, `macos-x64`, `macos-x64-baseline` (files say `darwin-*`) | `opencodevil-browsevil-darwin-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/macos-arm64 |
-| `cli` | `windows-x64`, `windows-x64-baseline` | `opencodevil-browsevil-windows-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/windows-x64 |
+| `extension` | `chromium` | `opencode-evil-browse-extension-<version>.zip` (the store build on stable, unpacked on dev); `opencodevil-browser-<version>.zip` on releases before the rename | https://anoma.ly/release/browse/extension/stable/chromium |
+| `cli` | `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl` | `opencode-browsevil-<target>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/linux-x64 |
+| `cli` | `macos-arm64`, `macos-x64`, `macos-x64-baseline` (files say `darwin-*`) | `opencode-browsevil-darwin-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/macos-arm64 |
+| `cli` | `windows-x64`, `windows-x64-baseline` | `opencode-browsevil-windows-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/windows-x64 |
 
 Every target has a `.../<target>/info` with its version, size and SHA-256. `install` reads the manifest, checks the
 file's size and SHA-256 and installs it; every relay (except a checkout build) polls `cli/<stable|dev>.json` at launch

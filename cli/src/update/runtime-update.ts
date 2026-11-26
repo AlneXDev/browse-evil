@@ -184,11 +184,16 @@ export async function runSelfUpdate(args: readonly string[], runtime = installed
   try {
     // A binary install follows its release service channel; its installer checks the manifest's size and SHA-256. An
     // npm install is pinned to the version npm serves (version, not channel), as npm install -g does.
-    const installChannel = releaseChannel(channel ?? channelOf(version))
-    const installed = await runInstaller({
-      runtime,
-      ...(runtime.kind === "binary" ? { channel: installChannel } : { version, ...(channel ? { channel } : {}) }),
-    })
+    // evil-v2: binary self-updates only through the GitHub updater; the Anomaly installer is never run.
+    if (runtime.kind === "binary") {
+      const { checkGithubUpdate, installGithubUpdate } = await import("./github-update.ts")
+      const update = await checkGithubUpdate(runtime.version)
+      if (!update) return
+      const installed = await installGithubUpdate(update)
+      log(`${new Date().toISOString()} installed ${installed}`)
+      return
+    }
+    const installed = await runInstaller({ runtime, version, ...(channel ? { channel } : {}) })
     log(`${new Date().toISOString()} installed ${installed}`)
     updateState(({ installing, lastError: _lastError, ...state }) => {
       const still = installing?.pid === process.pid ? undefined : installing
