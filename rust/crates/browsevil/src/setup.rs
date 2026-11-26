@@ -535,7 +535,7 @@ pub fn status(args: &[String]) -> anyhow::Result<i32> {
                 _ => None,
             };
             if let Some(running) = relay_version.filter(|v| v != VERSION) {
-                println!("           runs {running}, this CLI is {VERSION}; it restarts with the new version once idle");
+                println!("           runs {running}, this CLI is {VERSION}; update from https://github.com/AlneXDev/browse-evil/releases/latest");
             }
             let state = match status.get("pairingState").and_then(Value::as_str).unwrap_or_default() {
                 "connected" => "connected",

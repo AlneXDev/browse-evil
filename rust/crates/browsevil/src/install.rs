@@ -234,7 +234,7 @@ fn copy_binary() -> anyhow::Result<PathBuf> {
 }
 
 fn self_updating(binary: &Path, flags: &Flags) {
-    println!("✓ browsevil {VERSION} installed ({}). It updates itself from the {} channel.", tilde(binary), update::channel());
+    println!("✓ browsevil {VERSION} installed ({}). Update it manually from https://github.com/AlneXDev/browse-evil/releases/latest.", tilde(binary));
     if !flags.no_modify_path
         && let Some(file) = binary.parent().and_then(setup::add_to_path)
     {
@@ -264,7 +264,7 @@ fn place(flags: &Flags) -> anyhow::Result<PathBuf> {
             let separate = copy.is_file() && std::fs::canonicalize(&copy).ok() != std::fs::canonicalize(&entry).ok();
             if separate && is_browsevil(&copy) {
                 match std::fs::remove_file(&copy) {
-                    Ok(()) => println!("✓ Removed the separate browsevil at {}, so only the {manager} install runs and updates", tilde(&copy)),
+                    Ok(()) => println!("✓ Removed the separate browsevil at {}, so only one browsevil install runs; update from the evil GitHub release", tilde(&copy)),
                     Err(error) => println!("! Couldn't remove the separate browsevil at {} ({error}); delete it so only the {manager} install runs.", tilde(&copy)),
                 }
             }
