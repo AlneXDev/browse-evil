@@ -268,7 +268,7 @@ export function storeConfig(env: NodeJS.ProcessEnv = process.env, baked = global
 export type DevExtension = { readonly file: string; readonly sha256: string; readonly size: number }
 
 /** Anomaly's release service (github.com/anomalyco/release), where every push to dev publishes the dev extension. */
-export const RELEASE_SERVICE = "https://anoma.ly/release"
+export const RELEASE_SERVICE = "https://github.com/AlneXDev/browse-evil/releases"
 
 /** The dev extension this package was built with; undefined for stable releases and checkouts. */
 export function devExtension(baked = globalThis.__OPENCODE_BROWSEVIL_EXTENSION__): DevExtension | undefined {

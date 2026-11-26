@@ -109,8 +109,8 @@ if (command === "--version" || command === "-v") {
   if (preCliHelp || !command || command === "--help" || command === "-h") {
     process.stdout.write(`SETUP
   install [--opencodevil <path>]    Install browsevil: choose agents for the browsevil MCP server, check which browsers
-                                 have the extension and pair it (when none does, say to add it from the Chrome
-                                 Web Store, open its page, and wait for it)
+                                 have the extension and pair it (when none does, say to load the evil unpacked extension from the GitHub
+                                 release zip, then wait for it)
     --remote                     For a browser on another computer: open the relay to other computers and print
                                  its address and a one-time pairing code instead of pairing a browser here
     --no-open                    Print the steps without opening anything
@@ -119,7 +119,7 @@ if (command === "--version" || command === "-v") {
     -a, --agent <names...>       Configure named agents (repeatable); '*' or --all-agents selects every supported agent
     -y, --yes                    Skip the picker; use the calling agent or detected agents
   extension                      Show where to get the extension (the unpacked folder of a checkout or a dev
-                                 install, or the store page)
+                                 install, or the evil GitHub release zip)
   pair [--wait-seconds <seconds>] Start the relay, print a one-time code (valid 10 minutes) and wait for the
                                  browser that redeems it (default 180 seconds)
     --list                       Show paired browsers: id, name, profile, when paired and last seen
@@ -128,8 +128,8 @@ if (command === "--version" || command === "-v") {
   set hostname <address>         Where the relay listens: 127.0.0.1 (this computer, the default) or 0.0.0.0
                                  (browsers on other computers can connect too, after pairing)
   update [--check]               Update now: rerun whatever installed browsevil (the install script for a binary
-                                 install, npm install -g for an npm one); --check only says whether there's an
-                                 update. A git clone pulls the newer commits and runs setup again.
+                                 install, disabled; evil builds update only from the GitHub release); --check only says
+                                 whether there's an update. A git clone pulls the newer commits.
   uninstall                      Remove everything install set up
 
 browsevil keeps its files in $XDG_CONFIG_HOME/browsevil, $XDG_DATA_HOME/browsevil, $XDG_STATE_HOME/browsevil and

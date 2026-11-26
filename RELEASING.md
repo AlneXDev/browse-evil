@@ -107,7 +107,7 @@ rulesets below require their review. The jobs that need a secret run in the envi
 
 The dev zip keeps the manifest `key`, so it loads with the same unpacked ID as a checkout's `dist/`, which the relay
 trusts, and every dev build still publishes it to the release service
-(`https://anoma.ly/release/browse/extension/dev/chromium`). The Rust CLI doesn't fetch it: `browsevil install` points at
+(`https://github.com/AlneXDev/browse-evil/releases/browse/extension/dev/chromium`). The Rust CLI doesn't fetch it: `browsevil install` points at
 the Chrome Web Store item on every channel, and the store build works with dev CLIs (the relay keeps accepting older
 extension protocols). To try a dev extension, download the zip, unpack it and load it unpacked, then `browsevil pair`;
 `browsevil extension` prints these steps on the dev channel and the README's Updates section has them. (The TypeScript CLI baked the dev zip's sha256 in and unpacked it into
@@ -116,17 +116,17 @@ reviewed, too slow for a build per push.
 
 ## The release service
 
-`https://anoma.ly/release` is Anomaly's update service ([anomalyco/release](https://github.com/anomalyco/release)).
+`https://github.com/AlneXDev/browse-evil/releases` is Anomaly's update service ([anomalyco/release](https://github.com/anomalyco/release)).
 Like Hex and OpenCode, a job in a named environment trades its GitHub OIDC token for a publish session through
 `client.sh` ([.github/release/publish-release-service.sh](.github/release/publish-release-service.sh)); the service
 checks the token against `registry/browsevil.json` there ([scripts/release-registry.json](scripts/release-registry.json)).
 
 | Artifact | Target | File | Latest link |
 | --- | --- | --- | --- |
-| `extension` | `chromium` | `opencode-evil-browse-extension-<version>.zip` (the store build on stable, unpacked on dev); `opencodevil-browser-<version>.zip` on releases before the rename | https://anoma.ly/release/browse/extension/stable/chromium |
-| `cli` | `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl` | `opencode-browsevil-<target>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/linux-x64 |
-| `cli` | `macos-arm64`, `macos-x64`, `macos-x64-baseline` (files say `darwin-*`) | `opencode-browsevil-darwin-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/macos-arm64 |
-| `cli` | `windows-x64`, `windows-x64-baseline` | `opencode-browsevil-windows-<arch>-<version>.tgz` | https://anoma.ly/release/browse/cli/stable/windows-x64 |
+| `extension` | `chromium` | `opencode-evil-browse-extension-<version>.zip` (the store build on stable, unpacked on dev); `opencodevil-browser-<version>.zip` on releases before the rename | https://github.com/AlneXDev/browse-evil/releases/browse/extension/stable/chromium |
+| `cli` | `linux-x64`, `linux-x64-baseline`, `linux-arm64`, `linux-x64-musl`, `linux-x64-baseline-musl`, `linux-arm64-musl` | `opencode-browsevil-<target>-<version>.tgz` | https://github.com/AlneXDev/browse-evil/releases/browse/cli/stable/linux-x64 |
+| `cli` | `macos-arm64`, `macos-x64`, `macos-x64-baseline` (files say `darwin-*`) | `opencode-browsevil-darwin-<arch>-<version>.tgz` | https://github.com/AlneXDev/browse-evil/releases/browse/cli/stable/macos-arm64 |
+| `cli` | `windows-x64`, `windows-x64-baseline` | `opencode-browsevil-windows-<arch>-<version>.tgz` | https://github.com/AlneXDev/browse-evil/releases/browse/cli/stable/windows-x64 |
 
 Every target has a `.../<target>/info` with its version, size and SHA-256. `install` reads the manifest, checks the
 file's size and SHA-256 and installs it; every relay (except a checkout build) polls `cli/<stable|dev>.json` at launch

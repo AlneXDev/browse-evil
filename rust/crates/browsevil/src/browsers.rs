@@ -18,7 +18,7 @@ pub fn store_id() -> String {
 }
 
 pub fn store_url() -> String {
-    "https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5".to_string()
+    "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip".to_string()
 }
 
 pub struct Browser {

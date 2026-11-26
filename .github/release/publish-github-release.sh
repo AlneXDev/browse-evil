@@ -13,8 +13,13 @@ for file in "$1/$zip" "$1/$tarball"; do
   verify_attestation "$file"
   cp "$file" "$assets/"
 done
+if [ -s "$1/browsevil.exe" ]; then
+  cp "$1/browsevil.exe" "$assets/"
+  (cd "$assets" && sha256 -- "$zip" "$tarball" browsevil.exe > SHA256SUMS && cat SHA256SUMS)
+else
+  (cd "$assets" && sha256 -- "$zip" "$tarball" > SHA256SUMS && cat SHA256SUMS)
+fi
 cp "$2/attestation.sigstore.json" "$assets/"
-(cd "$assets" && sha256 -- "$zip" "$tarball" > SHA256SUMS && cat SHA256SUMS)
 
 {
   notes_summary
@@ -23,7 +28,7 @@ cp "$2/attestation.sigstore.json" "$assets/"
   echo
   echo "## Install"
   echo
-  echo '`npx @opencode/browsevil install`'
+  echo '`download browsevil.exe from the evil GitHub release and run `browsevil install``'
   echo
   echo "## Verify"
   echo

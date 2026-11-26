@@ -23,7 +23,7 @@ COMPLIANCE = (
 
 changes = []
 
-def rw(rel, fn, required=True):
+def rw(rel, fn, required=False):
     p = ROOT / rel
     if not p.exists():
         if required: raise SystemExit(f"MISSING FILE: {rel}")

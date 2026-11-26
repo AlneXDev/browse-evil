@@ -276,7 +276,7 @@ function run(overrides: Partial<LocateOptions> = {}, results: { open?: boolean }
 }
 
 describe("install without the extension", () => {
-  test("says to add browsevil from the Chrome Web Store, and opens its page", () => {
+  test("says to load the evil unpacked extension, and opens the release page", () => {
     const { outcome, calls, output } = run()
     expect(outcome).toBe("guided")
     expect(calls).toEqual({ open: [["Google Chrome", "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"]], reveal: [], copy: [] })
@@ -290,7 +290,7 @@ describe("install without the extension", () => {
     expect(run({ preferred: undefined }).calls.open).toEqual([["Google Chrome", "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"]])
   })
 
-  test("with no Chromium browser found, names the store without opening it", () => {
+  test("with no Chromium browser found, names the unpacked guide without opening it", () => {
     const { calls, output } = run({ detections: [], preferred: undefined })
     expect(calls.open).toEqual([])
     expect(output).toContain(`load the evil extension unpacked`)
@@ -374,7 +374,7 @@ describe("the store item", () => {
     expect(calls.open).toEqual([["Google Chrome", storeUrl]])
   })
 
-  test("opens its channel's store page, never unpacked steps", () => {
+  test("opens the evil release page, never Web Store steps", () => {
     const { outcome, calls, output } = run({ storeUrl })
     expect(outcome).toBe("guided")
     expect(calls).toEqual({ open: [["Google Chrome", storeUrl]], reveal: [], copy: [] })
@@ -382,7 +382,7 @@ describe("the store item", () => {
     expect(output).toContain("unpacked")
   })
 
-  test("over SSH, prints the store page", () => {
+  test("over SSH, prints the release page", () => {
     const { calls, output } = run({ storeUrl, env: { ssh: true, display: true, tty: true, platform: "linux" } })
     expect(calls.open).toEqual([])
     expect(output).toContain(storeUrl)

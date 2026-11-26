@@ -485,6 +485,9 @@ install_from_binary() {
     mv -f "$INSTALL_DIR/$installed_binary.new" "$INSTALL_DIR/$installed_binary"
 }
 
+if [ -z "$binary_path" ]; then
+    fail "evil builds install only from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe (or use --binary)"
+fi
 if [ -n "$binary_path" ]; then
     install_from_binary
 elif [ -n "$requested_version" ]; then

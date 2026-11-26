@@ -32,9 +32,8 @@ export type LocateOptions = {
  */
 export function locateExtension(options: LocateOptions, effects: Effects = systemEffects): "ready" | "off" | "guided" {
   const { log } = effects
-  const GUIDE = "load the evil extension unpacked from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip (download the zip, extract it, open chrome://extensions, turn on Developer mode and click Load unpacked)"
-
-const listing = "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"
+  const listing = options.storeUrl ?? "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"
+  const GUIDE = `load the evil extension unpacked from ${listing} (download the zip, extract it, open chrome://extensions, turn on Developer mode and click Load unpacked)`
   if (options.pairedOffline) return log(pairedOfflineMessage), "ready"
   // A connected extension is installed, even somewhere the scan doesn't look (a custom profile directory, a snap).
   if (options.connected) return log(connectedMessage), "ready"

@@ -34,7 +34,7 @@ release publishes the same binary under the baseline names, which the install sc
 
 Each target ships as `opencode-browsevil-<target>-<version>.tgz` holding `package/bin/browsevil[.exe]`, `package.json` and
 `LICENSE`: the npm package `@opencode/browsevil-<target>` and the release service file are the same tarball. Its size and
-SHA-256 go into the channel manifest's `release.targets` at `https://anoma.ly/release/browse/cli/<channel>.json`.
+SHA-256 go into the channel manifest's `release.targets` at `https://github.com/AlneXDev/browse-evil/releases/browse/cli/<channel>.json`.
 Every relay polls it at launch and hourly, in every mode (`off` checks and installs nothing). Versions are only tested
 for equality (the release protocol's client rules, `crates/browsevil/src/protocol.rs`, checked against the release repo's test vectors
 in `crates/browsevil/tests/fixtures/release`): when the channel's release isn't the running one, installed binaries

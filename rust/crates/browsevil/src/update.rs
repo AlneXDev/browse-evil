@@ -240,7 +240,7 @@ fn get(kind: Kind, url: &str, timeout: Duration, limit: u64) -> anyhow::Result<V
 /// manifest's file for this platform; a package install or runner takes the release's version (the package manager is
 /// asked for it), so it checks as `unknown`.
 pub fn check(install: &Install) -> anyhow::Result<Check> {
-    bail!("evil builds update only from the GitHub release (`browsevil update`)")
+    bail!("evil builds update only from the GitHub release (`browsevil update`)");
     let kind = Kind::of(install);
     let channel = channel();
     let body = get(kind, &format!("{}/browsevil/cli/{channel}.json", service()), Duration::from_secs(30), 1024 * 1024)?;
@@ -296,7 +296,7 @@ fn tar() -> PathBuf {
 /// Downloads `release` (the install script's tarball, `package/bin/browsevil[.exe]`) beside `binary`, checks its size and
 /// SHA-256, and swaps the executable in. A running relay keeps its old executable until it restarts.
 pub fn install_binary(release: &Release, binary: &Path) -> anyhow::Result<()> {
-    bail!("evil builds update only from the GitHub release (`browsevil update`)")
+    bail!("evil builds update only from the GitHub release (`browsevil update`)");
     let file = release.file.as_ref().context("the release manifest has no download for this platform")?;
     let dir = binary.parent().context("no parent folder")?;
     let work = dir.join(format!(".browsevil.{}.update", std::process::id()));
@@ -404,7 +404,7 @@ fn not_published(text: &str) -> bool {
 
 /// Installs @opencode/browsevil@<version> into this global install with its package manager.
 pub fn package_install(global: &Global, version: &str) -> anyhow::Result<Installed> {
-    bail!("evil builds update only from the GitHub release (`browsevil update`)")
+    bail!("evil builds update only from the GitHub release (`browsevil update`)");
     let words = global.manager.words(version);
     let command = global.command(version, registry_override().as_deref());
     let stashed = stash_running(global);
@@ -542,61 +542,12 @@ fn switch_hint(exe: &Path) -> String {
 }
 
 /// `browsevil update [--check]`.
-pub fn command(args: &[String]) -> anyhow::Result<()> {
-    let check_only = args.iter().any(|a| a == "--check");
-    let mode = args.iter().position(|a| a == "--mode").and_then(|i| args.get(i + 1));
-    if let Some(mode) = mode {
-        let mode = Mode::parse(mode).context("--mode is on, notify or off")?;
-        set_mode(mode)?;
-        println!("Automatic updates: {}", describe_mode(mode));
-        if let Some(fixed) = override_mode().filter(|m| *m != mode) {
-            println!("! OPENCODE_BROWSEVIL_AUTO_UPDATE keeps it {} in this environment.", fixed.name());
-        }
-        return Ok(());
-    }
-    let install = install();
-    let binary = match &install {
-        Install::Global(global) => return package_command_update(&install, global, check_only),
-        Install::Runner(runner) => {
-            let tag = dist_tag(VERSION);
-            println!("This is a {} run: it resolves {PACKAGE} itself, so there is nothing to update here.", runner.name().replace('-', " "));
-            match check(&install) {
-                Ok(Check::Available(release)) => println!("browsevil {} is out (running {VERSION}); `{}` runs it.", release.version, runner.run(tag)),
-                Ok(Check::Deferred(version)) => println!("browsevil {version} is out, but not for everyone yet. Running {VERSION}."),
-                Ok(Check::UpToDate(_)) => println!("browsevil {VERSION} is up to date."),
-                Err(error) => println!("! couldn't check for a release: {error:#}"),
-            }
-            println!("For automatic updates run `{} install` once (the self-updating binary), or install it globally: `{}`.", runner.run(tag), runner.global_words(tag));
-            return Ok(());
-        }
-        Install::Other => {
-            let exe = crate::relay::current_exe()?;
-            println!("{} wasn't installed in a way browsevil can update.", exe.display());
-            println!("For automatic updates, {}.", switch_hint(&exe));
-            return Ok(());
-        }
-        Install::Binary(binary) => Some(binary.clone()),
-        Install::Checkout => None,
-    };
-    match check(&install)? {
-        Check::UpToDate(version) if version == VERSION => println!("browsevil {VERSION} is up to date ({} channel).", channel()),
-        Check::UpToDate(version) => println!("browsevil {VERSION} is up to date ({} channel's latest release is {version}).", channel()),
-        Check::Deferred(version) => println!("browsevil {version} is out, but not for this install yet. Running {VERSION}."),
-        Check::Available(release) if check_only => println!("browsevil {} is available (running {VERSION}). Run `browsevil update`.", release.version),
-        Check::Available(release) => {
-            let binary = match binary {
-                Some(binary) => binary,
-                None => bail!("this browsevil is a checkout build ({}); rebuild it, or run `browsevil install` for the self-updating binary", crate::relay::current_exe()?.display()),
-            };
-            println!("Downloading browsevil {}…", release.version);
-            install_binary(&release, &binary)?;
-            record_install(&release.version)?;
-            println!("✓ Updated browsevil {VERSION} → {}", release.version);
-            if matches!(crate::relay::probe(), crate::relay::Probe::Running(_)) {
-                println!("The relay switches to it as soon as no agent is using the browser.");
-            }
-        }
-    }
+pub fn command(_check_only: bool) -> anyhow::Result<()> {
+    println!("browsevil {VERSION} ({})", channel());
+    println!("Evil builds update only from the GitHub release:");
+    println!("https://github.com/AlneXDev/browse-evil/releases/latest");
+    println!("Download browsevil.exe and run `browsevil install`, or use `browsevil update` from the TS CLI.");
+
     Ok(())
 }
 
@@ -642,15 +593,12 @@ pub fn status_json() -> Value {
         "method": install.name(),
         "updateCommand": install.update_command(VERSION, &exe),
         "cli": cli,
-        "mode": stored.name(),
+        "mode": "off",
         "effective": "off",
         "version": VERSION,
         "channel": channel(),
     });
-    if override_mode().is_some() {
-        let by = if std::env::var_os("OPENCODE_BROWSEVIL_AUTO_UPDATE").is_some() { "OPENCODE_BROWSEVIL_AUTO_UPDATE" } else { "OPENCODE_BROWSEVIL_UPDATE_CHECK" };
-        status["overriddenBy"] = json!(by);
-    }
+
     if let Some(latest) = state.get("latest").and_then(Value::as_str).filter(|l| *l != VERSION) {
         status["latest"] = json!(latest);
     }
@@ -750,13 +698,10 @@ enum Found {
 
 impl Updater {
     /// `idle` says whether nothing is using the browser. Every relay but a checkout build's checks in.
-    pub fn spawn(idle: Arc<dyn Fn() -> bool + Send + Sync>) -> Option<Updater> {
+    pub fn spawn(_idle: Arc<dyn Fn() -> bool + Send + Sync>) -> Option<Updater> {
         // evil-v2: never poll the Anomaly release service. Updates come only from
         // the evil GitHub release via `browsevil update`.
-        let _ = idle;
         None
-        std::thread::spawn(move || worker.run());
-        Some(updater)
     }
 
     fn new(install: Install, idle: Arc<dyn Fn() -> bool + Send + Sync>) -> Option<(Updater, Worker)> {

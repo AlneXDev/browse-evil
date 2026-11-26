@@ -53,7 +53,7 @@ describe("cliUpdateNotice", () => {
   test("mentions installs that can't update themselves", () => {
     expect(cliUpdateNotice({ ...base, install: "npx", effective: "off" }, NOW)).toMatchObject({
       reason: "install",
-      command: "npx @opencode/browsevil@latest install",
+      command: "browsevil install",
     })
     expect(cliUpdateNotice({ ...base, install: "other", effective: "off" }, NOW)).toMatchObject({ reason: "install", command: "browsevil update" })
     expect(cliUpdateNotice({ ...base, install: "other", cli: "node /src/cli.mjs", effective: "off" }, NOW)).toMatchObject({

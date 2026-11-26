@@ -55,7 +55,7 @@ export function extensionProtocolAdvice(version: number | null | undefined, comm
   const skew = extensionProtocolSkew(version)
   const versions = `extension protocol ${version ?? "unknown"}, this relay speaks ${minExtensionProtocolVersion === extensionProtocolVersion ? extensionProtocolVersion : `${minExtensionProtocolVersion} to ${extensionProtocolVersion}`}`
   if (skew === "extension-newer")
-    return `The browsevil extension is newer than this browsevil CLI (${versions}). Update the CLI: run \`${commands.install}\` (an npm install with automatic updates also catches up by itself within a day), then restart opencodevil.`
+    return `The browsevil extension is newer than this browsevil CLI (${versions}). Update the CLI: run \`${commands.install}\`, then restart opencodevil.`
   if (skew === "extension-older") {
     const store = "Reload the unpacked extension: open chrome://extensions, turn on Developer mode and click Update."
     const next = distribution === "unpacked" ? unpackedReloadAdvice : distribution === "store" ? store : `For an unpacked extension: ${unpackedReloadAdvice} For a store extension: ${store}`

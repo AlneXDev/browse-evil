@@ -187,7 +187,7 @@ manager. The Chrome Web Store updates the extension.
 
 **Dev builds**: download from [the evil release](https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5): `curl -fsSL https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe -o browsevil.exe
 --channel dev`, or `npx @opencode/browsevil@dev install`. The store extension works with dev builds. To try the dev
-extension too, download https://anoma.ly/release/browse/extension/dev/chromium, unzip it, turn on **Developer mode** on
+extension too, download https://github.com/AlneXDev/browse-evil/releases, unzip it, turn on **Developer mode** on
 your browser's extensions page, click **Load unpacked**, pick the folder and run `browsevil pair` (`browsevil extension`
 prints these steps on the dev channel). Remove the store extension first so only one browsevil runs in that profile.
 

@@ -147,7 +147,7 @@ export function describeChanges(options: { readonly before: Settings; readonly a
     lines.push(`Changed ${changed.map((item) => `${item.key} from ${item.from} to ${item.to}`).join(", ")}. Tell the user what you changed; they can change it back on the extension's options page.`)
   if (unchanged.length) lines.push(`Already set: ${unchanged.map((key) => `${key} is ${options.after[key]}`).join(", ")}.`)
   for (const item of overridden)
-    lines.push(`Not changed: ${item.key} is fixed to ${item.effective} by ${item.variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit ${item.variable} where opencodevil starts, then run \`${cliCommand("relay restart")}\`.`)
+    lines.push(`Not changed: ${item.key} is fixed to ${item.effective} by ${item.variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit ${item.variable} where browsevil starts, then run \`${cliCommand("relay restart")}\`.`)
   return { changed, unchanged, overridden, settings: report(options.after, options.overrides), message: lines.join(" ") }
 }
 

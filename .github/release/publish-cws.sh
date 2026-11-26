@@ -50,9 +50,9 @@ previous_release() {
   local tags tag
   tags=$(gh release list --repo "$GITHUB_REPOSITORY" --exclude-drafts --limit 30 --json tagName --jq '.[].tagName') || return 2
   while IFS= read -r tag; do
-    [ "$tag" = "v$BROWSE_VERSION" ] && continue
-    [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || continue
-    printf '%s' "${tag#v}"
+    [ "$tag" = "evil-v$BROWSE_VERSION" ] && continue
+    [[ "$tag" =~ ^evil-v[0-9]+\.[0-9]+\.[0-9]+$ ]] || continue
+    printf '%s' "${tag#evil-v}"
     return 0
   done <<< "$tags"
   return 1

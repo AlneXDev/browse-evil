@@ -29,6 +29,7 @@ const versionOf = (tag: string) => tag.replace(/^evil-v/, "").replace(/^v/, "")
 
 /** The newest evil release, if it offers a Windows CLI newer than the running one. */
 export async function checkGithubUpdate(current: string, fetchFn: typeof fetch = fetch): Promise<GithubUpdate | undefined> {
+  if (process.platform !== "win32") return undefined
   const response = await fetchFn(API_URL, {
     headers: { Accept: "application/vnd.github+json", "User-Agent": "browsevil-evil" },
     signal: AbortSignal.timeout(20_000),

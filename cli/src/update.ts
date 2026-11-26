@@ -328,7 +328,7 @@ export function runUpdate(args: readonly string[], deps: UpdateDeps): number {
   const repo = deps.repo
   if (!repo) {
     log("browsevil was installed from npm. Update it with:")
-    log("  npx @opencode/browsevil@latest install")
+    log("  browsevil install")
     log("then restart opencodevil.")
     return 0
   }
@@ -439,7 +439,7 @@ export async function runUpdateCommand(args: readonly string[]) {
   }
   if (args.includes("--check")) {
     const repo = checkoutRoot()
-    if (!repo) return log("Installed from npm: run `npx @opencode/browsevil@latest install` to update.")
+    if (!repo) return log("Installed from npm: run `browsevil install` to update.")
     // Ask the remote now, whatever the cache says.
     const check = await checkForUpdate(repo)
     if (check) writeCache(path.join(cacheRoot(), CACHE_FILE), check)
