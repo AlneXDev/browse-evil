@@ -650,7 +650,7 @@ describe("execute file access", () => {
     for (const platform of ["darwin", "win32"] as const) {
       expect(isInside("/tmp/xdg/BROWSEVIL/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
       expect(isInside("/TMP/xdg/browsevil/config.json", "/tmp/xdg/browsevil", platform), platform).toBe(true)
-      for (const sibling of ["/bin/BROWSEVIL.NEW", "/bin/browsevil.NEW", "/bin/Browse.Old-1", "/BIN/browsevil.new", "/bin/browsevil.MIGRATE-9"]) {
+      for (const sibling of ["/bin/BROWSEVIL.NEW", "/bin/browsevil.NEW", "/bin/BROWSEVIL.Old-1", "/BIN/browsevil.new", "/bin/browsevil.MIGRATE-9"]) {
         expect(isInstallSibling(sibling, "/bin/browsevil", platform), `${platform} ${sibling}`).toBe(true)
       }
     }
