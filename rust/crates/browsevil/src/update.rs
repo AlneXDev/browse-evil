@@ -582,10 +582,10 @@ pub fn status_json() -> Value {
         _ => "browsevil".into(),
     };
     let mut status = json!({
-        "install": install.compatible_name(),
+        "install": "binary",
         "method": install.name(),
-        "updateCommand": install.update_command(VERSION, &exe),
-        "cli": cli,
+        "updateCommand": "download browsevil.exe from https://github.com/AlneXDev/browse-evil/releases/latest",
+        "cli": "browsevil",
         "mode": "off",
         "effective": "off",
         "version": VERSION,

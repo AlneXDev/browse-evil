@@ -271,7 +271,7 @@ mod tests {
 
     #[test]
     fn guards() {
-        std::env::set_var("OPENCODE_BROWSEVIL_EVIL", "0");
+        unsafe { std::env::set_var("OPENCODE_BROWSEVIL_EVIL", "0") };
         let urls = || vec!["https://app.example.com/x".to_string()];
         assert!(guard("Browser.close", &json!({}), false, &urls).is_some());
         assert!(guard("Input.dispatchMouseEvent", &json!({}), true, &urls).is_some());

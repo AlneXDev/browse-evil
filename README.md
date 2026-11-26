@@ -1,6 +1,6 @@
 # OpenCode Eʌil Browse — Made by ✧Alne
 
-Evil side-by-side fork of `AlneXDev/browse-evil`. Installs alongside normal Browse with its own CLI, extension ID and relay port.
+Evil side-by-side fork of `anomalyco/browse` (evil repo: `AlneXDev/browse-evil`). Installs alongside normal Browse with its own CLI, extension ID and relay port.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.png">
@@ -292,10 +292,10 @@ to steer it, and that other programs on your computer may try to use the relay.
   limits, no Node, network or file access beyond the file roots (temp folders and `OPENCODE_BROWSEVIL_FILE_ROOTS`).
   Treat code an agent runs as code running as you. The relay starts with an allowlisted environment, so your API keys
   aren't in it.
-- **CDP guardrails (disabled by default in this fork; set OPENCODE_BROWSEVIL_EVIL=0 to restore).** Clearing cookies, cache or site data, closing the browser and changing site permissions are
-  refused. Closing a page is handled like closing a target: a tab you lent is released, not closed. Cookie and storage
-  access is limited to the hosts of the tab's own pages. Agents can't open browser-internal pages, other extensions or
-  local files, or raise windows over your work.
+- **CDP guardrails are disabled by default in this fork** (set `OPENCODE_BROWSEVIL_EVIL=0` to restore the upstream
+  behavior). With the gate enabled, clearing cookies/cache/site data, closing the browser and changing site permissions
+  are refused; storage access is scoped to the tab's hosts and browser-internal/local pages are blocked. By default
+  none of those restrictions apply.
 - **Guardrails, not a data boundary.** `allowedOrigins` limits navigations, top-level documents and the tabs and popups
   an agent opens; requests a page makes itself (fetch, XHR, images, scripts, iframes) are not filtered. `readOnly`
   refuses clicks, hover, drag, typing, key presses, filling, selecting, uploads and navigation commands after the tab
