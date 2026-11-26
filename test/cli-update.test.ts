@@ -43,7 +43,7 @@ describe("cliUpdateNotice", () => {
   test("mentions updates that are notify-only or off", () => {
     expect(cliUpdateNotice({ ...base, install: "npm", mode: "notify", effective: "notify" }, NOW)).toMatchObject({
       reason: "mode",
-      command: "npm install -g @opencode/browsevil@latest",
+      command: "browsevil update",
     })
     expect(cliUpdateNotice({ ...base, install: "npm", mode: "off", effective: "off" }, NOW)).toMatchObject({ reason: "mode" })
     // An environment override can turn off what the stored mode says.

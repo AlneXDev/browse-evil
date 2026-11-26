@@ -148,9 +148,8 @@ describe("update check", () => {
     git(clone, "fetch", "-q")
     push("b.txt")
     const notice = await updateNotice({ repo: clone, dataDir: data })
-    // The remote head isn't fetched yet, so the summary names the two heads.
-    expect(notice?.summary).toMatch(/^origin\/main is at [0-9a-f]{7} \(you have [0-9a-f]{7}\)$/)
-    expect(notice?.command).toMatch(/ update$/)
+    // evil-v2: update checks are disabled; no notice is produced from a git checkout.
+    expect(notice).toBeUndefined()
     const previous = process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK
     process.env.OPENCODE_BROWSEVIL_UPDATE_CHECK = "0"
     try {
@@ -303,6 +302,6 @@ describe("update command", () => {
   test("installed from npm: prints the npx update instead", () => {
     const { code, output } = update(undefined)
     expect(code).toBe(0)
-    expect(output).toContain("npx @opencode/browsevil@latest install")
+    expect(output).toContain("browsevil install")
   })
 })

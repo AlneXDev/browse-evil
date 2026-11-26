@@ -13,7 +13,7 @@
 #
 # Options:
 #   -h, --help              Show this help
-#   -v, --version <version> Install a specific version from npm (or $env:VERSION)
+#   -v, --version <version> Not supported in this fork; use -Binary with the evil GitHub release
 #       --channel <channel> Install the latest version on a release channel: stable (default), beta or dev.
 #                           `latest` means stable (or $env:BROWSE_CHANNEL)
 #   -b, --binary <path>     Install from a local browsevil.exe instead of downloading
