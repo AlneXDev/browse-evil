@@ -17,7 +17,7 @@ globalThis.fetch = (async (input: string | URL) => {
   const url = String(input)
   if (url.endsWith("/relay-pairing.json")) return new Response("not found", { status: 404 })
   return new URL(url).pathname === "/version" && new URL(url).port === String(PORT)
-    ? Response.json({ version: "0.0.2", instanceId: "relay-29699", pid: 1 })
+    ? Response.json({ app: "browsevil", version: "0.0.2", instanceId: "relay-29699", pid: 1 })
     : new Response("not found", { status: 404 })
 }) as unknown as typeof fetch
 

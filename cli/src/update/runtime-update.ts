@@ -88,7 +88,7 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
   if (!runtime) return false
   if (runtime.kind === "npx") {
     log("This is an npx install; npx resolves the package itself, so there is nothing to update here.")
-    log(`Install it once with \`${installCommand()}\` to get automatic updates.`)
+    log(`Install it once with \`${installCommand()}\` from the evil GitHub release.`)
     return true
   }
   // evil-v2: only binary installs are supported, and they update from the evil GitHub release.

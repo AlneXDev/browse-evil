@@ -47,7 +47,7 @@ globalThis.fetch = (async (input: string | URL) => {
   if (url.endsWith("/relay-pairing.json")) return new Response("not found", { status: 404 })
   const port = Number(/127\.0\.0\.1:(\d+)\/version/.exec(url)?.[1])
   return port === HINT_PORT || port === DEFAULT_PORT
-    ? Response.json({ version: "0.0.2", instanceId: `listener-${port}`, pid: 1 })
+    ? Response.json({ app: "browsevil", version: "0.0.2", instanceId: `listener-${port}`, pid: 1 })
     : new Response("not found", { status: 404 })
 }) as unknown as typeof fetch
 ;(globalThis as { WebSocket: unknown }).WebSocket = FakeWebSocket

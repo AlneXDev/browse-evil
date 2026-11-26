@@ -53,7 +53,7 @@ globalThis.fetch = (async (input: string | URL) => {
   probes.push(url)
   const port = Number(/127\.0\.0\.1:(\d+)\/version/.exec(url)?.[1])
   return port === BROWSER_PORT
-    ? Response.json({ version: "0.0.2", instanceId: "abc", pid: 1 })
+    ? Response.json({ app: "browsevil", version: "0.0.2", instanceId: "abc", pid: 1 })
     : new Response("not found", { status: 404 })
 }) as unknown as typeof fetch
 ;(globalThis as { WebSocket: unknown }).WebSocket = FakeWebSocket

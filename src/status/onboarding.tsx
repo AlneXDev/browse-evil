@@ -493,7 +493,7 @@ function AgentStep(props: {
             }
           >
             <Note tone="warn">
-              This extension is older than the browsevil CLI on this computer. Chrome updates it within a few hours; to update
+              This extension is older than the browsevil CLI on this computer. Reload the unpacked extension from https://github.com/AlneXDev/browse-evil/releases/latest; to update
               now, open the extensions page, turn on Developer mode and click Update.
             </Note>
             <div class="actions">

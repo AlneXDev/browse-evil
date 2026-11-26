@@ -25,7 +25,7 @@ export const settingSpecs: Record<SettingKey, { readonly label: string; readonly
   humanInput: { label: "Human-like input (off is faster, but easier for sites to flag)", values: ["on", "off"], variable: "OPENCODE_BROWSEVIL_HUMAN_INPUT" },
   muteTabs: { label: "Mute the tabs agents open (on keeps them quiet)", values: ["on", "off"] },
   handoffNotifications: { label: "System notification on a handoff (only while recorded, or every handoff)", values: ["recording", "always"] },
-  autoUpdate: { label: "installs: install updates automatically when idle, only notify, or never check", values: ["on", "notify", "off"], variable: "OPENCODE_BROWSEVIL_AUTO_UPDATE" },
+  autoUpdate: { label: "updates come manually from the evil GitHub release", values: ["on", "notify", "off"], variable: "OPENCODE_BROWSEVIL_AUTO_UPDATE" },
 }
 
 /** Environment-only switches that relax a guard or reach the network; the settings tool never touches them. */

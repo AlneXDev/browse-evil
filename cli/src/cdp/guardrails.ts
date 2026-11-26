@@ -216,7 +216,6 @@ function guardStorageAccess(context: GuardContext): string | null {
 
 /** Schemes agents can't open: browser-internal pages, other extensions, DevTools, and local files. */
 const restrictedNavigationSchemes = new Set([
-  "about:",
   "file:", "chrome:", "chrome-extension:", "chrome-untrusted:", "chrome-search:", "devtools:", "view-source:",
   "edge:", "brave:", "opera:", "vivaldi:", "filesystem:",
 ])
@@ -232,6 +231,7 @@ function guardNavigation(context: GuardContext): string | null {
   } catch {
     return null
   }
+  if (scheme === "about:" && /^about:(blank|srcdoc)(#.*)?$/i.test(url.trim())) return null
   if (!restrictedNavigationSchemes.has(scheme)) return null
   if (scheme === "file:" && allowsFileUrls()) return null
   const hint = scheme === "file:"

@@ -433,7 +433,7 @@ export async function runUpdateCommand(args: readonly string[]) {
   if (await runInstalledUpdate(args)) return
   // An executable that `install` hasn't set up (one downloaded and run in place) has nothing to update.
   if (compiledBinary()) {
-    log(`This browsevil isn't installed. Run \`${cliCommand("install")}\` to set it up; it updates itself from then on.`)
+    log(`This browsevil isn't installed. Run \`${cliCommand("install")}\` to set it up; update it manually from the evil GitHub release.`)
     process.exitCode = 1
     return
   }

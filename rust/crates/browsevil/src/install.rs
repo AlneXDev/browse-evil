@@ -259,7 +259,7 @@ fn place(flags: &Flags) -> anyhow::Result<PathBuf> {
                 Some(shim) => shim,
                 None => global.binary().unwrap_or(exe),
             };
-            println!("✓ browsevil {VERSION} is installed with {manager} ({}). {manager} keeps it up to date; nothing else is installed.", tilde(&entry));
+            println!("✓ browsevil {VERSION} is installed with {manager} ({}). {manager} is not used by this fork; update from the evil GitHub release; nothing else is installed.", tilde(&entry));
             let copy = bin_root().join(method::EXECUTABLE);
             let separate = copy.is_file() && std::fs::canonicalize(&copy).ok() != std::fs::canonicalize(&entry).ok();
             if separate && is_browsevil(&copy) {

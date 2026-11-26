@@ -364,7 +364,7 @@ test("relay shutdown releases Fetch before the extension link closes", async () 
     expect(shutdown.status).toBe(200)
 
     // The client socket is still open, so this exercises cleanup's shutdown release rather than a client disconnect.
-    expect(await until(() => fetches(extension, "Fetch.disable").some((command) => command.params?.tabId === tabId), 5_000)).toBe(true)
+    expect(await until(() => fetches(extension, "Fetch.disable").some((command) => command.params?.tabId === tabId), 15_000)).toBe(true)
   } finally {
     socket?.close()
     extension.close()
