@@ -3,7 +3,8 @@
 //   data    $XDG_DATA_HOME/browsevil        session catalogs, relay token, paired browsers
 //   state   $XDG_STATE_HOME/browsevil       logs, journals, current session, pairing codes, update state
 //   cache   $XDG_CACHE_HOME/browsevil       update checks and the dev extension (re-creatable)
-//   bin     $XDG_BIN_HOME              the installer's executable (XDG_BIN_HOME, else ~/.local/bin)// Unset variables fall back to ~/.config, ~/.local/share, ~/.local/state, ~/.cache and ~/.local/bin;
+//   bin     $XDG_BIN_HOME              the installer's executable (XDG_BIN_HOME, else ~/.local/bin)
+// Unset variables fall back to ~/.config, ~/.local/share, ~/.local/state, ~/.cache and ~/.local/bin;
 // Windows uses the same paths under %USERPROFILE%. OPENCODE_BROWSEVIL_HOME overrides all of them for isolated
 // test relays (the executable then lives in <root>/bin).
 import fs from "node:fs"

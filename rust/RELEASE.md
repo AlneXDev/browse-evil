@@ -32,7 +32,7 @@ bun ../scripts/npm-package.ts platforms --binaries dist --out dist/npm   # the p
 The TS build's `-baseline` (no AVX2) variants aren't needed: Rust's default x86-64 target doesn't require AVX2. The
 release publishes the same binary under the baseline names, which the install script still asks for.
 
-Each target ships as `opencodevil-browsevil-<target>-<version>.tgz` holding `package/bin/browsevil[.exe]`, `package.json` and
+Each target ships as `opencode-browsevil-<target>-<version>.tgz` holding `package/bin/browsevil[.exe]`, `package.json` and
 `LICENSE`: the npm package `@opencode/browsevil-<target>` and the release service file are the same tarball. Its size and
 SHA-256 go into the channel manifest's `release.targets` at `https://anoma.ly/release/browse/cli/<channel>.json`.
 Every relay polls it at launch and hourly, in every mode (`off` checks and installs nothing). Versions are only tested

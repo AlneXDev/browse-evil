@@ -1,9 +1,9 @@
 // Builds and checks the release artifacts exactly as the release workflow does, without publishing anything:
-//   bun run release:check [--tag v0.1.0] [--require-changelog] [--versions-only]
+//   bun run release:check [--tag evil-v0.1.0] [--require-changelog] [--versions-only]
 // 1. the version is one release version everywhere: cli/package.json, package.json, public/manifest.json, the Rust
 //    workspace (rust/Cargo.toml and every workspace crate in rust/Cargo.lock), and the tag
 // 2. the extension zip (scripts/package.ts): release/opencode-evil-browse-extension-<version>.zip, the store build (stable) or the
-//    release service's unpacked build (dev); then release/opencodevil-browsevil-<version>.tgz, the npm launcher package
+//    release service's unpacked build (dev); then release/opencode-browsevil-<version>.tgz, the npm launcher package
 //    (scripts/npm-package.ts)
 // 3. scripts/check-artifacts.ts on both, then release/SHA256SUMS. The npm install check needs a platform package, so
 //    the release workflow runs it once the binaries are built (--platform-tarball here runs it too).
@@ -40,7 +40,7 @@ export async function versionProblems(options: { tag?: string; requireChangelog?
   if (cargo !== cli) problems.push(`rust/Cargo.toml workspace version ${String(cargo)} differs from cli/package.json ${cli}`)
   for (const member of cargoLockMemberVersions(await readFile(path.join(root, "rust", "Cargo.lock"), "utf8")))
     if (member.version !== cli) problems.push(`rust/Cargo.lock has ${member.name} ${member.version}, not ${cli} (crates take version.workspace = true; bun scripts/version.ts set ${cli})`)
-  if (options.tag !== undefined && options.tag !== `evil-v${cli}`) problems.push(`tag ${options.tag} doesn't match cli/package.json version ${cli} (expected v${cli})`)
+  if (options.tag !== undefined && options.tag !== `evil-v${cli}`) problems.push(`tag ${options.tag} doesn't match cli/package.json version ${cli} (expected evil-v${cli})`)
   if (options.requireChangelog && !existsSync(path.join(root, "changelog", `${cli}.md`))) problems.push(`changelog/${cli}.md is missing`)
   return { version: cli, problems }
 }

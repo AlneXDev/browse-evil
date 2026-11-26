@@ -181,7 +181,7 @@ pub fn describe_changes(before: &[(String, String)], after: &[(String, String)],
     for (key, value) in requested {
         if let Some((_, variable, effective)) = fixed.iter().find(|(k, _, _)| k == key) {
             overridden.push(json!({ "key": key, "requested": shown(key, value), "variable": variable, "effective": shown(key, effective) }));
-            lines.push(format!("Not changed: {key} is fixed to {effective} by {variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit {variable} where opencodevil starts, then restart the relay."));
+            lines.push(format!("Not changed: {key} is fixed to {effective} by {variable} in the relay's environment, so this setting has no effect. Tell the user; to change it they remove or edit {variable} where browsevil starts, then restart the relay."));
         } else if lookup(before, key) == lookup(after, key) {
             unchanged.push(key.clone());
         } else {

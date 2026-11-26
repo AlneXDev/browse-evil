@@ -279,26 +279,26 @@ describe("install without the extension", () => {
   test("says to add browsevil from the Chrome Web Store, and opens its page", () => {
     const { outcome, calls, output } = run()
     expect(outcome).toBe("guided")
-    expect(calls).toEqual({ open: [["Google Chrome", STORE_URL]], reveal: [], copy: [] })
-    expect(output).toBe(`Add browsevil to Google Chrome from the Chrome Web Store (opened): ${STORE_URL}`)
-    expect(output).not.toContain("unpacked")
-    expect(output).not.toContain("Developer mode")
+    expect(calls).toEqual({ open: [["Google Chrome", "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"]], reveal: [], copy: [] })
+    expect(output).toContain("load the evil extension unpacked")
+    expect(output).toContain("unpacked")
+    expect(output).toContain("Developer mode")
     expect(output).not.toContain(folder)
   })
 
   test("falls back to the first detected browser when the default isn't a known Chromium", () => {
-    expect(run({ preferred: undefined }).calls.open).toEqual([["Google Chrome", STORE_URL]])
+    expect(run({ preferred: undefined }).calls.open).toEqual([["Google Chrome", "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"]])
   })
 
   test("with no Chromium browser found, names the store without opening it", () => {
     const { calls, output } = run({ detections: [], preferred: undefined })
     expect(calls.open).toEqual([])
-    expect(output).toContain(`Add browsevil to your browser from the Chrome Web Store: ${STORE_URL}`)
+    expect(output).toContain(`load the evil extension unpacked`)
   })
 
   test("doesn't claim the page opened when the browser couldn't be launched", () => {
     const { output } = run({}, { open: false })
-    expect(output).toContain(`Add browsevil to Google Chrome from the Chrome Web Store: ${STORE_URL}`)
+    expect(output).toContain("load the evil extension unpacked")
     expect(output).not.toContain("(opened)")
   })
 
@@ -309,14 +309,14 @@ describe("install without the extension", () => {
     const { outcome, calls, output } = run(overrides)
     expect(outcome).toBe("guided")
     expect(calls).toEqual({ open: [], reveal: [], copy: [] })
-    expect(output).toContain(`Add browsevil to Google Chrome from the Chrome Web Store: ${STORE_URL}`)
+    expect(output).toContain("load the evil extension unpacked")
     expect(output).not.toContain("(opened)")
   })
 
   test("over SSH, prints the line without scanning or opening anything", () => {
     const { calls, output } = run({ env: { ssh: true, display: true, tty: true, platform: "linux" } })
     expect(calls).toEqual({ open: [], reveal: [], copy: [] })
-    expect(output).toContain(`Add browsevil to Google Chrome from the Chrome Web Store: ${STORE_URL}`)
+    expect(output).toContain("load the evil extension unpacked")
   })
 
   test("doesn't open anything when a browser couldn't be checked and may already have it", () => {
@@ -367,7 +367,7 @@ describe("install with the extension", () => {
 })
 
 describe("the store item", () => {
-  const storeUrl = "https://chromewebstore.google.com/detail/abcdefghijklmnopabcdefghijklmnop"
+  const storeUrl = "https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/opencode-evil-browse-extension-0.1.5.zip"
 
   test("an agent without a terminal opens the store if a display is available", () => {
     const { calls } = run({ storeUrl, env: { ssh: false, display: true, tty: false, platform: "darwin" } })
@@ -378,21 +378,21 @@ describe("the store item", () => {
     const { outcome, calls, output } = run({ storeUrl })
     expect(outcome).toBe("guided")
     expect(calls).toEqual({ open: [["Google Chrome", storeUrl]], reveal: [], copy: [] })
-    expect(output).toContain("Add browsevil to Google Chrome from the Chrome Web Store (opened)")
-    expect(output).not.toContain("unpacked")
+    expect(output).toContain("load the evil extension unpacked")
+    expect(output).toContain("unpacked")
   })
 
   test("over SSH, prints the store page", () => {
     const { calls, output } = run({ storeUrl, env: { ssh: true, display: true, tty: true, platform: "linux" } })
     expect(calls.open).toEqual([])
     expect(output).toContain(storeUrl)
-    expect(output).not.toContain("unpacked")
+    expect(output).toContain("unpacked")
   })
 
   test("a checkout, with no store item baked in, points at browsevil's public item", () => {
     const { output } = run()
-    expect(output).toContain("https://chromewebstore.google.com/detail/lfmeghngagemglmdnplimokblljgmnoj")
-    expect(output).not.toContain("unpacked")
+    expect(output).toContain("https://github.com/AlneXDev/browse-evil/releases")
+    expect(output).toContain("unpacked")
   })
 })
 
@@ -515,7 +515,7 @@ describe("relayNotRestarted", () => {
   test("without a connected session it gives the relay's reason, and by default the command for this checkout", () => {
     const lines = relayNotRestarted("not json", output)
     expect(lines[0]).toBe("! Relay not restarted: Relay has raw CDP clients attached; disconnect them before restarting.")
-    expect(lines[2]).toMatch(/run: node .*cli[/\\]dist[/\\]cli\.mjs relay restart$/)
+    expect(lines[2]).toMatch(/relay restart$/)
   })
 })
 

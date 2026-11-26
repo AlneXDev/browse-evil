@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# publish-github-release.sh <build dir> <attestation dir>: creates the v<version> GitHub release with the extension zip,
+# publish-github-release.sh <build dir> <attestation dir>: creates the evil-v<version> GitHub release with the extension zip,
 # the npm tarball, their SHA256SUMS and the provenance bundle, and BROWSE_RELEASE_NOTES (a summary line, then the
 # changelog sections). The tag must exist (tag-release.sh). Immutable releases lock assets once published, so they go
 # to a draft first.

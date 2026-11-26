@@ -1,7 +1,7 @@
 import { compareVersions } from "./auto-update.ts"
 // evil-v2: updates come from the evil build's own GitHub release, never from Anomaly's feed.
 import { createHash } from "node:crypto"
-import { existsSync, renameSync, rmSync, writeFileSync } from "node:fs"
+import { chmodSync, existsSync, renameSync, rmSync, writeFileSync } from "node:fs"
 import path from "node:path"
 import { installedBinaryPath } from "../paths.ts"
 
@@ -59,6 +59,7 @@ export async function installGithubUpdate(update: GithubUpdate, fetchFn: typeof 
   writeFileSync(staged, bytes)
   if (existsSync(destination)) renameSync(destination, previous)
   renameSync(staged, destination)
+  if (process.platform !== "win32") chmodSync(destination, 0o755)
   try { if (existsSync(previous)) rmSync(previous, { force: true }) } catch { /* the running relay may still hold it */ }
   return update.latest
 }

@@ -40,8 +40,8 @@ describe("entry commands", () => {
   test("resolves npm's global shim to the installed cli, not the running npx copy", () => {
     // npm puts browsevil.cmd and node_modules side by side in its global prefix; PATH may quote entries and leave gaps.
     const prefix = "C:\\Users\\me\\AppData\\Roaming\\npm"
-    const installed = `${prefix}\\node_modules\\@opencodevil\\browsevil\\dist\\cli.mjs`
-    const running = "C:\\Users\\me\\AppData\\Local\\npm-cache\\_npx\\abc123\\node_modules\\@opencodevil\\browsevil\\dist\\cli.mjs"
+    const installed = `${prefix}\\node_modules\\@opencode\\browsevil\\dist\\cli.mjs`
+    const running = "C:\\Users\\me\\AppData\\Local\\npm-cache\\_npx\\abc123\\node_modules\\@opencode\\browsevil\\dist\\cli.mjs"
     expect(
       win("browsevil", {
         running,
@@ -59,12 +59,12 @@ describe("entry commands", () => {
   test("resolves a .cmd entry through its own folder", () => {
     const prefix = "C:\\Users\\me\\AppData\\Roaming\\npm"
     const shim = `${prefix}\\browsevil.cmd`
-    const script = `${prefix}\\node_modules\\@opencodevil\\browsevil\\dist\\cli.mjs`
+    const script = `${prefix}\\node_modules\\@opencode\\browsevil\\dist\\cli.mjs`
     expect(win(shim, { existsSync: files(shim, script) })).toEqual([node, script])
   })
 
   test("leaves a bare entry when nothing resolves and the running script is under _npx", () => {
-    const running = "C:\\Users\\me\\AppData\\Local\\npm-cache\\_npx\\abc123\\node_modules\\@opencodevil\\browsevil\\dist\\cli.mjs"
+    const running = "C:\\Users\\me\\AppData\\Local\\npm-cache\\_npx\\abc123\\node_modules\\@opencode\\browsevil\\dist\\cli.mjs"
     expect(win("browsevil", { running })).toEqual(["browsevil"])
   })
 
@@ -73,7 +73,7 @@ describe("entry commands", () => {
   })
 
   test("falls back to a running script outside npx and checkouts", () => {
-    const running = "C:\\Users\\me\\AppData\\Roaming\\npm\\node_modules\\@opencodevil\\browsevil\\dist\\cli.mjs"
+    const running = "C:\\Users\\me\\AppData\\Roaming\\npm\\node_modules\\@opencode\\browsevil\\dist\\cli.mjs"
     expect(win("browsevil", { running })).toEqual([node, running])
   })
 

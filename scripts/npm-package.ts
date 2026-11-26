@@ -1,6 +1,6 @@
 // Packs the npm packages of the Rust browsevil (rust/):
 //   bun scripts/npm-package.ts main --out <dir>
-//       @opencode/browsevil: opencodevil-browsevil-<version>.tgz, the launcher (rust/npm/browsevil.mjs as dist/cli.mjs, the bin the
+//       @opencode/browsevil: opencode-browsevil-<version>.tgz, the launcher (rust/npm/browsevil.mjs as dist/cli.mjs, the bin the
 //       TypeScript package had) with an optional dependency on each platform package, which npm installs by os, cpu and
 //       libc
 //   bun scripts/npm-package.ts platforms --binaries <dir> --out <dir>

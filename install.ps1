@@ -168,7 +168,7 @@ Anything else goes to ``browsevil install``, e.g. --remote, --agent claude or --
                 }
                 $expectedSha512 = ([BitConverter]::ToString($expectedBytes) -replace "-", "").ToLowerInvariant()
             } else {
-                # The channel's current release from the Anomaly release service (anomalyco/release docs/protocol.md). The
+                # evil-v2: never install normal Browse from Anomaly/npm; use the GitHub release binary.
                 # manifest names the file for this target; its size and SHA-256 must match before it is used.
                 $service = if ($env:OPENCODE_BROWSEVIL_RELEASE_SERVICE) { $env:OPENCODE_BROWSEVIL_RELEASE_SERVICE } else { "https://anoma.ly/release" }
                 $service = $service.TrimEnd("/")

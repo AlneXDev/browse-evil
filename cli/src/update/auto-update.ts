@@ -233,7 +233,7 @@ export function autoUpdateStatus(options: { readonly env?: NodeJS.ProcessEnv; re
   return {
     install,
     cli: cliPrefix(),
-    mode: storedMode(),
+    mode: "off" as const,
     // evil-v2: never auto-update from Anomaly's feed - it would replace the evil build with normal Browse.
     effective: "off" as const,
     ...(override ? { overriddenBy: env.OPENCODE_BROWSEVIL_AUTO_UPDATE !== undefined ? "OPENCODE_BROWSEVIL_AUTO_UPDATE" : "OPENCODE_BROWSEVIL_UPDATE_CHECK" } : {}),
@@ -344,18 +344,7 @@ export async function runInstaller(options: InstallerOptions): Promise<string> {
   const platform = options.platform ?? process.platform
   if (options.runtime.kind === "npx") return options.runtime.version
   if (options.runtime.kind === "npm") {
-    const spec = `${PACKAGE_NAME}@${options.version ?? options.channel ?? "latest"}`
-    const npm = await run("npm", ["install", "-g", spec], { timeoutMs: 10 * 60_000, env })
-    if (npm.status !== 0) throw new Error(`npm install -g ${spec} failed: ${(npm.stderr || npm.stdout).trim().split("\n").slice(-3).join(" ")}`)
-    const target = await updateTarget(options.runtime, run, env)
-    if (!target) throw new Error(`npm install -g ${spec} ran, but \`npm root -g\` didn't say where it installed`)
-    const found = existsSync(target.entry) ? installedVersion(target) : undefined
-    // A runtime outside npm's folder can only see the update there, so it is there or the install failed.
-    if (!found && target !== options.runtime) throw new Error(`npm install -g ${spec} ran, but ${target.entry} isn't there`)
-    const version = found ?? options.version ?? options.channel ?? "latest"
-    if (options.version && compareVersions(version, options.version) < 0)
-      throw new Error(`npm install -g ${spec} left ${version}, not the requested ${options.version}`)
-    return version
+    throw new Error("evil builds never update from npm; download the GitHub release")
   }
   // OPENCODE_BROWSEVIL_INSTALL_SCRIPT is the explicit override tests and developers use (a local file or a URL); every
   // other binary install runs the installer this release shipped with, never one fetched at update time.

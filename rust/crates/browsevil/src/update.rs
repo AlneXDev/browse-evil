@@ -240,6 +240,7 @@ fn get(kind: Kind, url: &str, timeout: Duration, limit: u64) -> anyhow::Result<V
 /// manifest's file for this platform; a package install or runner takes the release's version (the package manager is
 /// asked for it), so it checks as `unknown`.
 pub fn check(install: &Install) -> anyhow::Result<Check> {
+    bail!("evil builds update only from the GitHub release (`browsevil update`)")
     let kind = Kind::of(install);
     let channel = channel();
     let body = get(kind, &format!("{}/browsevil/cli/{channel}.json", service()), Duration::from_secs(30), 1024 * 1024)?;
@@ -295,6 +296,7 @@ fn tar() -> PathBuf {
 /// Downloads `release` (the install script's tarball, `package/bin/browsevil[.exe]`) beside `binary`, checks its size and
 /// SHA-256, and swaps the executable in. A running relay keeps its old executable until it restarts.
 pub fn install_binary(release: &Release, binary: &Path) -> anyhow::Result<()> {
+    bail!("evil builds update only from the GitHub release (`browsevil update`)")
     let file = release.file.as_ref().context("the release manifest has no download for this platform")?;
     let dir = binary.parent().context("no parent folder")?;
     let work = dir.join(format!(".browsevil.{}.update", std::process::id()));
@@ -402,6 +404,7 @@ fn not_published(text: &str) -> bool {
 
 /// Installs @opencode/browsevil@<version> into this global install with its package manager.
 pub fn package_install(global: &Global, version: &str) -> anyhow::Result<Installed> {
+    bail!("evil builds update only from the GitHub release (`browsevil update`)")
     let words = global.manager.words(version);
     let command = global.command(version, registry_override().as_deref());
     let stashed = stash_running(global);
@@ -640,7 +643,7 @@ pub fn status_json() -> Value {
         "updateCommand": install.update_command(VERSION, &exe),
         "cli": cli,
         "mode": stored.name(),
-        "effective": if install.updates_itself() { effective_mode().name() } else { "off" },
+        "effective": "off",
         "version": VERSION,
         "channel": channel(),
     });
@@ -748,7 +751,10 @@ enum Found {
 impl Updater {
     /// `idle` says whether nothing is using the browser. Every relay but a checkout build's checks in.
     pub fn spawn(idle: Arc<dyn Fn() -> bool + Send + Sync>) -> Option<Updater> {
-        let (updater, worker) = Updater::new(install(), idle)?;
+        // evil-v2: never poll the Anomaly release service. Updates come only from
+        // the evil GitHub release via `browsevil update`.
+        let _ = idle;
+        None
         std::thread::spawn(move || worker.run());
         Some(updater)
     }

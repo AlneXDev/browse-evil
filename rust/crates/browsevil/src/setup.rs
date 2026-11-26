@@ -454,7 +454,6 @@ pub fn pair(args: &[String]) -> anyhow::Result<i32> {
 
 pub fn extension() -> i32 {
     println!("Load the evil unpacked extension from https://github.com/AlneXDev/browse-evil/releases; then run `browsevil install` (or `browsevil pair`) to connect it.");
-    println!("Then run `browsevil install` (or `browsevil pair`) to connect it.");
     if update::channel() == "dev" {
         println!();
         println!("The evil extension comes from the GitHub release zip:");

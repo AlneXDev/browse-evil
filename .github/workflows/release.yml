@@ -206,7 +206,7 @@ jobs:
         env:
           OPENCODE_BROWSEVIL_STORE_ID: ${{ vars.CWS_ITEM_ID }}
         run: |
-          if [ "$MODE" = stable ]; then bun scripts/release-check.ts --tag "v$VERSION" --require-changelog
+          if [ "$MODE" = stable ]; then bun scripts/release-check.ts --tag "evil-v$VERSION" --require-changelog
           else bun scripts/release-check.ts; fi
 
       - id: upload
@@ -821,11 +821,11 @@ jobs:
           CWS_PUBLISHER_ID: ${{ vars.CWS_PUBLISHER_ID }}
           CWS_ITEM_ID: ${{ vars.CWS_ITEM_ID }}
 
-  # Once npm and the store both have the version: the GitHub release on the tag the tag job pushed.
+  # Once npm has the version: the GitHub release on the tag the tag job pushed. The store is opt-in.
   publish-github-release:
     name: GitHub release
-    needs: [plan, build, attest, publish-npm, publish-cws]
-    if: ${{ !cancelled() && needs.plan.outputs.channel == 'latest' && needs.publish-npm.result == 'success' && needs.publish-cws.result == 'success' }}
+    needs: [plan, build, attest, publish-npm]
+    if: ${{ !cancelled() && needs.plan.outputs.channel == 'latest' && needs.publish-npm.result == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: ${{ needs.plan.outputs.dry_run != 'true' && 'release' || '' }}

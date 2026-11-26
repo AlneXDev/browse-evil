@@ -75,7 +75,7 @@ same_extension() {
 download_extension() {
   local version=$1 dir=$2 name
   for name in "opencode-evil-browse-extension-$version.zip" "opencode-browser-$version.zip"; do
-    if gh release download "v$version" --repo "$GITHUB_REPOSITORY" --pattern "$name" --dir "$dir" --clobber 2> "$work/download.err"; then
+    if gh release download "evil-v$version" --repo "$GITHUB_REPOSITORY" --pattern "$name" --dir "$dir" --clobber 2> "$work/download.err"; then
       printf '%s' "$name"
       return 0
     fi
@@ -89,7 +89,7 @@ compare_with() {
   note=""
   mkdir -p "$dir/zip" "$dir/unpacked" "$work/current"
   if ! file=$(download_extension "$version" "$dir/zip"); then
-    note="Couldn't download opencode-evil-browse-extension-$version.zip or opencode-browser-$version.zip from v$version ($(head -n 1 "$work/download.err")), so there's nothing to compare with."
+    note="Couldn't download opencode-evil-browse-extension-$version.zip or opencode-browser-$version.zip from evil-v$version ($(head -n 1 "$work/download.err")), so there's nothing to compare with."
     return 1
   fi
   if [ ! -f "$work/current/manifest.json" ]; then unzip -q "$zip" -d "$work/current"; fi

@@ -91,6 +91,12 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
     log(`Install it once with \`${installCommand()}\` to get automatic updates.`)
     return true
   }
+  // evil-v2: only binary installs are supported, and they update from the evil GitHub release.
+  if (runtime.kind !== "binary") {
+    log("? Evil builds update only from the GitHub release; npm registry updates are disabled.")
+    process.exitCode = 1
+    return true
+  }
   const channel = channelOf(runtime.version)
   if (runtime.kind === "binary") {
     const update = await checkGithubUpdate(runtime.version).catch((error: Error) => error)
@@ -124,6 +130,7 @@ export async function runInstalledUpdate(args: readonly string[], runtime = inst
     log(`V Updated ${runtime.version} \u2192 ${installed}.`)
     return true
   }
+  // evil-v2: npm/bunx installs are never updated here; only the GitHub release is authoritative.
   const published = await fetchPublished({ registry: await registryUrl(), channel }).catch((error: Error) => error)
   if (published instanceof Error) {
     log(`✗ Couldn't check for updates: ${published.message}`)

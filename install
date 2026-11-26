@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installs browsevil: downloads the browsevil binary for this computer from Anomaly's release service into ~/.local/bin
+# evil-v2: installs only the evil GitHub-release binary; never fetches Anomaly/normal Browse.
 # ($XDG_BIN_HOME when set), then hands over to `browsevil install`, which does the rest (PATH, your agents, pairing with your
 # browser). Served from the evil release https://github.com/AlneXDev/browse-evil/releases/tag/evil-v0.1.5.
 set -eu
@@ -17,7 +17,7 @@ Usage: install [options] [browsevil install options]
 
 Options:
     -h, --help              Display this help message
-    -v, --version <version> Install a specific version from npm (e.g., 0.0.7)
+    -v, --version <version> Evil releases pin the version in the tag evil-v<version>
         --channel <channel> Install the latest version on a release channel:
                             stable (default), beta or dev. \`latest\` means stable
     -b, --binary <path>     Install from a local binary instead of downloading
@@ -366,6 +366,7 @@ service_target() {
 }
 
 download_npm() (
+    fail "evil builds never install from npm; use the GitHub release or --binary"
     print_message info "\n${MUTED}Installing ${NC}browsevil ${MUTED}version: ${NC}$specific_version"
 
     for delay in 0 15 30 60 75; do
@@ -420,6 +421,7 @@ download_npm() (
 # The channel's current release from the Anomaly release service (https://anoma.ly/release, anomalyco/release
 # docs/protocol.md). The manifest names the file for this target; its size and SHA-256 must match before it is used.
 download_release() (
+    fail "evil builds install only from https://github.com/AlneXDev/browse-evil/releases/download/evil-v0.1.5/browsevil.exe (or use --binary)"
     service="${OPENCODE_BROWSEVIL_RELEASE_SERVICE:-https://anoma.ly/release}"
     service="${service%/}"
     case "$service" in

@@ -81,6 +81,7 @@ const readOnlyAllowedMethods = new Set([
   "Runtime.releaseObject",
   "Runtime.releaseObjectGroup",
   "Runtime.runIfWaitingForDebugger",
+  "Runtime.terminateExecution",
   "Accessibility.getAXNodeAndAncestors",
   "Accessibility.getFullAXTree",
   "Accessibility.getPartialAXTree",

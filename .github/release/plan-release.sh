@@ -43,10 +43,10 @@ current=$(gh api -H "Accept: application/vnd.github.raw" "repos/$GITHUB_REPOSITO
 stable_version "$current" || die "cli/package.json at $GITHUB_SHA has version $current, not a stable x.y.z"
 # The tag job runs before any publish, so a version whose tag exists is consumed even when a publish job failed and its
 # release commit never reached dev. Count from the newest of cli/package.json and the newest stable v* tag.
-tag_refs=$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/v" --jq '.[].ref') ||
+tag_refs=$(gh api --paginate "repos/$GITHUB_REPOSITORY/git/matching-refs/tags/evil-v" --jq '.[].ref') ||
   die "Couldn't read the repository's v* tags"
 stable_tags=$(while IFS= read -r ref; do
-  candidate=${ref#refs/tags/v}
+  candidate=${ref#refs/tags/evil-v}
   if stable_version "$candidate"; then printf '%s\n' "$candidate"; fi
 done <<< "$tag_refs")
 newest_tag=$(printf '%s\n' "$stable_tags" | sort -V | tail -n 1)
@@ -55,7 +55,7 @@ base_tag=$newest_tag
 # A stable dispatch must be from a commit that contains the newest tag's release commit: a rerun keeps its original
 # $GITHUB_SHA, which a later release may have moved past, and would ship old code as the newest version.
 if [ "$mode" = stable ] && [ -n "$newest_tag" ]; then
-  tag_parent=$(gh api "repos/$GITHUB_REPOSITORY/commits/refs/tags/v$newest_tag" --jq '.parents[0].sha') ||
+  tag_parent=$(gh api "repos/$GITHUB_REPOSITORY/commits/refs/tags/evil-v$newest_tag" --jq '.parents[0].sha') ||
     die "Couldn't read the commit of tag v$newest_tag"
   status=$(gh api "repos/$GITHUB_REPOSITORY/compare/$tag_parent...$GITHUB_SHA" --jq .status) ||
     die "Couldn't compare $GITHUB_SHA with the commit of tag v$newest_tag"

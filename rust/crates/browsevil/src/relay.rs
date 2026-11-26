@@ -292,7 +292,7 @@ pub fn instructions(client: &str) -> String {
 /// `waiting` tells the relay an install is waiting for the extension to come.
 pub fn extension_status(waiting: bool) -> Option<Value> {
     let Probe::Running(_) = probe() else { return None };
-    let extra: &[(&str, &str)] = if waiting { &[("X-Browse-Install", "waiting")] } else { &[] };
+    let extra: &[(&str, &str)] = if waiting { &[("x-browsevil-install", "waiting")] } else { &[] };
     authorized("GET", "/extension/status", extra, None, Some(Duration::from_secs(10))).ok()
 }
 

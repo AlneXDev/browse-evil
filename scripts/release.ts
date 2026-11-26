@@ -28,7 +28,7 @@ if (values.draft) {
   const file = positionals[0] ?? "release-notes.md"
   if (existsSync(file)) fail(`${file} already exists`)
   await $`git fetch --quiet --tags origin dev`.cwd(root).quiet().nothrow()
-  const lastTag = (await $`git describe --tags --abbrev=0 --match v* origin/dev`.cwd(root).quiet().nothrow()).text().trim()
+  const lastTag = (await $`git describe --tags --abbrev=0 --match evil-v* origin/dev`.cwd(root).quiet().nothrow()).text().trim()
   const range = lastTag ? [`${lastTag}..origin/dev`] : ["-n", "50", "origin/dev"]
   const subjects = (await $`git log --no-merges --format=%s ${range}`.cwd(root).quiet().nothrow()).text().split("\n").filter(Boolean)
   await writeFile(file, draftNotes(subjects))
